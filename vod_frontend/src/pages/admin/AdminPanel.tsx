@@ -16,8 +16,8 @@ import AdminGameManager from "./AdminGameManager";
 
 const adminSections = [
     { name: "Video Management", component: <AdminVideoManager /> },
-    { name: "Benutzerverwaltung", component: <AdminUserManager /> },
-    { name: "Spiele hinzufügen", component: <AdminGameManager /> }
+    { name: "User Management", component: <AdminUserManager /> },
+    { name: "Game Management", component: <AdminGameManager /> }
 ];
 
 const AdminPanel: React.FC = () => {

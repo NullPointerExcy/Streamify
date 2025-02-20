@@ -33,14 +33,12 @@ const users = [
 ];
 
 const AdminGameManager: React.FC = () => {
-    // State for Games
     const [games, setGames] = React.useState([]);
     const [title, setTitle] = React.useState("");
     const [developer, setDeveloper] = React.useState("");
     const [releaseDate, setReleaseDate] = React.useState("");
     const [selectedGenre, setSelectedGenre] = React.useState("");
 
-    // State for Users
     const [userList, setUserList] = React.useState([...users]);
 
     const handleAddGame = () => {
@@ -70,12 +68,12 @@ const AdminGameManager: React.FC = () => {
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Spiele hinzufügen
+                Add Game
             </Typography>
             <Divider sx={{ marginBottom: 2 }}/>
             <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>
-                    Neues Spiel hinzufügen
+                    Add new Game
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
@@ -129,15 +127,14 @@ const AdminGameManager: React.FC = () => {
                             startIcon={<AddCircleIcon />}
                             onClick={handleAddGame}
                         >
-                            Spiel hinzufügen
+                            Add Game
                         </Button>
                     </Grid>
                 </Grid>
             </Paper>
 
-            {/* Anzeigen der hinzugefügten Spiele */}
             <Typography variant="h5" component="h2" gutterBottom>
-                Hinzugefügte Spiele
+                Games
             </Typography>
             <Grid container spacing={4}>
                 {games.map((game) => (
@@ -146,10 +143,10 @@ const AdminGameManager: React.FC = () => {
                             <CardContent>
                                 <Typography variant="h6">{game.title}</Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Entwickler: {game.developer}
+                                    Developer: {game.developer}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Release Datum: {game.releaseDate}
+                                    Release Date: {game.releaseDate}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
                                     Genre: {game.genre.name}

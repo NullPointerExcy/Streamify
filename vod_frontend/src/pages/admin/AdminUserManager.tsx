@@ -39,7 +39,7 @@ const AdminUserManager: React.FC = () => {
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Benutzerverwaltung
+                User Management
             </Typography>
             <Divider sx={{ marginBottom: 2 }}/>
             <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
@@ -61,7 +61,7 @@ const AdminUserManager: React.FC = () => {
                                             startIcon={<BlockIcon />}
                                             onClick={() => handleBanUser(user.id)}
                                         >
-                                            Bannen
+                                            Ban
                                         </Button>
                                     ) : (
                                         <Button
@@ -70,7 +70,7 @@ const AdminUserManager: React.FC = () => {
                                             startIcon={<AddCircleIcon />}
                                             onClick={() => handleUnbanUser(user.id)}
                                         >
-                                            Entbannen
+                                            Unban
                                         </Button>
                                     )}
                                 </CardActions>

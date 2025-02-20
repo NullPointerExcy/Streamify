@@ -82,7 +82,7 @@ const AdminVideoManager: React.FC = () => {
             <Divider sx={{ marginBottom: 2 }}/>
             <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>
-                    Neues Video hinzufügen
+                    Add a new Video
                 </Typography>
                 <Box container spacing={2}>
                     <Grid item xs={12} md={6}>
@@ -96,7 +96,7 @@ const AdminVideoManager: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <FormControl fullWidth>
-                            <InputLabel>Spiel</InputLabel>
+                            <InputLabel>Game</InputLabel>
                             <Select
                                 value={game}
                                 onChange={(e) => setGame(e.target.value)}
@@ -162,14 +162,14 @@ const AdminVideoManager: React.FC = () => {
                             startIcon={<CloudUploadIcon />}
                             onClick={handleAddVideo}
                         >
-                            Video hinzufügen
+                            Add Video
                         </Button>
                     </Grid>
                 </Box>
             </Paper>
 
             <Typography variant="h5" component="h2" gutterBottom>
-                Hochgeladene Videos
+                Uploaded Videos
             </Typography>
             <Grid container spacing={4}>
                 {videos.map((video, index) => (
@@ -186,10 +186,10 @@ const AdminVideoManager: React.FC = () => {
                                     {video.title}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Spiel: {video.game}
+                                    Game: {video.game}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Hochgeladen am: {video.uploadDate}
+                                    Uploaded at: {video.uploadDate}
                                 </Typography>
                             </CardContent>
                             <IconButton
