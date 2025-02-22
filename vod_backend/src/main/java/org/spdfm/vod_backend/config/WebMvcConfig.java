@@ -13,7 +13,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String[] locations = resourceLocations.split(",");
         registry.addResourceHandler("/videos/**")
-                .addResourceLocations(resourceLocations);
+                .addResourceLocations(locations);
     }
 }
