@@ -16,18 +16,43 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import ForumIcon from '@mui/icons-material/Forum';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import {ISiteSettings} from "../models/ISiteSettings";
+import {IFeature} from "../models/IFeature";
+import {getAllFeatures} from "../services/feature/FeatureServices";
 
-const TopBar: React.FC = () => {
+const TopBar: React.FC = (props: {
+    siteSettings: ISiteSettings
+}) => {
+
+    const {siteSettings} = props;
+
+    const [features, setFeatures] = React.useState<Array<IFeature>>([]);
+
+    const user = JSON.parse(localStorage.getItem('user') || "{}");
+
     const menuItems = [
-        {label: "Home", icon: <HomeIcon/>, link: "/"},
-        {label: "Playlists", icon: <SubscriptionsIcon/>, link: "/playlists"},
-        {label: "Videos", icon: <OndemandVideoIcon/>, link: "/videos"},
-        {label: "Forum", icon: <ForumIcon/>, link: "/forum"},
-        {label: "About", icon: <EditNoteIcon/>, link: "/about"}
-    ];
+        {id: "streamify-home-ft", label: "Home", icon: <HomeIcon/>, link: "/"},
+        {id: "streamify-playlists-ft", label: "Playlists", icon: <SubscriptionsIcon/>, link: "/playlists"},
+        {id: "streamify-videos-ft", label: "Videos", icon: <OndemandVideoIcon/>, link: "/videos"},
+        {id: "streamify-community-ft", label: "Community", icon: <ForumIcon/>, link: "/community"},
+        {id: "streamify-about-ft", label: "About", icon: <EditNoteIcon/>, link: "/about"},
+        user?.roles?.indexOf("ADMIN") > -1 && {
+            id: "streamify-admin-panel-ft",
+            label: "Admin-Panel",
+            icon: <AdminPanelSettingsIcon/>,
+            link: "/admin_panel"
+        }
+    ].filter(Boolean);
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isMenuOpen = Boolean(anchorEl);
+
+    React.useEffect(() => {
+        getAllFeatures().then((features) => {
+            setFeatures(features);
+        });
+    }, []);
 
     const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -42,60 +67,81 @@ const TopBar: React.FC = () => {
         if (action === "login") {
             window.location.href = "/login";
         } else if (action === "logout") {
-            alert("Erfolgreich ausgeloggt!");
+            alert("Successfully logged out!");
         }
     };
 
-    const handleAdminPanel = () => {
-        window.location.href = "/admin_panel";
-    }
-
     return (
-        <AppBar position="static" sx={{mb: 4}}>
-            <Toolbar
-                sx={{
-                    justifyContent: "space-between",
+        <AppBar position="static" sx={{mb: 0.1}}>
+            <Toolbar sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100vw",
+                backgroundColor: siteSettings?.siteTheme.backgroundColor,
+            }}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    flexGrow: 1
                 }}>
-                <Typography variant="h6" component="div">
-                    Streamify
-                </Typography>
-                <Box sx={{display: "flex", gap: 2}}>
-                    {menuItems.map((item) => (
-                        <Button
-                            key={item.label}
-                            color="inherit"
-                            startIcon={item.icon}
-                            onClick={() => window.location.href = item.link}
-                        >
-                            {item.label}
-                        </Button>
-                    ))}
+                    <Typography variant={siteSettings?.siteTheme.fontSize} component="div"
+                                sx={{
+                                    mb: 1,
+                                    color: siteSettings?.siteTheme.titleColor,
+                                    textShadow: siteSettings?.siteTheme.textShadow,
+                                    fontFamily: siteSettings?.siteTheme.fontFamily
+                                }}
+                    >
+                        {siteSettings?.siteTitle}
+                    </Typography>
+                    <Box sx={{
+                        display: "flex",
+                        gap: 2,
+                        justifyContent: "center"
+                    }}>
+                        {menuItems.map((item) => (
+                            (features.find(f => f.id === item.id && f.enabled) || features.find(f => f.id === item.id) === undefined) &&
+                            <Button
+                                key={item.label}
+                                color="inherit"
+                                startIcon={item.icon}
+                                onClick={() => window.location.href = item.link}
+                                fullWidth
+                            >
+                                {item.label}
+                            </Button>
+                        ))}
+                    </Box>
                 </Box>
-                <Avatar
-                    alt="User Avatar"
-                    sx={{cursor: "pointer"}}
-                    onClick={handleAvatarClick}
-                />
-                <Menu
-                    anchorEl={anchorEl}
-                    open={isMenuOpen}
-                    onClose={handleMenuClose}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                >
-                    <MenuItem onClick={() => handleLoginLogout("login")}>
-                        Einloggen
-                    </MenuItem>
-                    <MenuItem onClick={handleAdminPanel}>
-                        Admin-Panel
-                    </MenuItem>
-                </Menu>
+
+                <Box sx={{ml: "auto"}}>
+                    <Avatar
+                        alt="User Avatar"
+                        sx={{cursor: "pointer"}}
+                        onClick={handleAvatarClick}
+                    />
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={isMenuOpen}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <MenuItem onClick={() => handleLoginLogout("login")}>
+                            Login
+                        </MenuItem>
+                    </Menu>
+                </Box>
             </Toolbar>
         </AppBar>
     );

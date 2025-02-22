@@ -17,7 +17,6 @@ public class Playlist {
     private String description;
     private List<String> videoIds;
 
-    // Constructor for new playlists
     public Playlist(String title, String description, List<String> videoIds) {
         this.title = title;
         this.description = description;

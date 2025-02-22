@@ -25,4 +25,13 @@ public class GameService {
     public Game addGame(Game game) {
         return gameRepository.save(game);
     }
+
+    public Game updateGame(String id, Game game) {
+        game.setId(id);
+        return gameRepository.save(game);
+    }
+
+    public void deleteGame(String id) {
+        gameRepository.deleteById(id);
+    }
 }

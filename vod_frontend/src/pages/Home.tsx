@@ -15,6 +15,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import ForumIcon from '@mui/icons-material/Forum';
 
 const Home: React.FC = () => {
     const sections = [
@@ -35,6 +36,12 @@ const Home: React.FC = () => {
             description: "Find exciting videos.",
             icon: <OndemandVideoIcon sx={{ fontSize: 50 }} color="primary" />,
             link: "/videos"
+        },
+        {
+            title: "Community",
+            description: "Join our community and share your videos.",
+            icon: <ForumIcon sx={{ fontSize: 50 }} color="primary" />,
+            link: "/community"
         },
         {
             title: "About",

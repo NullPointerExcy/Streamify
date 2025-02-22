@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/videos")
+@RequestMapping("/api/v1/videos")
 public class VideoStreamingController {
 
     @Autowired

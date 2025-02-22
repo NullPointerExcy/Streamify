@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/genres")
+@RequestMapping("/api/v1/genres")
 public class GenreController {
 
     @Autowired
@@ -28,5 +28,15 @@ public class GenreController {
     @PostMapping
     public Genre addGenre(@RequestBody Genre genre) {
         return genreService.addGenre(genre);
+    }
+
+    @PutMapping("/{id}")
+    public Genre updateGenre(@PathVariable String id, @RequestBody Genre genre) {
+        return genreService.updateGenre(id, genre);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteGenre(@PathVariable String id) {
+        genreService.deleteGenre(id);
     }
 }

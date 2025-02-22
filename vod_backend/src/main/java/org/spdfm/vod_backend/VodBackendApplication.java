@@ -1,4 +1,4 @@
-package main.java.org.spdfm.vod_backend;
+package org.spdfm.vod_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

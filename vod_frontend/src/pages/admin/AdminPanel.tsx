@@ -7,75 +7,99 @@ import {
     ListItem,
     ListItemText,
     Typography,
-    Container
+    Container, Toolbar, Button, Avatar, Menu, MenuItem, AppBar, ListItemIcon
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import AdminVideoManager from "./AdminVideoManager";
 import AdminUserManager from "./AdminUserManager";
 import AdminGameManager from "./AdminGameManager";
+import AdminDesignSettings from "./AdminDesignSettings";
 
-const adminSections = [
-    { name: "Video Management", component: <AdminVideoManager /> },
-    { name: "User Management", component: <AdminUserManager /> },
-    { name: "Game Management", component: <AdminGameManager /> }
-];
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import PeopleIcon from '@mui/icons-material/People';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import BrushIcon from '@mui/icons-material/Brush';
+import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
+import {ISiteSettings} from "../../models/ISiteSettings";
+import AdminFeatureManager from "./AdminFeatureManager";
 
-const AdminPanel: React.FC = () => {
+const AdminPanel: React.FC = (props: {
+    siteSettings: ISiteSettings
+}) => {
+
+    const {siteSettings} = props;
+
     const [selectedSection, setSelectedSection] = React.useState(0);
+    const navigate = useNavigate();
+
+    const adminSections = [
+        {name: "Game Management", component: <AdminGameManager/>, icon: <SportsEsportsIcon/>},
+        {name: "Video Management", component: <AdminVideoManager/>, icon: <VideoLibraryIcon/>},
+        {name: "User Management", component: <AdminUserManager/>, icon: <PeopleIcon/>},
+        {
+            name: "Design Settings",
+            component: <AdminDesignSettings siteSettings={siteSettings}/>,
+            icon: <BrushIcon/>
+        },
+        {name: "Feature Management", component: <AdminFeatureManager/>, icon: <FeaturedPlayListIcon/>}
+    ];
 
     const handleSectionChange = (index) => {
         setSelectedSection(index);
     };
 
     return (
-        <Box sx={{ display: "flex" }}>
-            <Drawer
-                variant="permanent"
-                sx={{
-                    width: 240,
-                    flexShrink: 0,
-                    "& .MuiDrawer-paper": {
-                        width: 240,
-                        boxSizing: "border-box",
-                    }
-                }}
+        <>
+            <AppBar position="static" sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "row",
+                top: 0
+            }}
             >
-                <Typography variant="h5" sx={{ p: 2, textAlign: "center" }}>
-                    Admin Panel
-                </Typography>
-                <List>
-                    {adminSections.map((section, index) => (
-                        <ListItem
-                            button
-                            key={index}
-                            selected={selectedSection === index}
-                            onClick={() => handleSectionChange(index)}
-                            sx={{
-                                "&:hover": {
-                                    backgroundColor: "rgba(0, 0, 0, 0.1)",
-                                    cursor: "pointer"
-                                },
-                                backgroundColor:
-                                    selectedSection === index
-                                        ? "rgba(0, 0, 0, 0.2)"
-                                        : "inherit"
-                            }}
-                        >
-                            <ListItemText primary={section.name} />
-                        </ListItem>
-                    ))}
-                </List>
-            </Drawer>
-
+                <Toolbar
+                    sx={{
+                        justifyContent: "space-between",
+                    }}>
+                    <Box sx={{display: "flex", gap: 2}}>
+                        {adminSections.map((section, index) => (
+                            <ListItem
+                                button
+                                key={index}
+                                selected={selectedSection === index}
+                                onClick={() => handleSectionChange(index)}
+                                sx={{
+                                    "&:hover": {
+                                        backgroundColor: "rgba(0, 0, 0, 0.1)",
+                                        cursor: "pointer"
+                                    },
+                                    backgroundColor:
+                                        selectedSection === index
+                                            ? "rgba(0, 0, 0, 0.2)"
+                                            : "inherit",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1
+                                }}
+                            >
+                                <ListItemIcon sx={{minWidth: 30}}>
+                                    {section.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={section.name}/>
+                            </ListItem>
+                        ))}
+                    </Box>
+                </Toolbar>
+            </AppBar>
             <Box
                 component="main"
-                sx={{ flexGrow: 1, p: 3, ml: "240px" }}
+                sx={{flexGrow: 1, p: 3}}
             >
                 <Container maxWidth="lg">
                     {adminSections[selectedSection].component}
                 </Container>
             </Box>
-        </Box>
+        </>
     );
 };
 

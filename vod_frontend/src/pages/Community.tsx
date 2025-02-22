@@ -18,7 +18,7 @@ import AddCommentIcon from '@mui/icons-material/AddComment';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const Forum: React.FC = () => {
+const Community: React.FC = () => {
     const [topics, setTopics] = React.useState([]);
     const [newTopicTitle, setNewTopicTitle] = React.useState("");
     const [newTopicContent, setNewTopicContent] = React.useState("");
@@ -75,7 +75,7 @@ const Forum: React.FC = () => {
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Forum
+                Community
             </Typography>
             <Divider sx={{ marginBottom: 2 }}/>
             <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
@@ -182,4 +182,4 @@ const Forum: React.FC = () => {
     );
 };
 
-export default Forum;
+export default Community;

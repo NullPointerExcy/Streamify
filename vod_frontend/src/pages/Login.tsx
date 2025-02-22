@@ -14,6 +14,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GoogleIcon from '@mui/icons-material/Google';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import { purple, red } from "@mui/material/colors";
+import {LoginService} from "../services/users/LoginService";
 
 
 const Login: React.FC = () => {
@@ -27,7 +28,13 @@ const Login: React.FC = () => {
         const email = formData.get("email");
         const password = formData.get("password");
 
-        console.log("Login attempt:", { email, password });
+        LoginService(email, password).then((response) => {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            window.location.href = "/";
+        }).catch((error) => {
+            console.error("Login error:", error);
+        });
     };
 
     return (

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Document(collection = "videos")
@@ -24,6 +25,9 @@ public class Video {
 
     @DBRef
     private Game game;
+
+    @DBRef
+    private Set<User> watchedBy;
 
     public Video(String title, String description, String filePath, String thumbnail, Long duration, Game game) {
         this.title = title;

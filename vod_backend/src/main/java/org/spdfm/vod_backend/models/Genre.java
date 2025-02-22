@@ -13,9 +13,11 @@ public class Genre {
 
     private String name;
     private String description;
+    private String color;
 
-    public Genre(String name, String description) {
+    public Genre(String name, String description, String color) {
         this.name = name;
         this.description = description;
+        this.color = color;
     }
 }

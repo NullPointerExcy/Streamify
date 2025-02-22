@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/playlists")
+@RequestMapping("/api/v1/playlists")
 public class PlaylistController {
 
     @Autowired
