@@ -33,11 +33,17 @@ import BlockIcon from "@mui/icons-material/Block";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { IUser } from "../../models/IUser";
 import { getAllUsers } from "../../services/users/UserServices";
+import Pagination from "@mui/material/Pagination";
 
 const AdminUserManager: React.FC = () => {
+
     const [userList, setUserList] = React.useState<Array<IUser>>([]);
     const [searchTerm, setSearchTerm] = React.useState("");
     const [filterStatus, setFilterStatus] = React.useState("all"); // "all" | "banned" | "active"
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const itemsPerPage = 8;
 
     React.useEffect(() => {
         getAllUsers().then((users) => {
@@ -70,13 +76,11 @@ const AdminUserManager: React.FC = () => {
         return matchesSearch && matchesFilter;
     });
 
-    return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                User Management
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
+    const totalPages = Math.ceil(userList.length / itemsPerPage);
+    const currentGames = userList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    return (
+        <Container maxWidth="lg" sx={{ mt: 1 }}>
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={6}>
@@ -106,7 +110,16 @@ const AdminUserManager: React.FC = () => {
                 </Grid>
             </Paper>
 
-            <Paper elevation={3} sx={{ p: 4 }}>
+            {totalPages > 1 && (
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(event, value) => setCurrentPage(value)}
+                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                />
+            )}
+
+            <Paper elevation={3} sx={{ p: 1 }}>
                 <Grid container spacing={2}>
                     {filteredUsers.map((user) => (
                         <Grid item xs={12} md={6} key={user.id}>
@@ -219,6 +232,15 @@ const AdminUserManager: React.FC = () => {
                     ))}
                 </Grid>
             </Paper>
+
+            {totalPages > 1 && (
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(event, value) => setCurrentPage(value)}
+                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                />
+            )}
         </Container>
     );
 };

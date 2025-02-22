@@ -13,6 +13,8 @@ import {
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BlockIcon from '@mui/icons-material/Block';
 import ForumIcon from "@mui/icons-material/Forum";
+import GoogleIcon from '@mui/icons-material/Google';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {IFeature} from "../../models/IFeature";
 import {getAllFeatures, updateFeature} from "../../services/feature/FeatureServices";
 

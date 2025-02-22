@@ -8,5 +8,5 @@ export interface IVideo {
     thumbnail: string;
     duration: number;
     game: IGame;
-    updatedAt: string;
+    uploadedAt: string;
 }

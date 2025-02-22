@@ -11,9 +11,11 @@ import {
     CardActions,
     CardContent,
     Chip,
-    Divider,
+    Divider, IconButton,
     Typography
 } from "@mui/material";
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import EditGame from "./EditGame";
 
 
 const GameCard = (props: {
@@ -26,6 +28,7 @@ const GameCard = (props: {
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [flipped, setFlipped] = React.useState(false);
     const [showEditButton, setShowEditButton] = React.useState(false);
+    const [isEditing, setIsEditing] = React.useState(false);
 
     const navigate = useNavigate();
 
@@ -51,11 +54,11 @@ const GameCard = (props: {
 
     return (
         <>
+            <EditGame gameId={game.id} open={isEditing} onClose={() => setIsEditing(false)} />
             <Box
                 sx={{
-                    perspective: "1000px",
                     cursor: "pointer",
-                    height: 350,
+                    height: 400,
                     "&:hover": {
                         transition: "all 0.4s",
                         transform: "scale(1.05)",
@@ -86,6 +89,17 @@ const GameCard = (props: {
                     >
                         <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
                             <Box sx={{ height: "60%", overflow: "hidden" }}>
+                                <IconButton
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        setIsEditing(true);
+                                    }}
+                                    disabled={flipped}
+                                >
+                                    <DriveFileRenameOutlineIcon />
+                                </IconButton>
                                 {game.coverImage && (
                                     <img
                                         src={game.coverImage}

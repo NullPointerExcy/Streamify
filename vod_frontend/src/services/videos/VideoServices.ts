@@ -1,4 +1,5 @@
 import axios from '../../config/AxiosConfig';
+import {IVideo} from "../../models/IVideo";
 
 
 const token = localStorage.getItem('token');
@@ -29,47 +30,24 @@ export const getVideoById = async (id: string) => {
 }
 
 
-export const addVideo = async (gameId: string, video: any) => {
+export const uploadVideo = async (gameId: string, file: File) => {
     const formData = new FormData();
-    formData.append('file', video.file);
-
-    const filePath = await axios.post(`/videos/upload/${gameId}`, formData, {
+    formData.append("file", file); // key must be 'file'
+    return await axios.post(`/videos/upload/${gameId}`, formData, {
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then(
-        (response: any) => {
-            return response.data.filePath;
-        }
-    ).catch(error => {
-        console.error('Error during the upload: ', error);
-        throw error;
-    });
-
-    const videoData = {
-        title: video.title,
-        description: video.description,
-        filePath: filePath,
-        thumbnail: video.thumbnail,
-        duration: video.duration,
-        game: video.game
-    };
-
-    return await axios.post('/videos', videoData, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    }).then(
-        (response: any) => {
-            return response.data;
-        }
-    ).catch(error => {
-        console.error('Error during the save process: ', error);
-        throw error;
+            'Content-Type': 'multipart/form-data',
+        },
     });
 };
 
+export const addVideo = async (gameId: string, video: IVideo) => {
+    return await axios.post(`/videos`, video, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    }).then((response) => response.data);
+};
 
 
 export const updateVideo = async (video: any) => {

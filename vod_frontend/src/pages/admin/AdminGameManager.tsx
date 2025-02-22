@@ -188,11 +188,7 @@ const AdminGameManager: React.FC = () => {
     const closeDialog = () => setIsDialogOpen(false);
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Games
-            </Typography>
-
+        <Container maxWidth="lg" sx={{ mt: 1 }}>
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
@@ -226,7 +222,14 @@ const AdminGameManager: React.FC = () => {
                     </Grid>
                 </Grid>
             </Paper>
-
+            {totalPages > 1 && (
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(event, value) => setCurrentPage(value)}
+                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                />
+            )}
             <Grid container spacing={2}>
                 {currentGames.map((game) => (
                     <Grid item xs={9} md={4} lg={3} key={game.id}>

@@ -54,7 +54,7 @@ const AdminPanel: React.FC = (props: {
                 display: "flex",
                 justifyContent: "center",
                 flexDirection: "row",
-                top: 0
+                top: 0,
             }}
             >
                 <Toolbar
