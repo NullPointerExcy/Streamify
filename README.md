@@ -2,7 +2,7 @@
 
 > ⚠️ WIP: Not ready for production use yet, just started development on this project.
 
-Streamify-VODs is a self-hosted video-on-demand platform designed to give streamers, 
+Streamify is a self-hosted video-on-demand platform designed to give streamers, 
 content creators, and video enthusiasts full control over their 
 video hosting. Unlike traditional platforms, Streamify 
 allows you to host your own videos on your own server, 
