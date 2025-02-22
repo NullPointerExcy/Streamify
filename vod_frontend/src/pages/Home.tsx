@@ -45,7 +45,7 @@ const Home: React.FC = () => {
         },
         {
             title: "About",
-            description: "Learn more about zero VODs.",
+            description: "Learn more about Streamify.",
             icon: <EditNoteIcon sx={{ fontSize: 50 }} color="primary" />,
             link: "/about"
         }

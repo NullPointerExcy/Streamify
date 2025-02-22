@@ -12,7 +12,9 @@ export const getAllGames = async () => {
         }
     }).then(
         (response: any) => {
-            return response.data;
+            const games = response.data;
+            // Filter out fallback game (Unknown)
+            return games.filter((game: IGame) => game.title !== 'Unknown');
         }
     );
 }

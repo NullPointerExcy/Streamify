@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface GameRepository extends MongoRepository<Game, String> {
     List<Game> findByTitleContainingIgnoreCase(String title);
+    List<Game> findByTitle(String title);
 }

@@ -60,7 +60,7 @@ const GameCard = (props: {
                         transition: "all 0.4s",
                         transform: "scale(1.05)",
                         border: 5,
-                        borderColor: "warning.main",
+                        borderColor: "white",
                         boxShadow: 5,
                     },
                 }}

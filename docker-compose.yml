@@ -1,6 +1,5 @@
-version: '3.8'
 services:
-    backend:
+    streamify_backend:
         build:
             context: ./vod_backend
             dockerfile: Dockerfile
@@ -10,7 +9,7 @@ services:
             - SPRING_PROFILES_ACTIVE=prod
         depends_on:
             - mongodb
-    frontend:
+    streamify_frontend:
         build:
             context: ./vod_frontend
             dockerfile: Dockerfile
