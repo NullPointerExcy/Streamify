@@ -21,8 +21,10 @@ import {
     IconButton,
     Card,
     CardContent,
-    Divider, CardHeader,
+    Divider,
+    CardHeader,
 } from "@mui/material";
+import Pagination from "@mui/material/Pagination";
 import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import PaletteIcon from "@mui/icons-material/Palette";
@@ -35,11 +37,14 @@ import { IGame } from "../../models/IGame";
 import { IGenre } from "../../models/IGenre";
 import GameCard from "../../components/GameCard";
 
-
 const AdminGameManager: React.FC = () => {
     // Game and genre states
     const [games, setGames] = React.useState<Array<IGame>>([]);
     const [genres, setGenres] = React.useState<Array<IGenre>>([]);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const itemsPerPage = 8;
 
     // Dialog state for adding a game
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -87,7 +92,6 @@ const AdminGameManager: React.FC = () => {
     const handleAddNewGenre = () => {
         if (newGenre.trim() !== "") {
             const newGenreObject = {
-                id: (genres.length + 1).toString(),
                 name: newGenre,
                 description: "User-defined genre",
                 color: "#000000",
@@ -132,7 +136,6 @@ const AdminGameManager: React.FC = () => {
         }
     };
 
-    // Genre editing functions
     const openEditDialog = (genre: IGenre) => {
         setEditGenre(genre);
         setEditColor(genre.color);
@@ -169,7 +172,6 @@ const AdminGameManager: React.FC = () => {
         setGames(updatedGames);
     };
 
-    // Compute filtered games based on search criteria
     const filteredGames = games.filter((game) => {
         const matchesTitle = game.title.toLowerCase().includes(searchTitle.toLowerCase());
         const matchesDate = searchDate ? game.releaseDate.includes(searchDate) : true;
@@ -178,6 +180,9 @@ const AdminGameManager: React.FC = () => {
             : true;
         return matchesTitle && matchesDate && matchesGenre;
     });
+
+    const totalPages = Math.ceil(filteredGames.length / itemsPerPage);
+    const currentGames = filteredGames.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const openDialog = () => setIsDialogOpen(true);
     const closeDialog = () => setIsDialogOpen(false);
@@ -223,12 +228,21 @@ const AdminGameManager: React.FC = () => {
             </Paper>
 
             <Grid container spacing={2}>
-                {filteredGames.map((game) => (
+                {currentGames.map((game) => (
                     <Grid item xs={9} md={4} lg={3} key={game.id}>
                         <GameCard game={game} onDelete={handleDeleteGame} />
                     </Grid>
                 ))}
             </Grid>
+
+            {totalPages > 1 && (
+                <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(event, value) => setCurrentPage(value)}
+                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                />
+            )}
 
             <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth="md">
                 <DialogTitle>Add New Game</DialogTitle>
@@ -260,7 +274,7 @@ const AdminGameManager: React.FC = () => {
                                 </Box>
                             )}
                         </Grid>
-                        {/* Genre Select with Inline Edit Controls */}
+
                         <Grid item xs={12}>
                             <FormControl fullWidth>
                                 <InputLabel>Genres</InputLabel>
@@ -377,7 +391,6 @@ const AdminGameManager: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Genre Dialog */}
             <Dialog open={Boolean(editGenre)} onClose={closeEditDialog}>
                 <DialogTitle>Color for Genre: {editGenre?.name}</DialogTitle>
                 <DialogContent>
