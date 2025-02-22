@@ -192,8 +192,8 @@ const AdminVideoManager: React.FC = () => {
         setIsDialogOpen(false);
     };
 
-    const getStreamUrl = (filePath: string) => {
-        return encodeURI(filePath.replace(/\\/g, "/"));
+    const getStreamUrl = (filePath) => {
+        return encodeURI(`${process.env.REACT_APP_API_URL}${filePath.replace(/\\/g, "/")}`);
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);

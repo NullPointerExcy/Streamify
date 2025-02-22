@@ -3,6 +3,7 @@ package org.spdfm.vod_backend.controller;
 import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +19,14 @@ public class VideoController {
 
     @Autowired
     private VideoService videoService;
+
+    @Value("${video.storage.locations}")
+    private String[] storageLocations;
+
+    private String getStoragePath(String id) {
+        int index = Math.abs(id.hashCode()) % storageLocations.length;
+        return storageLocations[index];
+    }
 
     @GetMapping
     public List<Video> getAllVideos() {
@@ -38,7 +47,8 @@ public class VideoController {
     public String uploadVideo(@PathVariable String id, @RequestParam("file") MultipartFile file) {
         try {
             LocalDateTime now = LocalDateTime.now();
-            String uploadDir = "public/videos/" + id + "/" + now.getYear() + "/" + now.getMonthValue() + "/";
+            String baseDir = getStoragePath(id);
+            String uploadDir = baseDir + "/" + id + "/" + now.getYear() + "/" + now.getMonthValue() + "/";
             Path path = Paths.get(uploadDir + file.getOriginalFilename());
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());

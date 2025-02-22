@@ -15,6 +15,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String[] locations = resourceLocations.split(",");
         registry.addResourceHandler("/videos/**")
-                .addResourceLocations(locations);
+                .addResourceLocations(locations)
+                .setCachePeriod(3600);
     }
 }
