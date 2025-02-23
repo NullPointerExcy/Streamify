@@ -13,9 +13,9 @@ import {
     FormControl,
     InputLabel,
     TextField,
-    Divider,
     Dialog,
     IconButton,
+    Paper,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,8 +23,8 @@ import { getAllVideos } from "../services/videos/VideoServices";
 import { IVideo } from "../models/IVideo";
 
 const Videos: React.FC = () => {
-    const [videos, setVideos] = React.useState([]);
-    const [filteredVideos, setFilteredVideos] = React.useState([]);
+    const [videos, setVideos] = React.useState<IVideo[]>([]);
+    const [filteredVideos, setFilteredVideos] = React.useState<IVideo[]>([]);
     const [nameFilter, setNameFilter] = React.useState("");
     const [gameFilter, setGameFilter] = React.useState("");
     const [sortBy, setSortBy] = React.useState("title");
@@ -52,7 +52,7 @@ const Videos: React.FC = () => {
         }
     }, [selectedVideo]);
 
-    const handleSort = (videosToSort) => {
+    const handleSort = (videosToSort: IVideo[]) => {
         return [...videosToSort].sort((a, b) => {
             if (sortBy === "uploadDate") {
                 const dateA = new Date(a.uploadedAt);
@@ -64,67 +64,72 @@ const Videos: React.FC = () => {
                 return order === "asc"
                     ? a.game.title.localeCompare(b.game.title)
                     : b.game.title.localeCompare(a.game.title);
+            } else if (sortBy === "playlist") {
+                const playlistA = a.playlist ? a.playlist.title : "";
+                const playlistB = b.playlist ? b.playlist.title : "";
+                return order === "asc"
+                    ? playlistA.localeCompare(playlistB)
+                    : playlistB.localeCompare(playlistA);
             } else {
                 return order === "asc"
-                    ? a[sortBy].localeCompare(b[sortBy])
-                    : b[sortBy].localeCompare(a[sortBy]);
+                    ? a.title.localeCompare(b.title)
+                    : b.title.localeCompare(a.title);
             }
         });
     };
 
     React.useEffect(() => {
         handleFilter();
-    }, [nameFilter, gameFilter, sortBy, order, videos]);
+    }, [nameFilter, gameFilter, sortBy, order, videos, currentPage]);
 
-    const getStreamUrl = (filePath) => {
+    const getStreamUrl = (filePath: string) => {
         const normalizedPath = filePath.replace(/\\/g, "/");
-
         const parts = normalizedPath.split("/");
-
-        // TODO: Find a better way to handle this
-        const startIndex = parts.findIndex(part => part.toLowerCase() === "testvideofolder");
+        const startIndex = parts.findIndex(
+            (part) => part.toLowerCase() === "testvideofolder"
+        );
         const relativePath = parts.slice(startIndex + 1).join("/");
         const decodedPath = decodeURIComponent(relativePath);
-
         return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
-    const currentVideos = videos.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const currentVideos = videos.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
-    const allGames = Array.from(new Set(videos.map(video => video.game.title)));
+    const allGames = Array.from(new Set(videos.map((video) => video.game.title)));
 
     const handleFilter = () => {
-        let filtered = currentVideos ? currentVideos : videos;
+        let filtered = currentVideos;
         if (nameFilter) {
-            filtered = filtered.filter(video =>
+            filtered = filtered.filter((video) =>
                 video.title.toLowerCase().includes(nameFilter.toLowerCase())
             );
         }
         if (gameFilter) {
-            filtered = filtered.filter(video => video.game.title === gameFilter);
+            filtered = filtered.filter((video) => video.game.title === gameFilter);
         }
         setFilteredVideos(handleSort(filtered));
     };
 
     return (
-        <Container maxWidth={false} sx={{ mt: 4, width: "80%" }}>
+        <Container maxWidth={false} sx={{ width: "80%" }}>
             {selectedVideo && (
-                <Box sx={{ height: "100%", backgroundColor: "black" }}>
-                    {selectedVideo && (
-                        <video
-                            ref={videoRef}
-                            controls
-                            autoPlay
-                            style={{
-                                width: "70%",
-                                height: "70%",
-                                objectFit: "contain",
-                                backgroundColor: "black",
-                            }}
-                            src={getStreamUrl(selectedVideo.filePath)}
-                        />
-                    )}
+                <Box sx={{ height: "100%", backgroundColor: "black", position: "relative" }}>
+                    <video
+                        ref={videoRef}
+                        controls
+                        autoPlay
+                        style={{
+                            width: "70%",
+                            height: "70%",
+                            objectFit: "contain",
+                            backgroundColor: "black",
+                        }}
+                        src={getStreamUrl(selectedVideo.filePath)}
+                    />
                     <IconButton
                         onClick={() => setSelectedVideo(null)}
                         sx={{
@@ -143,56 +148,59 @@ const Videos: React.FC = () => {
             )}
 
             {!selectedVideo && (
-                <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
-                    <TextField
-                        label="Name"
-                        variant="outlined"
-                        value={nameFilter}
-                        onChange={(e) => setNameFilter(e.target.value)}
-                    />
-                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                        <InputLabel>Game</InputLabel>
-                        <Select
-                            value={gameFilter}
-                            onChange={(e) => setGameFilter(e.target.value)}
-                            label="Game"
-                        >
-                            <MenuItem value="">All</MenuItem>
-                            {allGames.map((game, index) => (
-                                <MenuItem key={index} value={game}>
-                                    {game}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                        <InputLabel>Sort by</InputLabel>
-                        <Select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            label="Sort by"
-                        >
-                            <MenuItem value="title">Name</MenuItem>
-                            <MenuItem value="uploadDate">Date</MenuItem>
-                            <MenuItem value="game">Game</MenuItem>
-                        </Select>
-                    </FormControl>
-                    {sortBy === "uploadDate" && (
-                        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                            <InputLabel>Order</InputLabel>
-                            <Select
-                                value={order}
-                                onChange={(e) => setOrder(e.target.value)}
-                                label="Order"
-                            >
-                                <MenuItem value="asc">Ascending</MenuItem>
-                                <MenuItem value="desc">Descending</MenuItem>
-                            </Select>
-                        </FormControl>
-                    )}
-                </Box>
+                <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={3}>
+                            <TextField
+                                label="Search by Name"
+                                variant="outlined"
+                                fullWidth
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                            <TextField
+                                label="Search by Game"
+                                variant="outlined"
+                                fullWidth
+                                value={gameFilter}
+                                onChange={(e) => setGameFilter(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                            <FormControl fullWidth>
+                                <InputLabel>Sort by</InputLabel>
+                                <Select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    label="Sort by"
+                                >
+                                    <MenuItem value="title">Name</MenuItem>
+                                    <MenuItem value="uploadDate">Date</MenuItem>
+                                    <MenuItem value="game">Game</MenuItem>
+                                    <MenuItem value="playlist">Playlist</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                            <FormControl fullWidth>
+                                <InputLabel>Order</InputLabel>
+                                <Select
+                                    value={order}
+                                    onChange={(e) => setOrder(e.target.value)}
+                                    label="Order"
+                                >
+                                    <MenuItem value="asc">Ascending</MenuItem>
+                                    <MenuItem value="desc">Descending</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                </Paper>
             )}
-            {(!selectedVideo && totalPages > 1) && (
+
+            {!selectedVideo && totalPages > 1 && (
                 <Pagination
                     count={totalPages}
                     page={currentPage}
@@ -200,49 +208,56 @@ const Videos: React.FC = () => {
                     sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
                 />
             )}
+
             <Grid container spacing={2}>
-                {!selectedVideo && filteredVideos.map((video, index) => (
-                    <Grid item xs={6} sm={5} md={3} key={index}>
-                        <Card
-                            sx={{
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                "&:hover": {
-                                    boxShadow: 5,
-                                    cursor: "pointer",
-                                    transform: "scale(1.05)",
-                                    transition: "all 0.3s ease",
-                                    backgroundColor: "rgba(144,202,249,0.13)"
-                                }
-                            }}
-                            onClick={() => setSelectedVideo(video)}
-                        >
-                            <CardMedia
-                                component="img"
-                                image={video.thumbnail}
-                                alt={video.title}
-                                sx={{ height: 200, objectFit: "cover" }}
-                            />
-                            <CardContent>
-                                <Typography variant="h6" component="h2" gutterBottom>
-                                    {video.title}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Duration: {Math.floor(video.duration)}s
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Uploaded at: {new Date(video.uploadedAt).toLocaleDateString()}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Game: {video.game.title}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
+                {!selectedVideo &&
+                    filteredVideos.map((video, index) => (
+                        <Grid item xs={6} sm={5} md={3} key={index}>
+                            <Card
+                                sx={{
+                                    height: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    "&:hover": {
+                                        boxShadow: 5,
+                                        cursor: "pointer",
+                                        transform: "scale(1.05)",
+                                        transition: "all 0.3s ease",
+                                        backgroundColor: "rgba(144,202,249,0.13)",
+                                    },
+                                }}
+                                onClick={() => setSelectedVideo(video)}
+                            >
+                                <CardMedia
+                                    component="img"
+                                    image={video.thumbnail}
+                                    alt={video.title}
+                                    sx={{ height: 200, objectFit: "cover" }}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6" component="h2" gutterBottom>
+                                        {video.title}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Game: {video.game.title}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Uploaded at: {new Date(video.uploadedAt).toLocaleDateString()}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Duration: {Math.floor(video.duration)}s
+                                    </Typography>
+                                    {video.playlist && (
+                                        <Typography variant="body2" color="textSecondary">
+                                            Playlist: {video.playlist.title}
+                                        </Typography>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
             </Grid>
-            {(!selectedVideo && totalPages > 1) && (
+            {!selectedVideo && totalPages > 1 && (
                 <Pagination
                     count={totalPages}
                     page={currentPage}

@@ -1,4 +1,3 @@
-// src/pages/admin/AdminPlaylistManager.tsx
 // @ts-nocheck
 import * as React from "react";
 import {
@@ -18,7 +17,7 @@ import {
     TextField,
     Typography,
     Divider,
-    Checkbox,
+    Checkbox, Table,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -188,7 +187,20 @@ const AdminPlaylistManager: React.FC = () => {
                                     {playlist.description}
                                 </Typography>
                                 <Divider sx={{ my: 2 }} />
-                                <Typography variant="subtitle1">Videos: {playlist.videos.length}</Typography>
+                                <Table>
+                                    <tbody>
+                                    <tr key={playlist.id}>
+                                        <td>
+                                            <Typography variant="h6">Number of Videos</Typography>
+                                            <Typography variant="h6">Total Playlist time</Typography>
+                                        </td>
+                                        <td>
+                                            <Typography variant="h6">{playlist.videos.length}</Typography>
+                                            <Typography variant="h6">{playlist.videos.reduce((acc, curr) => acc + curr.duration, 0)}</Typography>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </Table>
                             </CardContent>
                             <Box sx={{ mt: "auto", display: "flex", justifyContent: "space-between" }}>
                                 <IconButton
@@ -245,6 +257,9 @@ const AdminPlaylistManager: React.FC = () => {
                                         "&:hover": {
                                             boxShadow: 5,
                                             cursor: "pointer",
+                                            transform: "scale(1.05)",
+                                            transition: "all 0.3s ease",
+                                            backgroundColor: "rgba(144,202,249,0.13)"
                                         }
                                     }}
                                     onClick={() => handleVideoSelection(video.id)}

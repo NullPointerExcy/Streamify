@@ -6,15 +6,15 @@ export interface IUser {
     name: string;
     email: string;
     password: string;
-    roles: Set<string>;
+    roles: Array<string>;
     userImage: string;
     totalWatchTime: number;
     totalWatchedVideos: number;
     totalCreatedTopics: number;
     totalComments: number;
     isBanned: boolean;
-    topics: Set<string>;
-    comments: Set<string>;
-    watchedVideos: Set<IVideo>;
+    topics: Array<string>;
+    comments: Array<string>;
+    watchedVideos: Array<IVideo>;
     lastWatchedVideo: IVideo;
 }

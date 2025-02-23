@@ -20,31 +20,27 @@ import EditGame from "./EditGame";
 
 const GameCard = (props: {
     game: IGame,
-    onDelete: (id: string) => void
+    onDelete: (id: string) => void,
+    getGameStats: (g: IGame) => {}
 }) => {
 
-    const { game, onDelete } = props;
+    const { game, onDelete, getGameStats } = props;
 
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [flipped, setFlipped] = React.useState(false);
     const [showEditButton, setShowEditButton] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
+    const [totalVideos, setTotalVideos] = React.useState(0);
+    const [totalDuration, setTotalDuration] = React.useState(0);
+    const [totalUsers, setTotalUsers] = React.useState(0);
 
     const navigate = useNavigate();
 
-    const stats = {
-        videos: Math.floor(Math.random() * 10) + 1,
-        watchers: Math.floor(Math.random() * 1000) + 100,
-        totalDuration: Math.floor(Math.random() * 3600) + 300,
-    };
-
     React.useEffect(() => {
-        getAllVideos().then((response) => {
-            setVideos(response);
-            // TODO: Implement the following statistics:
-            // How many hours of videos are there in total for this game? How many watchers are there in total?
-            // ...
-        });
+        const stats = getGameStats(game);
+        setTotalVideos(stats.totalVideos);
+        setTotalDuration(stats.totalDuration);
+        setTotalUsers(stats.totalUsers);
     }, []);
 
     const handleCardClick = () => {
@@ -176,9 +172,9 @@ const GameCard = (props: {
                             <Divider sx={{ width: "100%", my: 2, boxShadow: "0px 0px 10px 0px #000000" }} />
                             <CardContent>
                                 <Typography variant="h6">Game Statistics</Typography>
-                                <Typography variant="body2">Videos: {stats.videos}</Typography>
-                                <Typography variant="body2">Watchers: {stats.watchers}</Typography>
-                                <Typography variant="body2">Total Duration: {stats.totalDuration} sec</Typography>
+                                <Typography variant="body2">Videos: {totalVideos || 0}</Typography>
+                                <Typography variant="body2">Watchers: {totalUsers || 0}</Typography>
+                                <Typography variant="body2">Total Duration: {totalDuration || 0} sec</Typography>
                             </CardContent>
                         </Card>
                     </Box>
