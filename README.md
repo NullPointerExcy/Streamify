@@ -37,5 +37,5 @@ and user management, all without the need for hiring developers.
 - Containerization: Docker & Docker Compose for easy deployment and scalability
 
 ## ⚠️ Limitations
-- The primary limitation is your hardware or server capacity—Streamify-VODs is designed to utilize the resources you provide.
+- The primary limitation is your hardware or server capacity, Streamify is designed to utilize the resources you provide.
 - Advanced UI theming is planned but currently limited to basic color and title customization.
