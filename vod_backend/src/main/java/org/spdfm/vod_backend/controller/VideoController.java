@@ -2,6 +2,8 @@ package org.spdfm.vod_backend.controller;
 
 import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.services.VideoService;
+import org.spdfm.vod_backend.config.RabbitMQConfig;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,9 @@ public class VideoController {
 
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private AmqpTemplate rabbitTemplate;
 
     @Value("${video.storage.locations}")
     private String[] storageLocations;
@@ -52,6 +57,11 @@ public class VideoController {
             Path path = Paths.get(uploadDir + file.getOriginalFilename());
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
+
+            String message = "{\"videoId\": \"" + id + "\", \"filePath\": \"" + path + "\"}";
+            // TODO: Send a message to the RabbitMQ server
+            // rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, message);
+
             return path.toString();
         } catch (Exception e) {
             throw new RuntimeException("Video upload failed!", e);

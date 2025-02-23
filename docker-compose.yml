@@ -1,4 +1,17 @@
+version: '3.8'
 services:
+    nginx:
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        ports:
+            - "80:80"
+        depends_on:
+            - streamify_backend
+            - streamify_frontend
+        networks:
+            - streamify_network
+
     streamify_backend:
         build:
             context: ./vod_backend
@@ -9,6 +22,9 @@ services:
             - SPRING_PROFILES_ACTIVE=prod
         depends_on:
             - mongodb
+        networks:
+            - streamify_network
+
     streamify_frontend:
         build:
             context: ./vod_frontend
@@ -16,13 +32,33 @@ services:
         ports:
             - "3000:3000"
         depends_on:
-            - backend
+            - streamify_backend
+        networks:
+            - streamify_network
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: admin
+        networks:
+            - streamify_network
+
+
     mongodb:
         image: mongo:latest
         ports:
             - "27017:27017"
         volumes:
             - mongo-data:/data/db
+        networks:
+            - streamify_network
 
 volumes:
     mongo-data:
+
+networks:
+    streamify_network:
