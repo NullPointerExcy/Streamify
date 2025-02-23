@@ -40,6 +40,12 @@ public class PlaylistController {
         playlistService.addVideoToPlaylist(playlistId, videoId);
     }
 
+    @PutMapping("/{playlistId}/videos")
+    public Playlist updatePlaylistVideos(@PathVariable String playlistId,
+                                         @RequestBody List<String> videoIds) {
+        return playlistService.updatePlaylistVideos(playlistId, videoIds);
+    }
+
     @DeleteMapping("/{playlistId}/videos/{videoId}")
     public void removeVideoFromPlaylist(@PathVariable String playlistId, @PathVariable String videoId) {
         playlistService.removeVideoFromPlaylist(playlistId, videoId);

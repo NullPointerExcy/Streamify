@@ -28,19 +28,7 @@ public class PlaylistService {
 
 
     public Optional<Playlist> getPlaylistById(String id) {
-        Optional<Playlist> optionalPlaylist = playlistRepository.findById(id);
-        if (optionalPlaylist.isPresent()) {
-            Playlist playlist = optionalPlaylist.get();
-            if (playlist.getVideos() != null) {
-                List<Video> resolvedVideos = playlist.getVideos().stream()
-                        .map(video -> videoRepository.findById(video.getId()).orElse(null))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList());
-                playlist.setVideos(resolvedVideos);
-            }
-            return Optional.of(playlist);
-        }
-        return Optional.empty();
+        return playlistRepository.findById(id);
     }
 
 
@@ -54,19 +42,14 @@ public class PlaylistService {
         existingPlaylist.setId(existingPlaylist.getId());
         existingPlaylist.setTitle(playlist.getTitle());
         existingPlaylist.setDescription(playlist.getDescription());
-        existingPlaylist.setVideos(playlist.getVideos());
         return playlistRepository.save(existingPlaylist);
     }
 
     public void addVideoToPlaylist(String playlistId, String videoId) {
-        Playlist playlist = getPlaylistById(playlistId)
+        Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new RuntimeException("Playlist not found"));
-        // videos are always null, even the DB entry has videos, and the frontend shows the videos
-        // TODO: FIX THIS
-
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new RuntimeException("Video not found"));
-
 
         if (playlist.getVideos() == null) {
             playlist.setVideos(new ArrayList<>());
@@ -75,6 +58,14 @@ public class PlaylistService {
             playlist.getVideos().add(video);
         }
         playlistRepository.save(playlist);
+    }
+
+    public Playlist updatePlaylistVideos(String playlistId, List<String> videoIds) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist not found"));
+        List<Video> videos = videoRepository.findAllById(videoIds);
+        playlist.setVideos(videos);
+        return playlistRepository.save(playlist);
     }
 
     public void removeVideoFromPlaylist(String playlistId, String videoId) {

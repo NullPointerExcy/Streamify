@@ -74,6 +74,15 @@ export const updatePlaylist = async (id: string, playlist: IPlaylist) => {
 }
 
 
+export const updatePlaylistVideos = async (playlistId: string, videos: Array<string>) => {
+    return await axios.put(`/playlists/${playlistId}/videos`, videos, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+}
+
+
 export const deletePlaylist = async (id: string) => {
     return await axios.delete(`/playlists/${id}`, {
         headers: {

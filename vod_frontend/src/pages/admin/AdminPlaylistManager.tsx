@@ -28,7 +28,7 @@ import {
     addPlaylist,
     updatePlaylist,
     deletePlaylist,
-    addVideoToPlaylist,
+    addVideoToPlaylist, updatePlaylistVideos,
 } from "../../services/playlist/PlaylistServices";
 import { getAllVideos } from "../../services/videos/VideoServices";
 import { IPlaylist } from "../../models/IPlaylist";
@@ -79,20 +79,34 @@ const AdminPlaylistManager: React.FC = () => {
 
     const handleAddOrUpdatePlaylist = () => {
         const newPlaylist: IPlaylist = {
+            id: selectedPlaylist?.id || "",
             title,
             description,
+            videos: [],
         };
 
         if (selectedPlaylist) {
             updatePlaylist(selectedPlaylist.id, newPlaylist).then(() => {
-                handleAddVideosToPlaylist(selectedPlaylist.id);
+                handleUpdatePlaylistVideos(selectedPlaylist.id);
             });
         } else {
             addPlaylist(newPlaylist).then((response) => {
                 const newPlaylistId = response.id;
-                handleAddVideosToPlaylist(newPlaylistId);
+                handleUpdatePlaylistVideos(newPlaylistId);
             });
         }
+    };
+
+    const handleUpdatePlaylistVideos = (playlistId: string) => {
+        updatePlaylistVideos(playlistId, selectedVideos)
+            .then(() => {
+                console.log("Playlist videos updated.");
+                fetchPlaylists();
+                handleCloseDialog();
+            })
+            .catch((error) => {
+                console.error("Error updating playlist videos:", error);
+            });
     };
 
     const handleAddVideosToPlaylist = (playlistId) => {
