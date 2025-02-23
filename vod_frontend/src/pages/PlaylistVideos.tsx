@@ -12,57 +12,19 @@ import {
     Button, Divider,
 } from "@mui/material";
 import {useParams} from "react-router-dom";
+import {IPlaylist} from "../models/IPlaylist";
+import {getAllPlaylists} from "../services/playlist/PlaylistServices";
 
-const videoData = {
-    1: [
-        {
-            title: "Zelda Video 1",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "10:23",
-            uploadDate: "2025-02-10"
-        },
-        {
-            title: "Zelda Video 2",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "8:45",
-            uploadDate: "2025-02-11"
-        }
-    ],
-    2: [
-        {
-            title: "Mario Video 1",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "15:02",
-            uploadDate: "2025-02-12"
-        }
-    ],
-    3: [
-        {
-            title: "Dark Souls Video 1",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "20:15",
-            uploadDate: "2025-02-13"
-        },
-        {
-            title: "Dark Souls Video 2",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "18:50",
-            uploadDate: "2025-02-14"
-        }
-    ],
-    4: [
-        {
-            title: "FF7 Video 1",
-            thumbnail: "https://placehold.co/600x400",
-            duration: "22:11",
-            uploadDate: "2025-02-15"
-        }
-    ]
-};
 
 const PlaylistVideos: React.FC = () => {
     const {id, game} = useParams();
-    const videos = videoData[id] || [];
+    const [playlists, setPlaylists] = React.useState<Array<IPlaylist>>([]);
+
+    React.useEffect(() => {
+        getAllPlaylists().then((response) => {
+            setPlaylists(response.data);
+        });
+    }, [id]);
 
     return (
         <Container maxWidth={false} sx={{mt: 4, width: "80%"}}>
@@ -71,7 +33,7 @@ const PlaylistVideos: React.FC = () => {
             </Typography>
             <Divider sx={{ marginBottom: 2 }}/>
             <Grid container spacing={2}>
-                {videos.map((video, index) => (
+                {playlists.map((playlist, index) => (
                     <Grid item xs={6} sm={5} md={3} key={index}>
                         <Card
                             sx={{
@@ -88,19 +50,19 @@ const PlaylistVideos: React.FC = () => {
                         >
                             <CardMedia
                                 component="img"
-                                image={video.thumbnail}
-                                alt={video.title}
+                                image={playlist.videos[0].thumbnail}
+                                alt={playlist.title}
                                 sx={{height: 200, objectFit: "cover"}}
                             />
                             <CardContent>
                                 <Typography variant="h6" component="h2" gutterBottom>
-                                    {video.title}
+                                    {playlist.title}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Duration: {video.duration}
+                                    Duration: {playlist.videos.reduce((acc, video) => acc + video.duration, 0)} minutes
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
-                                    Uploaded at: {video.uploadDate}
+                                    Uploaded at: {playlist.videos[0].uploadedAt}
                                 </Typography>
                             </CardContent>
                         </Card>

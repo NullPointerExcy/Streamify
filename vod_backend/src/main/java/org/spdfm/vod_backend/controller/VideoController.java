@@ -86,7 +86,6 @@ public class VideoController {
 
     @DeleteMapping("/{id}")
     public void deleteVideo(@PathVariable String id) {
-        // Remove the video from the storage
         String baseDir = getStoragePath(id) + id;
         try {
             Files.deleteIfExists(Paths.get(baseDir));
