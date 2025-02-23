@@ -65,7 +65,7 @@ const PlaylistVideos: React.FC = () => {
     const videos = videoData[id] || [];
 
     return (
-        <Container maxWidth="lg" sx={{mt: 4}}>
+        <Container maxWidth={false} sx={{mt: 4, width: "80%"}}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
                 Videos for {game}
             </Typography>

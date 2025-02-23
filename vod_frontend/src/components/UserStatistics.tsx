@@ -20,7 +20,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 
 
 const UserStatistics: React.FC = () => {
-    const [isVisible, setIsVisible] = React.useState(true);
+    const [isVisible, setIsVisible] = React.useState(false);
     const [isExpanded, setIsExpanded] = React.useState(true);
 
     const user = JSON.parse(localStorage.getItem('user') || null);
@@ -39,7 +39,7 @@ const UserStatistics: React.FC = () => {
                     top: "20vh",
                     right: 0,
                     transition: "width 0.3s ease",
-                    overflow: "hidden",
+                    overflow: "visible",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -50,21 +50,24 @@ const UserStatistics: React.FC = () => {
                     onClick={toggleSidebar}
                     sx={{
                         position: "absolute",
-                        left: -40,
                         top: "50%",
+                        left: isVisible ? -40 : 0,
                         transform: "translateY(-50%)",
-                        bgcolor: "#1976d2",
+                        bgcolor: "#404346",
                         color: "white",
-                        borderRadius: "50%",
+                        borderRadius: "5%",
+                        height: "40%",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                        zIndex: 1000,
                         "&:hover": {
-                            bgcolor: "#1565c0"
+                            bgcolor: "#344b64"
                         }
                     }}
                 >
                     {isVisible ? <ArrowForwardIosIcon /> : <ArrowBackIosIcon />}
                 </IconButton>
 
-                {user && (
+                {(user && isVisible) && (
                     <Box sx={{ width: "100%", p: 2, textAlign: "center" }}>
                         <Avatar
                             src={user.userImage}

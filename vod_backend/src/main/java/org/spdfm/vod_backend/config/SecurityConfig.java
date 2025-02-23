@@ -39,7 +39,15 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/videos/**").permitAll()
+                        .requestMatchers(
+                                "/videos/**",
+                                "/api/v1/auth/**",
+                                "/api/v1/auth/**",
+                                "/api/v1/playlists/**",
+                                "/api/v1/videos/**",
+                                "/api/v1/topics/**",
+                                "/api/v1/settings/**",
+                                "/api/v1/comments/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

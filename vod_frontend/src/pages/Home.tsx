@@ -52,7 +52,7 @@ const Home: React.FC = () => {
     ];
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth={false} sx={{ mt: 4, width: "80%" }}>
             <Box textAlign="center" mb={4}>
                 <Typography variant="h3" component="h1" gutterBottom>
                     Welcome to Streamify!

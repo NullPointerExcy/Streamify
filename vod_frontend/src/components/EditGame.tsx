@@ -129,7 +129,7 @@ const EditGame: React.FC<EditGameProps> = ({ gameId, open, onClose, onGameUpdate
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                label="Release Date"
+                                label="Upload Date"
                                 variant="outlined"
                                 fullWidth
                                 type="date"
@@ -143,7 +143,18 @@ const EditGame: React.FC<EditGameProps> = ({ gameId, open, onClose, onGameUpdate
                             {coverPreview && (
                                 <Box mt={2}>
                                     <Typography variant="subtitle1">Cover Preview:</Typography>
-                                    <img src={coverPreview} alt="Cover Preview" style={{ width: "100%", maxHeight: "300px" }} />
+                                    <img
+                                        src={coverPreview}
+                                        alt="Cover Preview"
+                                        style={{
+                                            width: "100%",
+                                            height: "auto",
+                                            aspectRatio: "4/3",
+                                            objectFit: "contain",
+                                            borderRadius: "4px",
+                                            border: "1px solid #000000"
+                                        }}
+                                    />
                                 </Box>
                             )}
                         </Grid>
@@ -159,7 +170,7 @@ const EditGame: React.FC<EditGameProps> = ({ gameId, open, onClose, onGameUpdate
                                             {(selected as string[]).map((value) => {
                                                 const genre = availableGenres.find((g) => g.id === value);
                                                 return (
-                                                    <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white" }} />
+                                                    <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />
                                                 );
                                             })}
                                         </Box>

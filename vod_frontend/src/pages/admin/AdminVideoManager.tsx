@@ -34,6 +34,8 @@ import { IGame } from "../../models/IGame";
 import { IVideo } from "../../models/IVideo";
 import { getAllGames } from "../../services/game/GameServices";
 import Pagination from "@mui/material/Pagination";
+import {IGenre} from "../../models/IGenre";
+import {getAllGenres} from "../../services/genre/GenreServices";
 
 const ThumbnailInput = styled("input")({
     display: "none",
@@ -48,6 +50,7 @@ const AdminVideoManager: React.FC = () => {
     // Store the game id as string for the selected game
     const [game, setGame] = React.useState("");
     const [games, setGames] = React.useState<Array<IGame>>([]);
+    const [genres, setGenres] = React.useState<Array<IGenre>>([]);
     const [videoUrl, setVideoUrl] = React.useState("");
     const [videoFile, setVideoFile] = React.useState<File | null>(null);
     const [thumbnailUrl, setThumbnailUrl] = React.useState("");
@@ -57,7 +60,13 @@ const AdminVideoManager: React.FC = () => {
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [duration, setDuration] = React.useState(0);
 
+    const [selectedGenre, setSelectedGenre] = React.useState<IGenre | null>(null);
     const [selectedVideo, setSelectedVideo] = React.useState<IVideo | null>(null);
+
+    // Search/Filter states for games
+    const [searchTitle, setSearchTitle] = React.useState("");
+    const [searchGenre, setSearchGenre] = React.useState("");
+    const [searchDate, setSearchDate] = React.useState("");
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -82,6 +91,9 @@ const AdminVideoManager: React.FC = () => {
         });
         getAllVideos().then((response) => {
             setVideos(response);
+        });
+        getAllGenres().then((response) => {
+            setGenres(response);
         });
     }, []);
 
@@ -199,8 +211,50 @@ const AdminVideoManager: React.FC = () => {
     const totalPages = Math.ceil(videos.length / itemsPerPage);
     const currentVideos = videos.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    const filteredVideos = currentVideos.filter((video) => {
+        const matchesTitle = video.title.toLowerCase().includes(searchTitle.toLowerCase());
+        const matchesDate = searchDate ? video.uploadedAt.includes(searchDate) : true;
+        const matchesGenre = searchGenre
+            ? video.game.genres.some((genre) => genre.name.toLowerCase().includes(searchGenre.toLowerCase()))
+            : true;
+        return matchesTitle && matchesDate && matchesGenre;
+    });
+
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth={false} sx={{ width: "80%" }}>
+            <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Search by Name"
+                            variant="outlined"
+                            fullWidth
+                            value={searchTitle}
+                            onChange={(e) => setSearchTitle(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Search by Genre"
+                            variant="outlined"
+                            fullWidth
+                            value={searchGenre}
+                            onChange={(e) => setSearchGenre(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Search by Upload Date"
+                            variant="outlined"
+                            fullWidth
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            value={searchDate}
+                            onChange={(e) => setSearchDate(e.target.value)}
+                        />
+                    </Grid>
+                </Grid>
+            </Paper>
             <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="md" fullWidth>
                 <DialogTitle>Add New Video</DialogTitle>
                 <DialogContent>
@@ -350,7 +404,7 @@ const AdminVideoManager: React.FC = () => {
                 />
             )}
             <Grid container spacing={4}>
-                {currentVideos.map((video, index) => (
+                {filteredVideos.map((video, index) => (
                     <Grid
                         item
                         xs={12} sm={6} md={4}

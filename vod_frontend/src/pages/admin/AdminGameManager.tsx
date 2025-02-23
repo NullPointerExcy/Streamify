@@ -188,7 +188,7 @@ const AdminGameManager: React.FC = () => {
     const closeDialog = () => setIsDialogOpen(false);
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 1 }}>
+        <Container maxWidth={false} sx={{ width: "80%" }}>
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
@@ -273,7 +273,18 @@ const AdminGameManager: React.FC = () => {
                             {coverPreview && (
                                 <Box mt={2}>
                                     <Typography variant="subtitle1">Cover Preview:</Typography>
-                                    <img src={coverPreview} alt="Cover Preview" style={{ width: "100%", maxHeight: "300px" }} />
+                                    <img
+                                        src={coverPreview}
+                                        alt="Cover Preview"
+                                        style={{
+                                            width: "100%",
+                                            height: "auto",
+                                            aspectRatio: "4/3",
+                                            objectFit: "contain",
+                                            borderRadius: "8px",
+                                            border: "1px solid #000000"
+                                        }}
+                                    />
                                 </Box>
                             )}
                         </Grid>
@@ -289,7 +300,7 @@ const AdminGameManager: React.FC = () => {
                                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                                             {selected.map((value) => {
                                                 const genre = genres.find((g) => g.id === value);
-                                                return <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white" }} />;
+                                                return <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />;
                                             })}
                                         </Box>
                                     )}
@@ -426,7 +437,10 @@ const AdminGameManager: React.FC = () => {
                     textAlign: "center",
                     "&:hover": { backgroundColor: "#2c9b98" },
                 }}
-                onClick={openDialog}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    openDialog();
+                }}
             >
                 <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
                 <Typography variant="button" sx={{ fontSize: 16 }}>

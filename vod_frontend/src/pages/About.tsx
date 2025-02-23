@@ -16,7 +16,7 @@ import BuildIcon from '@mui/icons-material/Build';
 
 const About: React.FC = () => {
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth={false} sx={{ mt: 4, width: "80%" }}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
                 About Streamify
             </Typography>

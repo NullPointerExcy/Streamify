@@ -93,11 +93,7 @@ const Playlists: React.FC = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                All Playlists
-            </Typography>
-            <Divider sx={{ marginBottom: 2 }}/>
+        <Container maxWidth={false} sx={{ mt: 4, width: "80%" }}>
             <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
                 <TextField
                     label="Name"

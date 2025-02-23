@@ -61,7 +61,7 @@ const AdminFeatureManager: React.FC = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{mt: 4}}>
+        <Container maxWidth={false} sx={{mt: 4, width: "80%"}}>
             <Typography variant="h4" component="h1" gutterBottom textAlign="center">
                 Feature Management: Enable/Disable Features
             </Typography>

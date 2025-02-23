@@ -118,7 +118,7 @@ const GameCard = (props: {
                                 </Typography>
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
                                     {game.genres.map((genre) => (
-                                        <Chip key={genre.id} label={genre.name} sx={{ backgroundColor: genre.color, color: "white" }} />
+                                        <Chip key={genre.id} label={genre.name} sx={{ backgroundColor: genre.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />
                                     ))}
                                 </Box>
                             </CardContent>

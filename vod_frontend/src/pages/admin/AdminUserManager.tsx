@@ -65,7 +65,10 @@ const AdminUserManager: React.FC = () => {
         setUserList(updatedUsers);
     };
 
-    const filteredUsers = userList.filter((user) => {
+    const totalPages = Math.ceil(userList.length / itemsPerPage);
+    const currentUsers = userList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const filteredUsers = currentUsers.filter((user) => {
         const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
         let matchesFilter = true;
         if (filterStatus === "banned") {
@@ -76,11 +79,8 @@ const AdminUserManager: React.FC = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const totalPages = Math.ceil(userList.length / itemsPerPage);
-    const currentGames = userList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
     return (
-        <Container maxWidth="lg" sx={{ mt: 1 }}>
+        <Container maxWidth={false} sx={{ mt: 1, width: "80%" }}>
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={6}>

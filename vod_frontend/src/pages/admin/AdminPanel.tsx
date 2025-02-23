@@ -95,7 +95,7 @@ const AdminPanel: React.FC = (props: {
                 component="main"
                 sx={{flexGrow: 1, p: 3}}
             >
-                <Container maxWidth="lg">
+                <Container maxWidth={false}>
                     {adminSections[selectedSection].component}
                 </Container>
             </Box>

@@ -8,7 +8,7 @@ import {
     Box,
     Button,
     Menu,
-    MenuItem,
+    MenuItem, Divider,
 } from "@mui/material";
 
 import HomeIcon from '@mui/icons-material/Home';
@@ -17,6 +17,11 @@ import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import ForumIcon from '@mui/icons-material/Forum';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
+import TheatersIcon from '@mui/icons-material/Theaters';
+import HistoryIcon from '@mui/icons-material/History';
+import SettingsIcon from '@mui/icons-material/Settings';
 import {ISiteSettings} from "../models/ISiteSettings";
 import {IFeature} from "../models/IFeature";
 import {getAllFeatures} from "../services/feature/FeatureServices";
@@ -70,6 +75,32 @@ const TopBar: React.FC = (props: {
             alert("Successfully logged out!");
         }
     };
+
+    const getLoginLogoutLabel = () => {
+        return (!user ?
+                (
+                    <Box sx={{
+                        display: "flex",
+                        gap: 1,
+                        flexDirection: "row",
+                        alignContent: "center",
+                    }}>
+                        <LoginIcon/> Login
+                    </Box>
+                )
+                :
+                (
+                    <Box sx={{
+                        display: "flex",
+                        gap: 1,
+                        flexDirection: "row",
+                        alignContent: "center",
+                    }}>
+                        <LogoutIcon/> Logout
+                    </Box>
+                )
+        );
+    }
 
     return (
         <AppBar position="static" sx={{mb: 0.1}}>
@@ -138,7 +169,38 @@ const TopBar: React.FC = (props: {
                         }}
                     >
                         <MenuItem onClick={() => handleLoginLogout("login")}>
-                            Login
+                            {getLoginLogoutLabel()}
+                        </MenuItem>
+                        <Divider sx={{ my: 1, boxShadow: 1 }}/>
+                        <MenuItem onClick={() => {}}>
+                            <Box sx={{
+                                display: "flex",
+                                gap: 1,
+                                flexDirection: "row",
+                                alignContent: "center",
+                            }}>
+                                <TheatersIcon/> Watchlist
+                            </Box>
+                        </MenuItem>
+                        <MenuItem onClick={() => {}}>
+                            <Box sx={{
+                                display: "flex",
+                                gap: 1,
+                                flexDirection: "row",
+                                alignContent: "center",
+                            }}>
+                                <HistoryIcon/> Watch History
+                            </Box>
+                        </MenuItem>
+                        <MenuItem onClick={() => {}}>
+                            <Box sx={{
+                                display: "flex",
+                                gap: 1,
+                                flexDirection: "row",
+                                alignContent: "center",
+                            }}>
+                                <SettingsIcon/> Settings
+                            </Box>
                         </MenuItem>
                     </Menu>
                 </Box>
