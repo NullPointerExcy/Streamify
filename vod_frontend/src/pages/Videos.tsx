@@ -77,7 +77,16 @@ const Videos: React.FC = () => {
     }, [nameFilter, gameFilter, sortBy, order, videos]);
 
     const getStreamUrl = (filePath) => {
-        return encodeURI(`${process.env.REACT_APP_API_URL}${filePath.replace(/\\/g, "/")}`);
+        const normalizedPath = filePath.replace(/\\/g, "/");
+
+        const parts = normalizedPath.split("/");
+
+        // TODO: Find a better way to handle this
+        const startIndex = parts.findIndex(part => part.toLowerCase() === "testvideofolder");
+        const relativePath = parts.slice(startIndex + 1).join("/");
+        const decodedPath = decodeURIComponent(relativePath);
+
+        return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);

@@ -1,3 +1,4 @@
+// src/pages/Playlists.tsx
 // @ts-nocheck
 import * as React from "react";
 import {
@@ -8,179 +9,152 @@ import {
     CardMedia,
     CardContent,
     Typography,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    TextField, Divider
+    IconButton,
+    Stack,
+    Paper,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-
-const playlists = [
-    {
-        id: 1,
-        game: "The Legend of Zelda",
-        thumbnail: "https://placehold.co/600x400",
-        videoCount: 5,
-        totalDuration: "2:34:21",
-    },
-    {
-        id: 2,
-        game: "Super Mario Odyssey",
-        thumbnail: "https://placehold.co/600x400",
-        videoCount: 8,
-        totalDuration: "4:12:47",
-    },
-    {
-        id: 3,
-        game: "Dark Souls III",
-        thumbnail: "https://placehold.co/600x400",
-        videoCount: 10,
-        totalDuration: "6:05:33",
-    },
-    {
-        id: 4,
-        game: "Final Fantasy VII Remake",
-        thumbnail: "https://placehold.co/600x400",
-        videoCount: 7,
-        totalDuration: "5:22:11",
-    }
-];
-
-const allGames = Array.from(new Set(playlists.map(playlist => playlist.game)));
+import { getAllPlaylists } from "../services/playlist/PlaylistServices";
+import { IPlaylist } from "../models/IPlaylist";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import {IVideo} from "../models/IVideo";
+import {getAllVideos} from "../services/videos/VideoServices";
+import {IGenre} from "../models/IGenre";
+import {getAllGenres} from "../services/genre/GenreServices";
+import {IGame} from "../models/IGame";
+import {getAllGames} from "../services/game/GameServices";
 
 const Playlists: React.FC = () => {
-    const navigate = useNavigate();
-    const [filteredPlaylists, setFilteredPlaylists] = React.useState([...playlists]);
-    const [nameFilter, setNameFilter] = React.useState("");
-    const [gameFilter, setGameFilter] = React.useState("");
-    const [sortBy, setSortBy] = React.useState("game");
-    const [order, setOrder] = React.useState("asc");
-    const [selectedGame, setSelectedGame] = React.useState("");
-
-    const handleSort = (playlistsToSort) => {
-        return [...playlistsToSort].sort((a, b) => {
-            if (sortBy === "videoCount") {
-                return order === "asc" ? a.videoCount - b.videoCount : b.videoCount - a.videoCount;
-            } else {
-                return order === "asc"
-                    ? a[sortBy].localeCompare(b[sortBy])
-                    : b[sortBy].localeCompare(a[sortBy]);
-            }
-        });
-    };
-
-    const handleFilter = () => {
-        let filtered = playlists;
-        if (nameFilter) {
-            filtered = filtered.filter(playlist =>
-                playlist.game.toLowerCase().includes(nameFilter.toLowerCase())
-            );
-        }
-        if (gameFilter) {
-            filtered = filtered.filter(playlist => playlist.game === gameFilter);
-        }
-        setFilteredPlaylists(handleSort(filtered));
-    };
+    const [playlists, setPlaylists] = React.useState<Array<IPlaylist>>([]);
+    const [genres, setGenres] = React.useState<Array<IGenre>>([]);
+    const [games, setGames] = React.useState<Array<IGame>>([]);
+    const [videos, setVideos] = React.useState<Array<IVideo>>([]);
+    const [activeIndex, setActiveIndex] = React.useState(0);
 
     React.useEffect(() => {
-        handleFilter();
-    }, [nameFilter, gameFilter, sortBy, order]);
+        getAllGenres().then((data) => {
+            setGenres(data);
+        });
+        getAllVideos().then((data) => {
+            setVideos(data);
+        });
+        getAllGames().then((data) => {
+            setGames(data);
+        });
+        getAllPlaylists().then((data) => {
+            setPlaylists(data);
+        });
+    }, []);
 
-    const handleViewPlaylist = (id, game) => {
-        setSelectedGame(game);
-        navigate(`/playlists/videos/${game}/${id}`);
+    const handleNext = () => {
+        setActiveIndex((prevIndex) =>
+            prevIndex === playlists.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    const handlePrev = () => {
+        setActiveIndex((prevIndex) =>
+            prevIndex === 0 ? playlists.length - 1 : prevIndex - 1
+        );
     };
 
     return (
         <Container maxWidth={false} sx={{ mt: 4, width: "80%" }}>
-            <Box sx={{ display: "flex", justifyContent: "center", mb: 4, gap: 2 }}>
-                <TextField
-                    label="Name"
-                    variant="outlined"
-                    value={nameFilter}
-                    onChange={(e) => setNameFilter(e.target.value)}
-                />
-
-                <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                    <InputLabel>Game</InputLabel>
-                    <Select
-                        value={gameFilter}
-                        onChange={(e) => setGameFilter(e.target.value)}
-                        label="Game"
+            <Stack spacing={4}>
+                {playlists.map((playlist, index) => (
+                    <Paper
+                        key={playlist.id}
+                        elevation={index === activeIndex ? 6 : 2}
+                        sx={{
+                            transform: index === activeIndex ? "scale(1.05)" : "scale(0.95)",
+                            transition: "transform 0.5s ease-in-out",
+                            opacity: index === activeIndex ? 1 : 0.6,
+                            display: index === activeIndex ? "block" : "none",
+                        }}
                     >
-                        <MenuItem value="">All</MenuItem>
-                        {allGames.map((game, index) => (
-                            <MenuItem key={index} value={game}>
-                                {game}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                    <InputLabel>Sort by</InputLabel>
-                    <Select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        label="Sortieren nach"
-                    >
-                        <MenuItem value="game">Name</MenuItem>
-                        <MenuItem value="videoCount">Number of Videos</MenuItem>
-                        <MenuItem value="totalDuration">Total Duration</MenuItem>
-                    </Select>
-                </FormControl>
-
-                <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                    <InputLabel>Order</InputLabel>
-                    <Select
-                        value={order}
-                        onChange={(e) => setOrder(e.target.value)}
-                        label="Reihenfolge"
-                    >
-                        <MenuItem value="asc">Ascending</MenuItem>
-                        <MenuItem value="desc">Descending</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
-
-            <Grid container spacing={2}>
-                {filteredPlaylists.map((playlist) => (
-                    <Grid item xs={6} sm={5} md={3} key={playlist.id}>
-                        <Card
+                        <Box
                             sx={{
-                                height: "100%", display: "flex", flexDirection: "column",
-                                "&:hover": {
-                                    boxShadow: 5,
-                                    cursor: "pointer",
-                                    transform: "scale(1.05)",
-                                    transition: "all 0.3s ease",
-                                    backgroundColor: "rgba(144,202,249,0.13)"
-                                }
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                p: 2,
                             }}
-                            onClick={() => handleViewPlaylist(playlist.id, playlist.game)}
                         >
-                            <CardMedia
-                                component="img"
-                                image={playlist.thumbnail}
-                                alt={playlist.game}
-                                sx={{ height: 200, objectFit: "cover" }}
-                            />
-                            <CardContent>
-                                <Typography variant="h6" component="h2" gutterBottom>
-                                    {playlist.game}
+                            <IconButton onClick={handlePrev}>
+                                <ArrowBackIosIcon />
+                            </IconButton>
+                            <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="h4" align="center">
+                                    {playlist.title}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Videos: {playlist.videoCount}
+                                <Typography
+                                    variant="body2"
+                                    align="center"
+                                    color="textSecondary"
+                                >
+                                    {playlist.description}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Total Duration: {playlist.totalDuration}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                                <Grid container spacing={2} sx={{ mt: 2 }}>
+                                    {playlist.videos.map((video) => (
+                                        <Grid item xs={12} sm={6} md={4} key={video.id}>
+                                            <Card
+                                                sx={{
+                                                    "&:hover": {
+                                                        boxShadow: 5,
+                                                        cursor: "pointer",
+                                                        transform: "scale(1.05)",
+                                                        transition: "all 0.3s ease",
+                                                        backgroundColor:
+                                                            "rgba(144,202,249,0.13)",
+                                                    },
+                                                }}
+                                            >
+                                                <CardMedia
+                                                    component="img"
+                                                    image={video.thumbnail}
+                                                    alt={video.title}
+                                                    sx={{
+                                                        height: 200,
+                                                        objectFit: "cover",
+                                                    }}
+                                                />
+                                                <CardContent>
+                                                    <Typography
+                                                        variant="h6"
+                                                        component="h2"
+                                                        gutterBottom
+                                                    >
+                                                        {video.title}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="textSecondary"
+                                                    >
+                                                        Duration:{" "}
+                                                        {Math.floor(video.duration)}s
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="textSecondary"
+                                                    >
+                                                        Uploaded at:{" "}
+                                                        {new Date(
+                                                            video.uploadedAt
+                                                        ).toLocaleDateString()}
+                                                    </Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Box>
+                            <IconButton onClick={handleNext}>
+                                <ArrowForwardIosIcon />
+                            </IconButton>
+                        </Box>
+                    </Paper>
                 ))}
-            </Grid>
+            </Stack>
         </Container>
     );
 };

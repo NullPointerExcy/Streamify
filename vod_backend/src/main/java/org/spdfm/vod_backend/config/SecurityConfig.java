@@ -25,9 +25,23 @@ public class SecurityConfig {
     @Value("${cors.allowed.origins}")
     private String allowedOrigins;
 
+    @Value("${web.stream.resource.locations}")
+    private String streamResourceLocations;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         List<String> origins = List.of(this.allowedOrigins.split(","));
+        List<String> streamLocations = new java.util.ArrayList<>(List.of(this.streamResourceLocations.split(",")));
+
+        streamLocations.replaceAll(s -> s + "**");
+        streamLocations.add("/videos/**");
+        streamLocations.add("/api/v1/videos/**");
+        streamLocations.add("/api/v1/playlists/**");
+        streamLocations.add("/api/v1/topics/**");
+        streamLocations.add("/api/v1/settings/**");
+        streamLocations.add("/api/v1/comments/**");
+        streamLocations.add("/api/v1/auth/**");
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
@@ -41,13 +55,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/videos/**",
-                                "/api/v1/auth/**",
-                                "/api/v1/auth/**",
-                                "/api/v1/playlists/**",
                                 "/api/v1/videos/**",
+                                "/api/v1/playlists/**",
                                 "/api/v1/topics/**",
                                 "/api/v1/settings/**",
-                                "/api/v1/comments/**").permitAll()
+                                "/api/v1/comments/**",
+                                "/api/v1/auth/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

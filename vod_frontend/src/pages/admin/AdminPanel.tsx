@@ -22,6 +22,9 @@ import BrushIcon from '@mui/icons-material/Brush';
 import FeaturedPlayListIcon from '@mui/icons-material/FeaturedPlayList';
 import {ISiteSettings} from "../../models/ISiteSettings";
 import AdminFeatureManager from "./AdminFeatureManager";
+import AdminPlaylistManager from "./AdminPlaylistManager";
+import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
+
 
 const AdminPanel: React.FC = (props: {
     siteSettings: ISiteSettings
@@ -35,6 +38,7 @@ const AdminPanel: React.FC = (props: {
     const adminSections = [
         {name: "Game Management", component: <AdminGameManager/>, icon: <SportsEsportsIcon/>},
         {name: "Video Management", component: <AdminVideoManager/>, icon: <VideoLibraryIcon/>},
+        {name: "Playlist Management", component: <AdminPlaylistManager/>, icon: <SubscriptionsIcon/>},
         {name: "User Management", component: <AdminUserManager/>, icon: <PeopleIcon/>},
         {
             name: "Design Settings",

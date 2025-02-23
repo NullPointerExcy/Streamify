@@ -1,4 +1,5 @@
 import {IGame} from "./IGame";
+import {IPlaylist} from "./IPlaylist";
 
 export interface IVideo {
     id: string;
@@ -9,4 +10,5 @@ export interface IVideo {
     duration: number;
     game: IGame;
     uploadedAt: string;
+    playlist: IPlaylist;
 }

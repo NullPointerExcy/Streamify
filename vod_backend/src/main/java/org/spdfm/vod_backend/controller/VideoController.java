@@ -53,23 +53,46 @@ public class VideoController {
         try {
             LocalDateTime now = LocalDateTime.now();
             String baseDir = getStoragePath(id);
-            String uploadDir = baseDir + "/" + id + "/" + now.getYear() + "/" + now.getMonthValue() + "/";
-            Path path = Paths.get(uploadDir + file.getOriginalFilename());
+            String uploadDir = baseDir + id + "/";
+
+            String originalFilename = file.getOriginalFilename();
+            Path path = Paths.get(uploadDir, originalFilename).normalize();
+
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
 
-            String message = "{\"videoId\": \"" + id + "\", \"filePath\": \"" + path + "\"}";
-            // TODO: Send a message to the RabbitMQ server
+            String message = "{\"videoId\": \"" + id + "\", \"filePath\": \"" + path.toString().replace("\\", "/") + "\"}";
             // rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, message);
 
-            return path.toString();
+            return path.toString().replace("\\", "/");
         } catch (Exception e) {
             throw new RuntimeException("Video upload failed!", e);
         }
     }
 
+    @PutMapping("/{id}")
+    public Video updateVideo(@PathVariable String id, @RequestBody Video video) {
+        Video existingVideo = videoService.getVideoById(id)
+                .orElseThrow(() -> new RuntimeException("Video not found"));
+        existingVideo.setTitle(video.getTitle());
+        existingVideo.setDescription(video.getDescription());
+        existingVideo.setFilePath(video.getFilePath());
+        existingVideo.setThumbnail(video.getThumbnail());
+        existingVideo.setDuration(video.getDuration());
+        existingVideo.setGame(video.getGame());
+        existingVideo.setViewerCount(video.getViewerCount());
+        return videoService.addVideo(existingVideo);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteVideo(@PathVariable String id) {
+        // Remove the video from the storage
+        String baseDir = getStoragePath(id) + id;
+        try {
+            Files.deleteIfExists(Paths.get(baseDir));
+        } catch (Exception e) {
+            throw new RuntimeException("Video deletion failed!", e);
+        }
         videoService.deleteVideo(id);
     }
 }

@@ -22,14 +22,13 @@ public class Video {
     private String thumbnail;
     private Long duration;
     private LocalDateTime uploadedAt;
+    private Long viewerCount;
 
     @DBRef
     private Game game;
 
-    @DBRef
-    private Set<User> watchedBy;
 
-    public Video(String title, String description, String filePath, String thumbnail, Long duration, Game game) {
+    public Video(String title, String description, String filePath, String thumbnail, Long duration, Game game, Long viewerCount) {
         this.title = title;
         this.description = description;
         this.filePath = filePath;
@@ -37,5 +36,6 @@ public class Video {
         this.duration = duration;
         this.uploadedAt = LocalDateTime.now();
         this.game = game;
+        this.viewerCount = viewerCount;
     }
 }

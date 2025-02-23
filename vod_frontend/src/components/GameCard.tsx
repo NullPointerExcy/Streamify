@@ -59,13 +59,6 @@ const GameCard = (props: {
                 sx={{
                     cursor: "pointer",
                     height: 400,
-                    "&:hover": {
-                        transition: "all 0.4s",
-                        transform: "scale(1.05)",
-                        border: 5,
-                        borderColor: "white",
-                        boxShadow: 5,
-                    },
                 }}
                 onClick={handleCardClick}
             >
@@ -87,7 +80,18 @@ const GameCard = (props: {
                             backfaceVisibility: "hidden",
                         }}
                     >
-                        <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                        <Card sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            "&:hover": {
+                                boxShadow: 5,
+                                cursor: "pointer",
+                                transform: "scale(1.05)",
+                                transition: "all 0.3s ease",
+                                backgroundColor: "rgba(144,202,249,0.13)"
+                            }
+                        }}>
                             <Box sx={{ height: "60%", overflow: "hidden" }}>
                                 <IconButton
                                     variant="contained"
@@ -146,11 +150,9 @@ const GameCard = (props: {
                             height: "100%",
                             backfaceVisibility: "hidden",
                             transform: "rotateY(180deg)",
-                            backgroundColor: "primary.main",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            p: 2,
                         }}
                     >
                         <Card
@@ -161,6 +163,13 @@ const GameCard = (props: {
                                 flexDirection: "column",
                                 justifyContent: "center",
                                 alignItems: "center",
+                                "&:hover": {
+                                    boxShadow: 5,
+                                    cursor: "pointer",
+                                    transform: "scale(1.05)",
+                                    transition: "all 0.3s ease",
+                                    backgroundColor: "rgba(144,202,249,0.13)"
+                                }
                             }}
                         >
                             <Typography variant="h4" align="center" >{game.title}</Typography>

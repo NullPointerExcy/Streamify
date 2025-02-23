@@ -2,37 +2,36 @@
 import * as React from "react";
 import {
     Box,
-    Container,
-    Typography,
-    TextField,
     Button,
-    Grid,
-    Paper,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
     Card,
     CardContent,
     CardMedia,
-    IconButton,
-    styled,
+    Container,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Fab,
+    FormControl,
+    Grid,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    styled,
     Switch,
+    TextField,
+    Typography,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import AddIcon from "@mui/icons-material/Add";
-import {addVideo, getAllVideos, uploadVideo} from "../../services/videos/VideoServices";
-import { IGame } from "../../models/IGame";
-import { IVideo } from "../../models/IVideo";
-import { getAllGames } from "../../services/game/GameServices";
+import {addVideo, deleteVideo, getAllVideos, uploadVideo} from "../../services/videos/VideoServices";
+import {IGame} from "../../models/IGame";
+import {IVideo} from "../../models/IVideo";
+import {getAllGames} from "../../services/game/GameServices";
 import Pagination from "@mui/material/Pagination";
 import {IGenre} from "../../models/IGenre";
 import {getAllGenres} from "../../services/genre/GenreServices";
@@ -102,11 +101,10 @@ const AdminVideoManager: React.FC = () => {
             const selectedGame: IGame =
                 games.find((g) => g.id === game) || { id: "", title: "" };
 
-            // Upload the video file first
             let uploadedVideoPath = "";
             try {
                 const uploadResponse = await uploadVideo(selectedGame.id, videoFile);
-                uploadedVideoPath = uploadResponse.data; // assuming backend returns file path
+                uploadedVideoPath = uploadResponse.data;
             } catch (err) {
                 console.error("Video upload failed", err);
                 alert("Video upload failed");
@@ -138,12 +136,6 @@ const AdminVideoManager: React.FC = () => {
         } else {
             alert("Please fill out all fields.");
         }
-    };
-
-    const handleDeleteVideo = (index: number) => {
-        const updatedVideos = [...videos];
-        updatedVideos.splice(index, 1);
-        setVideos(updatedVideos);
     };
 
     const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,6 +188,12 @@ const AdminVideoManager: React.FC = () => {
         }
     };
 
+    const handleDeleteVideo = (video: IVideo) => {
+        deleteVideo(video.id).then(() => {
+            setVideos(videos.filter((v) => v.id !== video.id));
+        });
+    }
+
     const openDialog = () => {
         setIsDialogOpen(true);
     };
@@ -205,7 +203,16 @@ const AdminVideoManager: React.FC = () => {
     };
 
     const getStreamUrl = (filePath) => {
-        return encodeURI(`${process.env.REACT_APP_API_URL}${filePath.replace(/\\/g, "/")}`);
+        const normalizedPath = filePath.replace(/\\/g, "/");
+
+        const parts = normalizedPath.split("/");
+
+        // TODO: Find a better way to handle this
+        const startIndex = parts.findIndex(part => part.toLowerCase() === "testvideofolder");
+        const relativePath = parts.slice(startIndex + 1).join("/");
+        const decodedPath = decodeURIComponent(relativePath);
+
+        return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
@@ -412,12 +419,26 @@ const AdminVideoManager: React.FC = () => {
                         onClick={() => setSelectedVideo(video)}
                         sx={{ cursor: "pointer" }}
                     >
-                        <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                        <Card sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            "&:hover": {
+                                boxShadow: 5,
+                                cursor: "pointer",
+                                transform: "scale(1.05)",
+                                transition: "all 0.3s ease",
+                                backgroundColor: "rgba(144,202,249,0.13)"
+                            }
+                        }}>
                             <CardMedia
                                 component="img"
                                 image={video.thumbnail}
                                 alt={video.title}
-                                sx={{ height: 200, objectFit: "cover" }}
+                                sx={{
+                                    height: 200,
+                                    objectFit: "cover",
+                            }}
                             />
                             <CardContent>
                                 <Typography variant="h6" component="h2">
@@ -438,7 +459,7 @@ const AdminVideoManager: React.FC = () => {
                                 fullWidth
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDeleteVideo(index);
+                                    handleDeleteVideo(video);
                                 }}
                                 sx={{ mt: 1, backgroundColor: "#782d28", color: "white" }}
                             >
@@ -470,7 +491,7 @@ const AdminVideoManager: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    textAlign: "center",
+                    textAlign: "left",
                     "&:hover": {
                         backgroundColor: "#2c9b98",
                     },
@@ -479,7 +500,7 @@ const AdminVideoManager: React.FC = () => {
             >
                 <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
                 <Typography variant="button" sx={{ fontSize: 16 }}>
-                    Add new Video
+                    Add Video
                 </Typography>
             </Fab>
         </Container>

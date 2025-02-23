@@ -30,6 +30,21 @@ public class PlaylistController {
         return playlistService.addPlaylist(playlist);
     }
 
+    @PutMapping("/{id}")
+    public Playlist updatePlaylist(@PathVariable String id, @RequestBody Playlist playlist) {
+        return playlistService.updatePlaylist(id, playlist);
+    }
+
+    @PutMapping("/{playlistId}/videos/{videoId}")
+    public void addVideoToPlaylist(@PathVariable String playlistId, @PathVariable String videoId) {
+        playlistService.addVideoToPlaylist(playlistId, videoId);
+    }
+
+    @DeleteMapping("/{playlistId}/videos/{videoId}")
+    public void removeVideoFromPlaylist(@PathVariable String playlistId, @PathVariable String videoId) {
+        playlistService.removeVideoFromPlaylist(playlistId, videoId);
+    }
+
     @DeleteMapping("/{id}")
     public void deletePlaylist(@PathVariable String id) {
         playlistService.deletePlaylist(id);
