@@ -23,6 +23,8 @@ import {getAllVideos, incrementViewerCount} from "../services/videos/VideoServic
 import { IVideo } from "../models/IVideo";
 import {addWatchedVideo} from "../services/users/UserServices";
 import {IUser} from "../models/IUser";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+
 
 const Videos: React.FC = (props: {
     user: IUser,
@@ -145,16 +147,22 @@ const Videos: React.FC = (props: {
     };
 
     return (
-        <Container maxWidth={false} sx={{ width: "80%" }}>
+        <Container maxWidth={true} sx={{ width: !selectedVideo ? "80%" : "100%" }}>
             {selectedVideo && (
-                <Box sx={{ height: "100%", backgroundColor: "black", position: "relative" }}>
+                <Box sx={{
+                    height: "100%",
+                    backgroundColor: "black",
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "center",
+                }}>
                     <video
                         ref={videoRef}
                         controls
                         autoPlay
                         style={{
-                            width: "70%",
-                            height: "70%",
+                            width: "85%",
+                            height: "auto",
                             objectFit: "contain",
                             backgroundColor: "black",
                         }}
@@ -164,8 +172,8 @@ const Videos: React.FC = (props: {
                         onClick={() => setSelectedVideo(null)}
                         sx={{
                             position: "absolute",
-                            top: "15%",
-                            right: "15%",
+                            top: "0%",
+                            right: "0%",
                             color: "white",
                             backgroundColor: "rgba(0,0,0,0.5)",
                             "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
@@ -255,18 +263,43 @@ const Videos: React.FC = (props: {
                                         transition: "all 0.3s ease",
                                         backgroundColor: "rgba(144,202,249,0.13)",
                                     },
+                                    "&:hover .play-icon": {
+                                        opacity: 1,
+                                        transform: "translate(-50%, -50%) scale(1.2)"
+                                    }
                                 }}
                                 onClick={() => {
                                     setSelectedVideo(video);
                                     handleIncrementViewerCount(video);
                                 }}
                             >
-                                <CardMedia
-                                    component="img"
-                                    image={video.thumbnail}
-                                    alt={video.title}
-                                    sx={{ height: 200, objectFit: "cover" }}
-                                />
+                                <Box sx={{ position: "relative", overflow: "hidden" }}>
+                                    <CardMedia
+                                        component="img"
+                                        image={video.thumbnail}
+                                        alt={video.title}
+                                        sx={{
+                                            height: 200,
+                                            objectFit: "cover"
+                                        }}
+                                    />
+                                    <PlayCircleOutlineIcon
+                                        sx={{
+                                            position: "absolute",
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
+                                            fontSize: "4rem",
+                                            color: "rgba(144,202,249,0.63)",
+                                            transition: "color 0.3s ease, transform 0.3s ease",
+                                            opacity: 0,
+                                            "&:hover": {
+                                                color: "rgb(144,202,249)",
+                                            }
+                                        }}
+                                        className="play-icon"
+                                    />
+                                </Box>
                                 <CardContent>
                                     <Typography variant="h6" component="h2" gutterBottom>
                                         {video.title}

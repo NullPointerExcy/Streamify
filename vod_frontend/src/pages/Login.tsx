@@ -34,7 +34,6 @@ const Login: React.FC = () => {
                 id: response.user.id,
                 name: response.user.name,
                 email: response.user.email,
-                userImage: response.user.userImage
             }
             localStorage.setItem('user', JSON.stringify(minimalUser));
             window.location.href = "/";
