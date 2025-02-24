@@ -41,7 +41,13 @@ import {getAllVideos} from "../../services/videos/VideoServices";
 import {IUser} from "../../models/IUser";
 import {getAllUsers} from "../../services/users/UserServices";
 
-const AdminGameManager: React.FC = () => {
+const AdminGameManager: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     // Game and genre states
     const [games, setGames] = React.useState<Array<IGame>>([]);
     const [genres, setGenres] = React.useState<Array<IGenre>>([]);
@@ -110,13 +116,6 @@ const AdminGameManager: React.FC = () => {
             });
         }
     };
-
-    const getGameStats = (game: IGame) => {
-        const totalVideos = videos.filter((video) => video.game.id === game.id).length;
-        const totalDuration = videos.reduce((acc, video) => acc + video.duration, 0);
-        const totalUsers = users?.watchedVideos?.filter((video) => video.game.id === game.id).length;
-        return { totalVideos, totalDuration, totalUsers };
-    }
 
     const handleAddGame = async () => {
         if (title && developer && releaseDate && selectedGenres.length > 0) {
@@ -248,7 +247,7 @@ const AdminGameManager: React.FC = () => {
             <Grid container spacing={2}>
                 {currentGames.map((game) => (
                     <Grid item xs={9} md={4} lg={3} key={game.id}>
-                        <GameCard game={game} onDelete={handleDeleteGame} getGameStats={getGameStats}/>
+                        <GameCard game={game} onDelete={handleDeleteGame} videos={videos} users={users}/>
                     </Grid>
                 ))}
             </Grid>

@@ -1,14 +1,19 @@
 // @ts-nocheck
 import React from "react";
 import { Navigate } from "react-router-dom";
+import {IUser} from "../models/IUser";
+import {getUserById} from "../services/users/UserServices";
 
-const AdminRoute = ({ children }) => {
-    const user = JSON.parse(localStorage.getItem('user') || "{}");
-    console.log(user?.roles?.indexOf("ADMIN"));
-    if (user?.roles?.indexOf("ADMIN") === -1) {
+const AdminRoute = ({ user, children }) => {
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (!user.roles || !user.roles.includes("ADMIN")) {
         return <Navigate to="/" replace />;
     }
-    return children;
+
+    return <>{children}</>;
 };
 
 export default AdminRoute;

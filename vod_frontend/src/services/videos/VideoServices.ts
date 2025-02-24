@@ -17,6 +17,19 @@ export const getAllVideos = async (video: any) => {
 }
 
 
+export const incrementViewerCount = async (videoId: string) => {
+    return await axios.put(`/videos/${videoId}/view`, {}, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(
+        (response: any) => {
+            return response.data;
+        }
+    );
+}
+
+
 export const getVideoById = async (id: string) => {
     return await axios.get(`/videos/${id}`, {
         headers: {

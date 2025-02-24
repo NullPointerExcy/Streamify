@@ -10,5 +10,5 @@ export interface IVideo {
     duration: number;
     game: IGame;
     uploadedAt: string;
-    playlist: IPlaylist;
+    viewerCount: number;
 }

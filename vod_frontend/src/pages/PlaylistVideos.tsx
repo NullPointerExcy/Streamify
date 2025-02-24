@@ -14,9 +14,16 @@ import {
 import {useParams} from "react-router-dom";
 import {IPlaylist} from "../models/IPlaylist";
 import {getAllPlaylists} from "../services/playlist/PlaylistServices";
+import {IUser} from "../models/IUser";
 
 
-const PlaylistVideos: React.FC = () => {
+const PlaylistVideos: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const {id, game} = useParams();
     const [playlists, setPlaylists] = React.useState<Array<IPlaylist>>([]);
 

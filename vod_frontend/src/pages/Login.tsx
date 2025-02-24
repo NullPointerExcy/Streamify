@@ -30,7 +30,13 @@ const Login: React.FC = () => {
 
         LoginService(email, password).then((response) => {
             localStorage.setItem('token', response.token);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            const minimalUser = {
+                id: response.user.id,
+                name: response.user.name,
+                email: response.user.email,
+                userImage: response.user.userImage
+            }
+            localStorage.setItem('user', JSON.stringify(minimalUser));
             window.location.href = "/";
         }).catch((error) => {
             console.error("Login error:", error);

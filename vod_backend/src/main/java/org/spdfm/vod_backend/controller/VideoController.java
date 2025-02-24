@@ -70,6 +70,11 @@ public class VideoController {
         }
     }
 
+    @PutMapping("/{id}/view")
+    public Video incrementViewerCount(@PathVariable String id) {
+        return videoService.incrementViewerCount(id);
+    }
+
     @PutMapping("/{id}")
     public Video updateVideo(@PathVariable String id, @RequestBody Video video) {
         Video existingVideo = videoService.getVideoById(id)

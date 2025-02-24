@@ -17,8 +17,16 @@ import {
 } from "@mui/material";
 import { getAllPlaylists } from "../services/playlist/PlaylistServices";
 import { IPlaylist } from "../models/IPlaylist";
+import {getUserById} from "../services/users/UserServices";
+import {IUser} from "../models/IUser";
 
-const Playlists: React.FC = () => {
+const Playlists: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [playlists, setPlaylists] = React.useState<IPlaylist[]>([]);
     const [filteredPlaylists, setFilteredPlaylists] = React.useState<IPlaylist[]>([]);
     const [searchName, setSearchName] = React.useState("");

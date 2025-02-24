@@ -35,7 +35,12 @@ import { IUser } from "../../models/IUser";
 import { getAllUsers } from "../../services/users/UserServices";
 import Pagination from "@mui/material/Pagination";
 
-const AdminUserManager: React.FC = () => {
+const AdminUserManager: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
 
     const [userList, setUserList] = React.useState<Array<IUser>>([]);
     const [searchTerm, setSearchTerm] = React.useState("");

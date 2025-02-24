@@ -50,6 +50,20 @@ public class VideoService {
         return Optional.empty();
     }
 
+    public Video incrementViewerCount(String id) {
+        Optional<Video> optionalVideo = videoRepository.findById(id);
+        if (optionalVideo.isPresent()) {
+            Video video = optionalVideo.get();
+            Long viewerCount = video.getViewerCount();
+            if (viewerCount == null) {
+                viewerCount = 0L;
+            }
+            video.setViewerCount(viewerCount + 1);
+            return videoRepository.save(video);
+        }
+        return null;
+    }
+
     public void deleteVideo(String id) {
         videoRepository.deleteById(id);
     }

@@ -17,8 +17,15 @@ import {
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {IUser} from "../models/IUser";
 
-const Community: React.FC = () => {
+const Community: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [topics, setTopics] = React.useState([]);
     const [newTopicTitle, setNewTopicTitle] = React.useState("");
     const [newTopicContent, setNewTopicContent] = React.useState("");

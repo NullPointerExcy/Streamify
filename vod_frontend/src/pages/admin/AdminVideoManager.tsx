@@ -10,7 +10,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
+    DialogTitle, Divider,
     Fab,
     FormControl,
     Grid,
@@ -35,6 +35,7 @@ import {getAllGames} from "../../services/game/GameServices";
 import Pagination from "@mui/material/Pagination";
 import {IGenre} from "../../models/IGenre";
 import {getAllGenres} from "../../services/genre/GenreServices";
+import {IUser} from "../../models/IUser";
 
 const ThumbnailInput = styled("input")({
     display: "none",
@@ -44,7 +45,13 @@ const VideoInput = styled("input")({
     display: "none",
 });
 
-const AdminVideoManager: React.FC = () => {
+const AdminVideoManager: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [title, setTitle] = React.useState("");
     // Store the game id as string for the selected game
     const [game, setGame] = React.useState("");
@@ -207,12 +214,11 @@ const AdminVideoManager: React.FC = () => {
 
         const parts = normalizedPath.split("/");
 
-        // TODO: Find a better way to handle this
+        // TODO: Find a better way to handle this, get config from DB, get the last part of the path, etc.
         const startIndex = parts.findIndex(part => part.toLowerCase() === "testvideofolder");
         const relativePath = parts.slice(startIndex + 1).join("/");
-        const decodedPath = decodeURIComponent(relativePath);
-
-        return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
+        const encodedPath = relativePath.split('/').map(encodeURIComponent).join('/');
+        return `${process.env.REACT_APP_API_URL}/videos/${encodedPath}`;
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
@@ -398,7 +404,7 @@ const AdminVideoManager: React.FC = () => {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setSelectedVideo(null)}>Close</Button>
+                    <Button onClick={() => setSelectedVideo(null)} fullWidth variant="contained">Close</Button>
                 </DialogActions>
             </Dialog>
 
@@ -452,6 +458,10 @@ const AdminVideoManager: React.FC = () => {
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
                                     Duration: {Math.floor(video.duration)}s
+                                </Typography>
+                                <Divider sx={{ my: 1 }} />
+                                <Typography variant="body2" color="textSecondary">
+                                    Views: {video.viewerCount || 0}
                                 </Typography>
                             </CardContent>
                             <Button

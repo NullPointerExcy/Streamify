@@ -17,6 +17,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {IFeature} from "../../models/IFeature";
 import {getAllFeatures, updateFeature} from "../../services/feature/FeatureServices";
+import {IUser} from "../../models/IUser";
 
 // Hardcoded for now!
 const controllableFeatures = [
@@ -32,7 +33,13 @@ const availableFeatures = [
     },
 ];
 
-const AdminFeatureManager: React.FC = () => {
+const AdminFeatureManager: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [features, setFeatures] = React.useState<Array<IFeature>>([]);
 
     React.useEffect(() => {

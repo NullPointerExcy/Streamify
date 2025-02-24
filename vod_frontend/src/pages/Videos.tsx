@@ -15,14 +15,22 @@ import {
     TextField,
     Dialog,
     IconButton,
-    Paper,
+    Paper, Divider,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import CloseIcon from "@mui/icons-material/Close";
-import { getAllVideos } from "../services/videos/VideoServices";
+import {getAllVideos, incrementViewerCount} from "../services/videos/VideoServices";
 import { IVideo } from "../models/IVideo";
+import {addWatchedVideo} from "../services/users/UserServices";
+import {IUser} from "../models/IUser";
 
-const Videos: React.FC = () => {
+const Videos: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [videos, setVideos] = React.useState<IVideo[]>([]);
     const [filteredVideos, setFilteredVideos] = React.useState<IVideo[]>([]);
     const [nameFilter, setNameFilter] = React.useState("");
@@ -52,6 +60,10 @@ const Videos: React.FC = () => {
         }
     }, [selectedVideo]);
 
+    React.useEffect(() => {
+        handleFilter();
+    }, [nameFilter, gameFilter, sortBy, order, videos, currentPage]);
+
     const handleSort = (videosToSort: IVideo[]) => {
         return [...videosToSort].sort((a, b) => {
             if (sortBy === "uploadDate") {
@@ -78,10 +90,6 @@ const Videos: React.FC = () => {
         });
     };
 
-    React.useEffect(() => {
-        handleFilter();
-    }, [nameFilter, gameFilter, sortBy, order, videos, currentPage]);
-
     const getStreamUrl = (filePath: string) => {
         const normalizedPath = filePath.replace(/\\/g, "/");
         const parts = normalizedPath.split("/");
@@ -92,6 +100,28 @@ const Videos: React.FC = () => {
         const decodedPath = decodeURIComponent(relativePath);
         return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
     };
+
+    const handleIncrementViewerCount = (video: IVideo) => {
+        // Check if the user already watched the video
+        if (user && user.watchedVideos.includes(video.id)) {
+            return;
+        }
+
+        addWatchedVideo(user.id, video).then(() => {
+            const updatedUser = {...user, watchedVideos: [...user.watchedVideos, video]};
+            setUser(updatedUser);
+        });
+        incrementViewerCount(video.id).then(() => {
+            const updatedVideos = videos.map((v) => {
+                if (v.id === video.id) {
+                    return {...v, views: v.viewerCount + 1};
+                }
+                return v;
+            });
+            setVideos(updatedVideos);
+            setFilteredVideos(updatedVideos);
+        });
+    }
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
     const currentVideos = videos.slice(
@@ -226,7 +256,10 @@ const Videos: React.FC = () => {
                                         backgroundColor: "rgba(144,202,249,0.13)",
                                     },
                                 }}
-                                onClick={() => setSelectedVideo(video)}
+                                onClick={() => {
+                                    setSelectedVideo(video);
+                                    handleIncrementViewerCount(video);
+                                }}
                             >
                                 <CardMedia
                                     component="img"
@@ -246,6 +279,10 @@ const Videos: React.FC = () => {
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Duration: {Math.floor(video.duration)}s
+                                    </Typography>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Typography variant="body2" color="textSecondary">
+                                        Views: {video.viewerCount || 0}
                                     </Typography>
                                     {video.playlist && (
                                         <Typography variant="body2" color="textSecondary">

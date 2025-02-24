@@ -24,28 +24,34 @@ import {ISiteSettings} from "../../models/ISiteSettings";
 import AdminFeatureManager from "./AdminFeatureManager";
 import AdminPlaylistManager from "./AdminPlaylistManager";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
+import AdminConfigSettings from "./AdminConfigSettings";
+import TuneIcon from '@mui/icons-material/Tune';
+import {IUser} from "../../models/IUser";
 
 
 const AdminPanel: React.FC = (props: {
     siteSettings: ISiteSettings
+    user: IUser,
+    setUser: (usr: IUser) => void,
 }) => {
 
-    const {siteSettings} = props;
+    const {siteSettings, user, setUser} = props;
 
     const [selectedSection, setSelectedSection] = React.useState(0);
     const navigate = useNavigate();
 
     const adminSections = [
-        {name: "Game Management", component: <AdminGameManager/>, icon: <SportsEsportsIcon/>},
-        {name: "Video Management", component: <AdminVideoManager/>, icon: <VideoLibraryIcon/>},
-        {name: "Playlist Management", component: <AdminPlaylistManager/>, icon: <SubscriptionsIcon/>},
-        {name: "User Management", component: <AdminUserManager/>, icon: <PeopleIcon/>},
+        {name: "Game Management", component: <AdminGameManager user={user} setUser={setUser} />, icon: <SportsEsportsIcon/>},
+        {name: "Video Management", component: <AdminVideoManager user={user} setUser={setUser}/>, icon: <VideoLibraryIcon/>},
+        {name: "Playlist Management", component: <AdminPlaylistManager user={user} setUser={setUser}/>, icon: <SubscriptionsIcon/>},
+        {name: "User Management", component: <AdminUserManager user={user} setUser={setUser}/>, icon: <PeopleIcon/>},
         {
             name: "Design Settings",
-            component: <AdminDesignSettings siteSettings={siteSettings}/>,
+            component: <AdminDesignSettings siteSettings={siteSettings} user={user} setUser={setUser}/>,
             icon: <BrushIcon/>
         },
-        {name: "Feature Management", component: <AdminFeatureManager/>, icon: <FeaturedPlayListIcon/>}
+        {name: "Feature Management", component: <AdminFeatureManager user={user} setUser={setUser}/>, icon: <FeaturedPlayListIcon/>},
+        {name: "Application.Properties Management", component: <AdminConfigSettings user={user} setUser={setUser}/>, icon: <TuneIcon/>},
     ];
 
     const handleSectionChange = (index) => {

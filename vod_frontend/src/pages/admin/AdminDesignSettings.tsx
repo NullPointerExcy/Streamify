@@ -25,6 +25,7 @@ import {
     uploadBackgroundImage
 } from "../../services/backgroundImage/BackgroundImageServices";
 import {IBackgroundImage} from "../../models/IBackgroundImage";
+import {IUser} from "../../models/IUser";
 
 const fontSizes = [
     {label: "Small", value: "h6"},
@@ -41,10 +42,12 @@ const fontFamilies = [
 ];
 
 const AdminDesignSettings: React.FC = (props: {
-    siteSettings: ISiteSettings
+    siteSettings: ISiteSettings,
+    user: IUser,
+    setUser: (usr: IUser) => void,
 }) => {
 
-    const {siteSettings} = props;
+    const {siteSettings, user, setUser} = props;
 
     const [title, setTitle] = React.useState("Streamify");
     const [titleColor, setTitleColor] = React.useState("#000000");

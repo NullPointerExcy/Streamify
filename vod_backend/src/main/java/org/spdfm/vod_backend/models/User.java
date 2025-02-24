@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -29,7 +30,7 @@ public class User {
     private Set<Role> roles;
     private String userImage;
 
-    private long totalViewTime = 0;
+    private Long totalViewTime = 0L;
     private int totalVideosWatched = 0;
     private int totalCreatedTopics = 0;
     private int totalComments = 0;

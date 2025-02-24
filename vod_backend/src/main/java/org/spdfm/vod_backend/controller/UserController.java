@@ -2,6 +2,7 @@ package org.spdfm.vod_backend.controller;
 
 
 import org.spdfm.vod_backend.models.User;
+import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,11 @@ public class UserController {
     @PutMapping
     public void updateUser(@RequestBody User user) {
         userService.updateUser(user);
+    }
+
+    @PutMapping("/addWatchedVideo/{userId}")
+    public void addWatchedVideo(@PathVariable String userId, @RequestBody Video video) {
+        userService.addWatchedVideo(userId, video);
     }
 
     @DeleteMapping

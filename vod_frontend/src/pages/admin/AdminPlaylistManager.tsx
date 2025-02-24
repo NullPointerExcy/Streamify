@@ -32,8 +32,15 @@ import {
 import { getAllVideos } from "../../services/videos/VideoServices";
 import { IPlaylist } from "../../models/IPlaylist";
 import { IVideo } from "../../models/IVideo";
+import {IUser} from "../../models/IUser";
 
-const AdminPlaylistManager: React.FC = () => {
+const AdminPlaylistManager: React.FC = (props: {
+    user: IUser,
+    setUser: (usr: IUser) => void,
+}) => {
+
+    const { user, setUser } = props;
+
     const [playlists, setPlaylists] = React.useState<Array<IPlaylist>>([]);
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -78,7 +85,6 @@ const AdminPlaylistManager: React.FC = () => {
 
     const handleAddOrUpdatePlaylist = () => {
         const newPlaylist: IPlaylist = {
-            id: selectedPlaylist?.id || "",
             title,
             description,
             videos: [],

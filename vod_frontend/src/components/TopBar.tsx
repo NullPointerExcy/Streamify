@@ -25,16 +25,17 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import {ISiteSettings} from "../models/ISiteSettings";
 import {IFeature} from "../models/IFeature";
 import {getAllFeatures} from "../services/feature/FeatureServices";
+import {IUser} from "../models/IUser";
 
 const TopBar: React.FC = (props: {
-    siteSettings: ISiteSettings
+    siteSettings: ISiteSettings,
+    user: IUser,
+    setUser: (usr: IUser) => void,
 }) => {
 
-    const {siteSettings} = props;
+    const {siteSettings, user, setUser} = props;
 
     const [features, setFeatures] = React.useState<Array<IFeature>>([]);
-
-    const user = JSON.parse(localStorage.getItem('user') || "{}");
 
     const menuItems = [
         {id: "streamify-home-ft", label: "Home", icon: <HomeIcon/>, link: "/"},
@@ -72,7 +73,9 @@ const TopBar: React.FC = (props: {
         if (action === "login") {
             window.location.href = "/login";
         } else if (action === "logout") {
-            alert("Successfully logged out!");
+            localStorage.removeItem("user");
+            setUser(null);
+            window.location.href = "/";
         }
     };
 
@@ -168,7 +171,13 @@ const TopBar: React.FC = (props: {
                             horizontal: 'right',
                         }}
                     >
-                        <MenuItem onClick={() => handleLoginLogout("login")}>
+                        <MenuItem onClick={() => {
+                            if (!user) {
+                                handleLoginLogout("login");
+                            } else {
+                                handleLoginLogout("logout");
+                            }
+                        }}>
                             {getLoginLogoutLabel()}
                         </MenuItem>
                         <Divider sx={{ my: 1, boxShadow: 1 }}/>

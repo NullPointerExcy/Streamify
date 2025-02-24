@@ -17,13 +17,18 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import {IUser} from "../models/IUser";
+import { Link } from "react-router-dom";
 
 
-const UserStatistics: React.FC = () => {
+const UserStatistics: React.FC = (props: {
+    user: IUser
+}) => {
+
+    const { user } = props;
+
     const [isVisible, setIsVisible] = React.useState(false);
     const [isExpanded, setIsExpanded] = React.useState(true);
-
-    const user = JSON.parse(localStorage.getItem('user') || null);
 
     const toggleSidebar = () => setIsVisible(!isVisible);
     const toggleExpand = () => setIsExpanded(!isExpanded);
@@ -43,7 +48,8 @@ const UserStatistics: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    borderRadius: "8px 0 0 8px"
+                    borderRadius: "8px 0 0 8px",
+                    zIndex: 1000
                 }}
             >
                 <IconButton
@@ -87,7 +93,22 @@ const UserStatistics: React.FC = () => {
                             <ListItem>
                                 <ListItemText
                                     primary="Last watched Video"
-                                    secondary={user.lastWatchedVideo?.title || "No video watched yet"}
+                                    secondary={
+                                        user.lastWatchedVideo ? (
+                                            <Link
+                                                to={`/videos/${user.lastWatchedVideo.id}`}
+                                                style={{
+                                                    textDecoration: "none",
+                                                    color: "#90caf9",
+                                                    fontWeight: "bold"
+                                                }}
+                                            >
+                                                {user.lastWatchedVideo.title}
+                                            </Link>
+                                        ) : (
+                                            "No video watched yet"
+                                        )
+                                    }
                                 />
                             </ListItem>
                             <ListItem>

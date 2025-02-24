@@ -16,17 +16,18 @@ import {
 } from "@mui/material";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import EditGame from "./EditGame";
+import {IUser} from "../models/IUser";
 
 
 const GameCard = (props: {
     game: IGame,
     onDelete: (id: string) => void,
-    getGameStats: (g: IGame) => {}
+    videos: Array<IVideo>,
+    users: Array<IUser>
 }) => {
 
-    const { game, onDelete, getGameStats } = props;
+    const { game, onDelete, videos, users } = props;
 
-    const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [flipped, setFlipped] = React.useState(false);
     const [showEditButton, setShowEditButton] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
@@ -47,6 +48,13 @@ const GameCard = (props: {
         setFlipped(!flipped);
         setShowEditButton(!showEditButton);
     };
+
+    const getGameStats = (game: IGame) => {
+        const totalVideos = videos.filter((video) => video.game.id === game.id).length;
+        const totalDuration = videos.reduce((acc, video) => acc + video.duration, 0);
+        const totalUsers = users?.watchedVideos?.filter((video) => video.game.id === game.id).length;
+        return { totalVideos, totalDuration, totalUsers };
+    }
 
     return (
         <>

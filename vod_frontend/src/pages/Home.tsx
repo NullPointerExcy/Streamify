@@ -16,8 +16,15 @@ import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ForumIcon from '@mui/icons-material/Forum';
+import {IUser} from "../models/IUser";
+import {getUserById} from "../services/users/UserServices";
 
-const Home: React.FC = () => {
+const Home: React.FC = (props: {
+    user: IUser
+}) => {
+
+    const { user } = props;
+
     const sections = [
         {
             title: "Home",
