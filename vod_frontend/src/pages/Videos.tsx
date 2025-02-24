@@ -168,14 +168,16 @@ const Videos: React.FC = (props: {
 
 
     const handleIncrementViewerCount = (video: IVideo) => {
-        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
-        if (user && alreadyWatched) {
-            return;
-        }
         addWatchedVideo(user.id, video).then(() => {
             const updatedUser = { ...user, watchedVideos: [...user.watchedVideos, video] };
             setUser(updatedUser);
         });
+
+        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
+        if (user && alreadyWatched) {
+            return;
+        }
+
         incrementViewerCount(video.id).then(() => {
             const updatedVideos = videos.map((v) => {
                 if (v.id === video.id) {
@@ -192,6 +194,7 @@ const Videos: React.FC = (props: {
         try {
             const response = await fetch(hlsUrl, {
                 method: "HEAD",
+                cors: "no-cors",
                 cache: "no-cache"
             });
             return response.ok;
@@ -226,7 +229,7 @@ const Videos: React.FC = (props: {
             {selectedVideo && (
                 <Box sx={{
                     height: "100%",
-                    backgroundColor: "black",
+                    backgroundColor: "#0b0b0b",
                     position: "relative",
                     display: "flex",
                     justifyContent: "center",
@@ -254,39 +257,47 @@ const Videos: React.FC = (props: {
                             <PlayCircleOutlineIcon fontSize="large" />
                         </IconButton>
                     )}
-                    {selectedVideo && videoUrl && (
-                        videoUrl.includes('.m3u8') ? (
-                            <ReactHlsPlayer
-                                src={videoUrl}
-                                autoPlay
-                                controls
-                                width="75%"
-                                height="auto"
-                                hlsConfig={{
-                                    maxLoadingDelay: 4,
-                                    minAutoBitrate: 0,
-                                    lowLatencyMode: true,
-                                }}
-                                playerRef={videoRef}
-                            />
-                        ) : (
-                            <video
-                                ref={videoRef}
-                                controls
-                                preload="auto"
-                                crossOrigin="anonymous"
-                                style={{
-                                    width: "75%",
-                                    height: "auto",
-                                    objectFit: "contain",
-                                    backgroundColor: "black",
-                                }}
-                                src={videoUrl}
-                                onPlay={() => setIsPlaying(true)}
-                                onPause={() => setIsPlaying(false)}
-                            />
-                        )
-                    )}
+                    <Box sx={{
+                        overflow: "auto",
+                        objectFit: "contain",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        {selectedVideo && videoUrl && (
+                            videoUrl.includes('.m3u8') ? (
+                                <ReactHlsPlayer
+                                    src={videoUrl}
+                                    autoPlay
+                                    controls
+                                    width="75%"
+                                    height="auto"
+                                    hlsConfig={{
+                                        maxLoadingDelay: 4,
+                                        minAutoBitrate: 0,
+                                        lowLatencyMode: true,
+                                    }}
+                                    playerRef={videoRef}
+                                />
+                            ) : (
+                                <video
+                                    ref={videoRef}
+                                    controls
+                                    preload="auto"
+                                    crossOrigin="anonymous"
+                                    style={{
+                                        width: "75%",
+                                        height: "auto",
+                                        objectFit: "contain",
+                                        backgroundColor: "black",
+                                    }}
+                                    src={videoUrl}
+                                    onPlay={() => setIsPlaying(true)}
+                                    onPause={() => setIsPlaying(false)}
+                                />
+                            )
+                        )}
+                    </Box>
                     <IconButton
                         onClick={() => {
                             setSelectedVideo(null);

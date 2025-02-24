@@ -3,13 +3,9 @@ package org.spdfm.vod_backend.config;
 import org.spdfm.vod_backend.models.Config;
 import org.spdfm.vod_backend.services.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,8 +38,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 List<String> streamLocations = new ArrayList<>(List.of(config.getValue().split(",")));
                 streamLocations.replaceAll(s -> s.endsWith("/") ? s + "**" : s + "/**");
                 streamLocations.add("/videos/**");
-                streamLocations.add("/video/stream/**");
-                streamLocations.add("/video/stream/hls/**");
+                streamLocations.add("/videos/stream/**");
+                streamLocations.add("/videos/stream/hls/**");
                 return streamLocations;
             }
         } catch (Exception e) {

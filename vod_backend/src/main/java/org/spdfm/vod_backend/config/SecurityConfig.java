@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,6 @@ public class SecurityConfig {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
-
-    @Autowired
-    private ConfigService configService;
 
     @Value("${cors.allowed.origins}")
     private String allowedOrigins;
@@ -40,14 +38,16 @@ public class SecurityConfig {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
                     corsConfig.setAllowedOrigins(origins);
                     corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfig.setAllowedHeaders(List.of("*"));
-                    corsConfig.setExposedHeaders(List.of("Content-Type", "Accept", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+                    corsConfig.setAllowedHeaders(List.of("Content-Type", "Authorization"));
+                    corsConfig.setExposedHeaders(List.of("Content-Type", "Authorization"));
                     corsConfig.setAllowCredentials(true);
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/**",
                                 "/videos/**",
+                                "/videos/stream/hls/**",
                                 "/api/v1/videos/**",
                                 "/api/v1/videos/stream/**",
                                 "/api/v1/videos/stream/hls/**",

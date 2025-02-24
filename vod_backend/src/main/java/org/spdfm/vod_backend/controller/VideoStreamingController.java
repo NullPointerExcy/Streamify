@@ -104,6 +104,8 @@ public class VideoStreamingController {
                     Resource resource = new UrlResource(filePath.toUri());
                     String contentType = Files.probeContentType(filePath);
 
+                    System.out.println(filePath);
+
                     if (filename.endsWith(".m3u8")) {
                         contentType = "application/vnd.apple.mpegurl";
                     } else if (filename.endsWith(".ts")) {

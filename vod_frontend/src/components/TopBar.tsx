@@ -27,6 +27,9 @@ import {IFeature} from "../models/IFeature";
 import {getAllFeatures} from "../services/feature/FeatureServices";
 import {IUser} from "../models/IUser";
 
+import logo from "../resources/Streamify.png";
+
+
 const TopBar: React.FC = (props: {
     siteSettings: ISiteSettings,
     user: IUser,
@@ -127,8 +130,13 @@ const TopBar: React.FC = (props: {
                                     mb: 1,
                                     color: siteSettings?.siteTheme.titleColor,
                                     textShadow: siteSettings?.siteTheme.textShadow,
-                                    fontFamily: siteSettings?.siteTheme.fontFamily
+                                    fontFamily: siteSettings?.siteTheme.fontFamily,
+                                    position: "relative",
+                                    "&:hover": {
+                                        cursor: "pointer",
+                                    }
                                 }}
+                                onClick={() => window.location.href = "/"}
                     >
                         {siteSettings?.siteTitle}
                     </Typography>
@@ -149,6 +157,19 @@ const TopBar: React.FC = (props: {
                                 {item.label}
                             </Button>
                         ))}
+                    </Box>
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            left: 0,
+                            width: "10%",
+                            height: "auto",
+                            opacity: 0.8,
+                            zIndex: 5,
+                            objectFit: "contain",
+                        }}
+                    >
+                        <img src={logo} alt="Logo" style={{width: "100%", height: "auto"}}/>
                     </Box>
                 </Box>
 

@@ -23,6 +23,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import {IVideo} from "../models/IVideo";
 import {addWatchedVideo} from "../services/users/UserServices";
 import {incrementViewerCount} from "../services/videos/VideoServices";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
+import ReactHlsPlayer from "react-hls-player";
 
 
 const Playlists: React.FC = (props: {
@@ -42,13 +44,46 @@ const Playlists: React.FC = (props: {
     const [selectedVideo, setSelectedVideo] = React.useState<IVideo | null>(null);
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const videoRef = React.useRef<HTMLVideoElement>(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [videoUrl, setVideoUrl] = React.useState("");
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const itemsPerPage = 8;
+    const { videoId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const startTime = parseInt(searchParams.get("startTime")) || 0;
 
     React.useEffect(() => {
-        if (selectedVideo && videoRef.current) {
-            videoRef.current.play().catch((err) => {
-                console.error("Auto play failed", err);
-            });
+        if (videoRef.current && !isPlaying) {
+            const currentTime = Math.floor(videoRef.current.currentTime);
+            // Throttled update of URL
+            navigate(`/videos/${selectedVideo?.id}?startTime=${currentTime}`, { replace: true });
         }
+    }, [isPlaying]);
+
+    React.useEffect(() => {
+        const fetchVideoUrl = async () => {
+            if (selectedVideo) {
+                // const hlsUrl = await getHslStreamUrl(selectedVideo.id);
+
+                const fallbackUrl = await getStreamUrl(selectedVideo.id);
+                setVideoUrl(fallbackUrl);
+                /*const isHlsAvailable = await checkHlsAvailability(hlsUrl);
+
+                if (isHlsAvailable) {
+                    console.log("HLS available:", hlsUrl);
+                    setVideoUrl(hlsUrl);
+                } else {
+                    console.log("HLS not available, falling back to normal stream");
+                    const fallbackUrl = await getStreamUrl(selectedVideo.id);
+                    setVideoUrl(fallbackUrl);
+                }*/
+            }
+        };
+        fetchVideoUrl();
     }, [selectedVideo]);
 
     React.useEffect(() => {
@@ -57,6 +92,46 @@ const Playlists: React.FC = (props: {
             setFilteredPlaylists(data);
         });
     }, []);
+
+    React.useEffect(() => {
+        const handleLoadedMetadata = () => {
+            if (videoRef.current) {
+                videoRef.current.currentTime = startTime;
+            }
+        };
+
+        const videoElement = videoRef.current;
+        if (videoElement) {
+            videoElement.addEventListener("loadedmetadata", handleLoadedMetadata);
+        }
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
+            }
+        };
+    }, [startTime]);
+
+    React.useEffect(() => {
+        if (videoId && videos.length > 0) {
+            const selected = videos.find((video) => video.id === videoId);
+            if (selected) {
+                setSelectedVideo(selected);
+                if (videoRef.current) {
+                    videoRef.current.currentTime = startTime;
+                }
+            } else {
+                setSelectedVideo(null);
+            }
+        } else {
+            setSelectedVideo(null);
+        }
+    }, [videoId, videos, startTime]);
+
+    React.useEffect(() => {
+        if (selectedVideo && videoRef.current) {
+            videoRef.current.currentTime = startTime;
+        }
+    }, [selectedVideo, startTime]);
 
     const handleSort = (playlistsToSort: IPlaylist[]) => {
         return [...playlistsToSort].sort((a, b) => {
@@ -93,26 +168,49 @@ const Playlists: React.FC = (props: {
         return handleSort(filtered);
     };
 
+    const getStreamUrl = async (videoId: string) => {
+        return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
+    };
+
+    const getHslStreamUrl = async (videoId: string) => {
+        return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/hls/${videoId}/master.m3u8`;
+    };
+
     const handleIncrementViewerCount = (video: IVideo) => {
-        // Check if the user already watched the video
-        if (user && user.watchedVideos.includes(video.id)) {
+        addWatchedVideo(user.id, video).then(() => {
+            const updatedUser = { ...user, watchedVideos: [...user.watchedVideos, video] };
+            setUser(updatedUser);
+        });
+
+        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
+        if (user && alreadyWatched) {
             return;
         }
 
-        addWatchedVideo(user.id, video).then(() => {
-            const updatedUser = {...user, watchedVideos: [...user.watchedVideos, video]};
-            setUser(updatedUser);
-        });
         incrementViewerCount(video.id).then(() => {
             const updatedVideos = videos.map((v) => {
                 if (v.id === video.id) {
-                    return {...v, views: v.viewerCount + 1};
+                    return { ...v, views: v.viewerCount + 1 };
                 }
                 return v;
             });
             setVideos(updatedVideos);
         });
     }
+
+    const checkHlsAvailability = async (hlsUrl: string) => {
+        try {
+            const response = await fetch(hlsUrl, {
+                method: "HEAD",
+                cors: "no-cors",
+                cache: "no-cache"
+            });
+            return response.ok;
+        } catch (error) {
+            console.error("HLS check failed:", error);
+            return false;
+        }
+    };
 
     React.useEffect(() => {
         setFilteredPlaylists(filterAndSortPlaylists());
@@ -237,25 +335,43 @@ const Playlists: React.FC = (props: {
                     </Grid>
                 </>
             )}
-            {selectedPlaylist && selectedVideo && (
+            {selectedPlaylist && (
                 <Box sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "flex-start",
                 }}>
                     <Box sx={{ flex: 2, position: "relative" }}>
-                        <video
-                            ref={videoRef}
-                            controls
-                            autoPlay
-                            style={{
-                                width: "100%",
-                                height: "auto",
-                                objectFit: "contain",
-                                backgroundColor: "black",
-                            }}
-                            src={selectedVideo.filePath}
-                        />
+                        {videoUrl && (
+                            videoUrl.includes('.m3u8') ? (
+                                <ReactHlsPlayer
+                                    src={videoUrl}
+                                    autoPlay
+                                    controls
+                                    width="75%"
+                                    height="auto"
+                                    hlsConfig={{
+                                        maxLoadingDelay: 4,
+                                        minAutoBitrate: 0,
+                                        lowLatencyMode: true,
+                                    }}
+                                    playerRef={videoRef}
+                                />
+                            ) : (
+                                <video
+                                    ref={videoRef}
+                                    controls
+                                    autoPlay
+                                    style={{
+                                        width: "100%",
+                                        height: "auto",
+                                        objectFit: "contain",
+                                        backgroundColor: "black",
+                                    }}
+                                    src={videoUrl}
+                                />
+                            )
+                        )}
                         <IconButton
                             onClick={() => {
                                 setSelectedPlaylist(null);
