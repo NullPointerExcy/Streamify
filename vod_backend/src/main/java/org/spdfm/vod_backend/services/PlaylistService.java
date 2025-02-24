@@ -42,6 +42,7 @@ public class PlaylistService {
         existingPlaylist.setId(existingPlaylist.getId());
         existingPlaylist.setTitle(playlist.getTitle());
         existingPlaylist.setDescription(playlist.getDescription());
+        existingPlaylist.setThumbnail(playlist.getThumbnail());
         return playlistRepository.save(existingPlaylist);
     }
 

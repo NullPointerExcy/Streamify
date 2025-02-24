@@ -16,13 +16,15 @@ public class Playlist {
 
     private String title;
     private String description;
+    private String thumbnail;
 
     @DBRef(lazy = false)
     private List<Video> videos;
 
-    public Playlist(String title, String description, List<Video> videos) {
+    public Playlist(String title, String description, String thumbnail, List<Video> videos) {
         this.title = title;
         this.description = description;
+        this.thumbnail = thumbnail;
         this.videos = videos;
     }
 

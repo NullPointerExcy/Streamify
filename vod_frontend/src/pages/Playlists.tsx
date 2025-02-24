@@ -190,7 +190,7 @@ const Playlists: React.FC = (props: {
                                     <Box sx={{ position: "relative", overflow: "hidden" }}>
                                         <CardMedia
                                             component="img"
-                                            image={playlist.videos[0]?.thumbnail || ''}
+                                            image={playlist.thumbnail || playlist.videos[0]?.thumbnail || ""}
                                             alt={playlist.title}
                                             sx={{
                                                 height: 200,

@@ -27,7 +27,7 @@ import {
     addPlaylist,
     updatePlaylist,
     deletePlaylist,
-    addVideoToPlaylist, updatePlaylistVideos,
+    addVideoToPlaylist, updatePlaylistVideos, addPlaylistThumbnail,
 } from "../../services/playlist/PlaylistServices";
 import { getAllVideos } from "../../services/videos/VideoServices";
 import { IPlaylist } from "../../models/IPlaylist";
@@ -50,6 +50,10 @@ const AdminPlaylistManager: React.FC = (props: {
     const [selectedVideos, setSelectedVideos] = React.useState<string[]>([]);
     const [searchTitle, setSearchTitle] = React.useState("");
 
+    const [thumbnail, setThumbnail] = React.useState<File | null>(null);
+    const [previewThumbnail, setPreviewThumbnail] = React.useState<string | null>(null);
+
+
     React.useEffect(() => {
         fetchPlaylists();
         fetchVideos();
@@ -67,11 +71,45 @@ const AdminPlaylistManager: React.FC = (props: {
         });
     };
 
+    const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setThumbnail(file);
+            const reader = new FileReader();
+            reader.onload = () => {
+                setPreviewThumbnail(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleUploadThumbnail = (playlist: IPlaylist) => {
+        if (!thumbnail) return;
+
+        const formData = new FormData();
+        formData.append('file', thumbnail);
+
+        addPlaylistThumbnail(formData)
+            .then((response) => {
+                const coverUrl = response.data.imageData;
+                playlist.thumbnail = coverUrl;
+                updatePlaylist(playlist.id, playlist).then(() => {
+                    fetchPlaylists();
+                    setThumbnail(null);
+                    setPreviewThumbnail(null);
+                });
+            })
+            .catch((error) => {
+                console.error("Error uploading thumbnail:", error);
+            });
+    };
+
     const handleOpenDialog = (playlist = null) => {
         setSelectedPlaylist(playlist);
         setTitle(playlist?.title || "");
         setDescription(playlist?.description || "");
         setSelectedVideos(playlist?.videos?.map((v) => v.id) || []);
+        setPreviewThumbnail(playlist?.thumbnail || null);
         setIsDialogOpen(true);
     };
 
@@ -89,6 +127,10 @@ const AdminPlaylistManager: React.FC = (props: {
             description,
             videos: [],
         };
+
+        if (thumbnail && selectedPlaylist) {
+            handleUploadThumbnail(selectedPlaylist);
+        }
 
         if (selectedPlaylist) {
             updatePlaylist(selectedPlaylist.id, newPlaylist).then(() => {
@@ -132,6 +174,15 @@ const AdminPlaylistManager: React.FC = (props: {
 
     const handleDeletePlaylist = (id) => {
         deletePlaylist(id).then(() => {
+            fetchPlaylists();
+        });
+    };
+
+    const handleRemoveThumbnail = (playlist: IPlaylist) => {
+        setThumbnail(null);
+        setPreviewThumbnail(null);
+        playlist.thumbnail = "";
+        updatePlaylist(playlist.id, playlist).then(() => {
             fetchPlaylists();
         });
     };
@@ -192,6 +243,12 @@ const AdminPlaylistManager: React.FC = (props: {
                                 <Typography variant="body2" color="textSecondary">
                                     {playlist.description}
                                 </Typography>
+                                <CardMedia
+                                    component="img"
+                                    image={playlist.thumbnail || ""}
+                                    alt={playlist.title}
+                                    sx={{ height: 200, objectFit: "cover" }}
+                                />
                                 <Divider sx={{ my: 2 }} />
                                 <Table>
                                     <tbody>
@@ -232,6 +289,41 @@ const AdminPlaylistManager: React.FC = (props: {
                     {selectedPlaylist ? "Edit Playlist" : "Add New Playlist"}
                 </DialogTitle>
                 <DialogContent>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="subtitle1" sx={{ mb: 2 }}>Thumbnail:</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Button
+                            variant="contained"
+                            component="label"
+                        >
+                            Choose Thumbnail
+                            <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={handleThumbnailChange}
+                            />
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() => handleRemoveThumbnail(selectedPlaylist)}
+                            disabled={!selectedPlaylist?.thumbnail}
+                        >
+                            Remove Thumbnail
+                        </Button>
+                        {previewThumbnail && (
+                            <Box sx={{ ml: 2 }}>
+                                <Typography variant="body2">Preview:</Typography>
+                                <CardMedia
+                                    component="img"
+                                    image={previewThumbnail}
+                                    alt="Thumbnail Preview"
+                                    sx={{ width: 100, height: 100, objectFit: "cover" }}
+                                />
+                            </Box>
+                        )}
+                    </Box>
                     <TextField
                         label="Title"
                         variant="outlined"

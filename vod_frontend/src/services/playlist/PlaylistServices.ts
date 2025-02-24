@@ -17,6 +17,17 @@ export const getAllPlaylists = async () => {
 }
 
 
+export const addPlaylistThumbnail = async (formData: any) => {
+    return await axios.post(`/playlists/upload-cover`, formData, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+};
+
+
+
 export const addVideoToPlaylist = async (playlistId: string, videoId: string) => {
     return await axios.put(`/playlists/${playlistId}/videos/${videoId}`, {}, {
         headers: {

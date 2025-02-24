@@ -1,6 +1,7 @@
 package org.spdfm.vod_backend.controller;
 
 import org.spdfm.vod_backend.models.Video;
+import org.spdfm.vod_backend.services.ConfigService;
 import org.spdfm.vod_backend.services.VideoService;
 import org.spdfm.vod_backend.config.RabbitMQConfig;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -23,14 +24,13 @@ public class VideoController {
     private VideoService videoService;
 
     @Autowired
+    private ConfigService configService;
+
+    @Autowired
     private AmqpTemplate rabbitTemplate;
 
-    @Value("${video.storage.locations}")
-    private String[] storageLocations;
-
-    private String getStoragePath(String id) {
-        int index = Math.abs(id.hashCode()) % storageLocations.length;
-        return storageLocations[index];
+    private String getStoragePath() {
+        return configService.getConfigByKey("video.storage.locations").getValue();
     }
 
     @GetMapping
@@ -52,7 +52,7 @@ public class VideoController {
     public String uploadVideo(@PathVariable String id, @RequestParam("file") MultipartFile file) {
         try {
             LocalDateTime now = LocalDateTime.now();
-            String baseDir = getStoragePath(id);
+            String baseDir = getStoragePath();
             String uploadDir = baseDir + id + "/";
 
             String originalFilename = file.getOriginalFilename();
@@ -91,7 +91,7 @@ public class VideoController {
 
     @DeleteMapping("/{id}")
     public void deleteVideo(@PathVariable String id) {
-        String baseDir = getStoragePath(id) + id;
+        String baseDir = getStoragePath() + id;
         try {
             Files.deleteIfExists(Paths.get(baseDir));
         } catch (Exception e) {
