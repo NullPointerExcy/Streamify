@@ -88,7 +88,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Home user={user} />} />
-                    <Route path="/videos" element={<Videos user={user} setUser={setUser} />} />
+                    <Route path="/videos/:videoId?" element={<Videos user={user} setUser={setUser} />} />
                     <Route path="/playlists" element={<Playlists user={user} setUser={setUser} />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/community" element={<Community user={user} setUser={setUser} />} />

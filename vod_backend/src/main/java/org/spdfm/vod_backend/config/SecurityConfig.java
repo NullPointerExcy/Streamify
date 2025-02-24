@@ -34,17 +34,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         List<String> origins = List.of(this.allowedOrigins.split(","));
-        List<String> streamLocations = getStreamLocations();
-
-        streamLocations.replaceAll(s -> s.endsWith("/") ? s + "**" : s + "/**");
-        streamLocations.add("/videos/**");
-        streamLocations.add("/api/v1/videos/**");
-        streamLocations.add("/api/v1/playlists/**");
-        streamLocations.add("/api/v1/topics/**");
-        streamLocations.add("/api/v1/settings/**");
-        streamLocations.add("/api/v1/comments/**");
-        streamLocations.add("/api/v1/auth/**");
-
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
@@ -59,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/videos/**",
                                 "/api/v1/videos/**",
+                                "/api/v1/videos/stream/**",
                                 "/api/v1/playlists/**",
                                 "/api/v1/topics/**",
                                 "/api/v1/settings/**",
@@ -74,22 +64,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    private List<String> getStreamLocations() {
-        try {
-            Config config = configService.getConfigByKey("web.stream.resource.locations");
-            if (config != null && config.getValue() != null) {
-                List<String> streamLocations = new ArrayList<>(List.of(config.getValue().split(",")));
-                streamLocations.replaceAll(s -> s.endsWith("/") ? s + "**" : s + "/**");
-                streamLocations.add("/videos/**");
-                streamLocations.add("/videos/**/**");
-                return streamLocations;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
     }
 
     @Bean

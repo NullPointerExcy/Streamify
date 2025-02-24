@@ -6,7 +6,6 @@ import org.spdfm.vod_backend.services.VideoService;
 import org.spdfm.vod_backend.config.RabbitMQConfig;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

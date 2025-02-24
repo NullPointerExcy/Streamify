@@ -24,6 +24,10 @@ import { IVideo } from "../models/IVideo";
 import {addWatchedVideo} from "../services/users/UserServices";
 import {IUser} from "../models/IUser";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import {getAllConfigs, getConfigByKey} from "../services/config/ConfigServices";
+import {IConfig} from "../models/IConfig";
+
 
 
 const Videos: React.FC = (props: {
@@ -40,12 +44,20 @@ const Videos: React.FC = (props: {
     const [sortBy, setSortBy] = React.useState("title");
     const [order, setOrder] = React.useState("asc");
     const [selectedVideo, setSelectedVideo] = React.useState<IVideo | null>(null);
+    const [isPlaying, setIsPlaying] = React.useState(false);
+    const [videoUrl, setVideoUrl] = React.useState("");
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 8;
 
     const videoRef = React.useRef<HTMLVideoElement>(null);
+    const { videoId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const searchParams = new URLSearchParams(location.search);
+    const startTime = parseInt(searchParams.get("startTime")) || 0;
 
     React.useEffect(() => {
         getAllVideos().then((response) => {
@@ -55,12 +67,57 @@ const Videos: React.FC = (props: {
     }, []);
 
     React.useEffect(() => {
-        if (selectedVideo && videoRef.current) {
-            videoRef.current.play().catch((err) => {
-                console.error("Auto play failed", err);
-            });
-        }
+        const fetchVideoUrl = async () => {
+            if (selectedVideo) {
+                const url = await getStreamUrl(selectedVideo.id);
+                setVideoUrl(url);
+            }
+        };
+        fetchVideoUrl();
     }, [selectedVideo]);
+
+    React.useEffect(() => {
+        const handleLoadedMetadata = () => {
+            if (videoRef.current) {
+                videoRef.current.currentTime = startTime;
+            }
+        };
+
+        const videoElement = videoRef.current;
+        if (videoElement) {
+            videoElement.addEventListener("loadedmetadata", handleLoadedMetadata);
+        }
+
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
+            }
+        };
+    }, [startTime]);
+
+    React.useEffect(() => {
+        if (videoId && videos.length > 0) {
+            const selected = videos.find((video) => video.id === videoId);
+            if (selected) {
+                setSelectedVideo(selected);
+
+                if (videoRef.current) {
+                    videoRef.current.currentTime = startTime;
+                }
+            } else {
+                setSelectedVideo(null);
+            }
+        } else {
+            setSelectedVideo(null);
+        }
+    }, [videoId, videos, startTime]);
+
+
+    React.useEffect(() => {
+        if (selectedVideo && videoRef.current) {
+            videoRef.current.currentTime = startTime;
+        }
+    }, [selectedVideo, startTime]);
 
     React.useEffect(() => {
         handleFilter();
@@ -92,15 +149,8 @@ const Videos: React.FC = (props: {
         });
     };
 
-    const getStreamUrl = (filePath: string) => {
-        const normalizedPath = filePath.replace(/\\/g, "/");
-        const parts = normalizedPath.split("/");
-        const startIndex = parts.findIndex(
-            (part) => part.toLowerCase() === "testvideofolder"
-        );
-        const relativePath = parts.slice(startIndex + 1).join("/");
-        const decodedPath = decodeURIComponent(relativePath);
-        return `${process.env.REACT_APP_API_URL}/videos/${decodedPath}`;
+    const getStreamUrl = async (videoId: string) => {
+        return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
     };
 
     const handleIncrementViewerCount = (video: IVideo) => {
@@ -156,20 +206,57 @@ const Videos: React.FC = (props: {
                     display: "flex",
                     justifyContent: "center",
                 }}>
-                    <video
-                        ref={videoRef}
-                        controls
-                        autoPlay
-                        style={{
-                            width: "85%",
-                            height: "auto",
-                            objectFit: "contain",
-                            backgroundColor: "black",
-                        }}
-                        src={getStreamUrl(selectedVideo.filePath)}
-                    />
+                    {!isPlaying && (
+                        <IconButton
+                            onClick={() => {
+                                if (videoRef.current) {
+                                    videoRef.current.play().catch((err) => {
+                                        console.error("Manual play failed", err);
+                                    });
+                                }
+                            }}
+                            sx={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                color: "white",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                zIndex: (theme) => theme.zIndex.modal + 101,
+                            }}
+                        >
+                            <PlayCircleOutlineIcon fontSize="large" />
+                        </IconButton>
+                    )}
+                    {selectedVideo && videoUrl && (
+                        <video
+                            ref={videoRef}
+                            controls
+                            autoPlay
+                            crossOrigin="anonymous"
+                            style={{
+                                width: "75%",
+                                height: "auto",
+                                objectFit: "contain",
+                                backgroundColor: "black",
+                            }}
+                            onTimeUpdate={() => {
+                                if (videoRef.current) {
+                                    const currentTime = Math.floor(videoRef.current.currentTime);
+                                    navigate(`/videos/${selectedVideo.id}?startTime=${currentTime}`, { replace: true });
+                                }
+                            }}
+                            src={videoUrl}
+                            onPlay={() => setIsPlaying(true)}
+                            onPause={() => setIsPlaying(false)}
+                        />
+                    )}
                     <IconButton
-                        onClick={() => setSelectedVideo(null)}
+                        onClick={() => {
+                            setSelectedVideo(null);
+                            navigate('/videos');
+                        }}
                         sx={{
                             position: "absolute",
                             top: "0%",
@@ -271,6 +358,8 @@ const Videos: React.FC = (props: {
                                 onClick={() => {
                                     setSelectedVideo(video);
                                     handleIncrementViewerCount(video);
+                                    navigate(`/videos/${video.id}`);
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
                                 }}
                             >
                                 <Box sx={{ position: "relative", overflow: "hidden" }}>

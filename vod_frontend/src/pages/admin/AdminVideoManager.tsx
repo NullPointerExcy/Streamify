@@ -36,6 +36,7 @@ import Pagination from "@mui/material/Pagination";
 import {IGenre} from "../../models/IGenre";
 import {getAllGenres} from "../../services/genre/GenreServices";
 import {IUser} from "../../models/IUser";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 
 const ThumbnailInput = styled("input")({
     display: "none",
@@ -65,6 +66,7 @@ const AdminVideoManager: React.FC = (props: {
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [duration, setDuration] = React.useState(0);
+    const [isPlaying, setIsPlaying] = React.useState(false);
 
     const [selectedGenre, setSelectedGenre] = React.useState<IGenre | null>(null);
     const [selectedVideo, setSelectedVideo] = React.useState<IVideo | null>(null);
@@ -84,12 +86,9 @@ const AdminVideoManager: React.FC = (props: {
 
     React.useEffect(() => {
         if (selectedVideo && videoRef.current) {
-            videoRef.current.play().catch((err) => {
-                console.error("Auto play failed", err);
-            });
+            videoRef.current.currentTime = startTime;
         }
     }, [selectedVideo]);
-
 
     React.useEffect(() => {
         getAllGames().then((response) => {
@@ -102,6 +101,16 @@ const AdminVideoManager: React.FC = (props: {
             setGenres(response);
         });
     }, []);
+
+    React.useEffect(() => {
+        const fetchVideoUrl = async () => {
+            if (selectedVideo) {
+                const url = await getStreamUrl(selectedVideo.id);
+                setVideoUrl(url);
+            }
+        };
+        fetchVideoUrl();
+    }, [selectedVideo]);
 
     const handleAddVideo = async () => {
         if (title && game && videoFile && (thumbnailUrl || thumbnailFile)) {
@@ -209,16 +218,8 @@ const AdminVideoManager: React.FC = (props: {
         setIsDialogOpen(false);
     };
 
-    const getStreamUrl = (filePath) => {
-        const normalizedPath = filePath.replace(/\\/g, "/");
-
-        const parts = normalizedPath.split("/");
-
-        // TODO: Find a better way to handle this, get config from DB, get the last part of the path, etc.
-        const startIndex = parts.findIndex(part => part.toLowerCase() === "testvideofolder");
-        const relativePath = parts.slice(startIndex + 1).join("/");
-        const encodedPath = relativePath.split('/').map(encodeURIComponent).join('/');
-        return `${process.env.REACT_APP_API_URL}/videos/${encodedPath}`;
+    const getStreamUrl = async (videoId: string) => {
+        return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
@@ -319,11 +320,44 @@ const AdminVideoManager: React.FC = (props: {
                                             </Button>
                                         </label>
                                     </FormControl>
-                                    {videoUrl && (
+                                    {!isPlaying && (
+                                        <IconButton
+                                            onClick={() => {
+                                                if (videoRef.current) {
+                                                    videoRef.current.play().catch((err) => {
+                                                        console.error("Manual play failed", err);
+                                                    });
+                                                }
+                                            }}
+                                            sx={{
+                                                position: "absolute",
+                                                top: "50%",
+                                                left: "50%",
+                                                transform: "translate(-50%, -50%)",
+                                                color: "white",
+                                                backgroundColor: "rgba(0,0,0,0.5)",
+                                                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                                zIndex: (theme) => theme.zIndex.modal + 101,
+                                            }}
+                                        >
+                                            <PlayCircleOutlineIcon fontSize="large" />
+                                        </IconButton>
+                                    )}
+                                    {selectedVideo && videoUrl && (
                                         <video
+                                            ref={videoRef}
                                             controls
+                                            autoPlay
+                                            crossOrigin="anonymous"
+                                            style={{
+                                                width: "85%",
+                                                height: "auto",
+                                                objectFit: "contain",
+                                                backgroundColor: "black",
+                                            }}
                                             src={videoUrl}
-                                            style={{ width: "100%", marginTop: "10px" }}
+                                            onPlay={() => setIsPlaying(true)}
+                                            onPause={() => setIsPlaying(false)}
                                         />
                                     )}
                                 </Box>
@@ -333,7 +367,7 @@ const AdminVideoManager: React.FC = (props: {
                                             component="img"
                                             image={
                                                 (useFirstFrameAsThumbnail ? thumbnailUrl : customThumbnail) ||
-                                                "https://placehold.co/600x400"
+                                                ""
                                             }
                                             alt="Thumbnail"
                                             sx={{ height: "100%", objectFit: "cover" }}
@@ -395,11 +429,36 @@ const AdminVideoManager: React.FC = (props: {
             >
                 <DialogTitle>{selectedVideo?.title}</DialogTitle>
                 <DialogContent>
-                    {selectedVideo && (
+                    {selectedVideo && !isPlaying && (
+                        <IconButton
+                            onClick={() => {
+                                if (videoRef.current) {
+                                    videoRef.current.play().catch((err) => {
+                                        console.error("Manual play failed", err);
+                                    });
+                                }
+                            }}
+                            sx={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                color: "white",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                zIndex: (theme) => theme.zIndex.modal + 101,
+                            }}
+                        >
+                            <PlayCircleOutlineIcon fontSize="large" />
+                        </IconButton>
+                    )}
+                    {selectedVideo && videoUrl && (
                         <video
                             controls
                             style={{ width: "100%" }}
-                            src={getStreamUrl(selectedVideo.filePath)}
+                            src={videoUrl}
+                            onPlay={() => setIsPlaying(true)}
+                            onPause={() => setIsPlaying(false)}
                         />
                     )}
                 </DialogContent>
