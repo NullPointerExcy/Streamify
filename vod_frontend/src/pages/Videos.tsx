@@ -13,22 +13,19 @@ import {
     FormControl,
     InputLabel,
     TextField,
-    Dialog,
     IconButton,
-    Paper, Divider,
+    Paper,
+    Divider,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import CloseIcon from "@mui/icons-material/Close";
-import {getAllVideos, incrementViewerCount} from "../services/videos/VideoServices";
-import { IVideo } from "../models/IVideo";
-import {addWatchedVideo} from "../services/users/UserServices";
-import {IUser} from "../models/IUser";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import { getAllVideos, incrementViewerCount } from "../services/videos/VideoServices";
+import { addWatchedVideo } from "../services/users/UserServices";
+import { IVideo } from "../models/IVideo";
+import { IUser } from "../models/IUser";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import {getAllConfigs, getConfigByKey} from "../services/config/ConfigServices";
-import {IConfig} from "../models/IConfig";
-
-
+import ReactHlsPlayer from "react-hls-player";
 
 const Videos: React.FC = (props: {
     user: IUser,
@@ -36,7 +33,6 @@ const Videos: React.FC = (props: {
 }) => {
 
     const { user, setUser } = props;
-
     const [videos, setVideos] = React.useState<IVideo[]>([]);
     const [filteredVideos, setFilteredVideos] = React.useState<IVideo[]>([]);
     const [nameFilter, setNameFilter] = React.useState("");
@@ -50,12 +46,10 @@ const Videos: React.FC = (props: {
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 8;
-
     const videoRef = React.useRef<HTMLVideoElement>(null);
     const { videoId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-
     const searchParams = new URLSearchParams(location.search);
     const startTime = parseInt(searchParams.get("startTime")) || 0;
 
@@ -65,6 +59,14 @@ const Videos: React.FC = (props: {
             setFilteredVideos(response);
         });
     }, []);
+
+    React.useEffect(() => {
+        if (videoRef.current && !isPlaying) {
+            const currentTime = Math.floor(videoRef.current.currentTime);
+            // Throttled update of URL
+            navigate(`/videos/${selectedVideo?.id}?startTime=${currentTime}`, { replace: true });
+        }
+    }, [isPlaying]);
 
     React.useEffect(() => {
         const fetchVideoUrl = async () => {
@@ -87,7 +89,6 @@ const Videos: React.FC = (props: {
         if (videoElement) {
             videoElement.addEventListener("loadedmetadata", handleLoadedMetadata);
         }
-
         return () => {
             if (videoElement) {
                 videoElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
@@ -100,7 +101,6 @@ const Videos: React.FC = (props: {
             const selected = videos.find((video) => video.id === videoId);
             if (selected) {
                 setSelectedVideo(selected);
-
                 if (videoRef.current) {
                     videoRef.current.currentTime = startTime;
                 }
@@ -111,7 +111,6 @@ const Videos: React.FC = (props: {
             setSelectedVideo(null);
         }
     }, [videoId, videos, startTime]);
-
 
     React.useEffect(() => {
         if (selectedVideo && videoRef.current) {
@@ -154,33 +153,31 @@ const Videos: React.FC = (props: {
     };
 
     const handleIncrementViewerCount = (video: IVideo) => {
-        // Check if the user already watched the video
-        if (user && user.watchedVideos.includes(video.id)) {
+        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
+        if (user && alreadyWatched) {
             return;
         }
-
         addWatchedVideo(user.id, video).then(() => {
-            const updatedUser = {...user, watchedVideos: [...user.watchedVideos, video]};
+            const updatedUser = { ...user, watchedVideos: [...user.watchedVideos, video] };
             setUser(updatedUser);
         });
         incrementViewerCount(video.id).then(() => {
             const updatedVideos = videos.map((v) => {
                 if (v.id === video.id) {
-                    return {...v, views: v.viewerCount + 1};
+                    return { ...v, views: v.viewerCount + 1 };
                 }
                 return v;
             });
             setVideos(updatedVideos);
             setFilteredVideos(updatedVideos);
         });
-    }
+    };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
     const currentVideos = videos.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
     const allGames = Array.from(new Set(videos.map((video) => video.game.title)));
 
     const handleFilter = () => {
@@ -230,27 +227,37 @@ const Videos: React.FC = (props: {
                         </IconButton>
                     )}
                     {selectedVideo && videoUrl && (
-                        <video
-                            ref={videoRef}
-                            controls
-                            autoPlay
-                            crossOrigin="anonymous"
-                            style={{
-                                width: "75%",
-                                height: "auto",
-                                objectFit: "contain",
-                                backgroundColor: "black",
-                            }}
-                            onTimeUpdate={() => {
-                                if (videoRef.current) {
-                                    const currentTime = Math.floor(videoRef.current.currentTime);
-                                    navigate(`/videos/${selectedVideo.id}?startTime=${currentTime}`, { replace: true });
-                                }
-                            }}
-                            src={videoUrl}
-                            onPlay={() => setIsPlaying(true)}
-                            onPause={() => setIsPlaying(false)}
-                        />
+                        videoUrl.includes('.m3u8') ? (
+                            <ReactHlsPlayer
+                                src={videoUrl}
+                                autoPlay
+                                controls
+                                width="75%"
+                                height="auto"
+                                hlsConfig={{
+                                    maxLoadingDelay: 4,
+                                    minAutoBitrate: 0,
+                                    lowLatencyMode: true,
+                                }}
+                                playerRef={videoRef}
+                            />
+                        ) : (
+                            <video
+                                ref={videoRef}
+                                controls
+                                preload="auto"
+                                crossOrigin="anonymous"
+                                style={{
+                                    width: "75%",
+                                    height: "auto",
+                                    objectFit: "contain",
+                                    backgroundColor: "black",
+                                }}
+                                src={videoUrl}
+                                onPlay={() => setIsPlaying(true)}
+                                onPause={() => setIsPlaying(false)}
+                            />
+                        )
                     )}
                     <IconButton
                         onClick={() => {
@@ -367,10 +374,7 @@ const Videos: React.FC = (props: {
                                         component="img"
                                         image={video.thumbnail}
                                         alt={video.title}
-                                        sx={{
-                                            height: 200,
-                                            objectFit: "cover"
-                                        }}
+                                        sx={{ height: 200, objectFit: "cover" }}
                                     />
                                     <PlayCircleOutlineIcon
                                         sx={{
@@ -382,9 +386,7 @@ const Videos: React.FC = (props: {
                                             color: "rgba(144,202,249,0.63)",
                                             transition: "color 0.3s ease, transform 0.3s ease",
                                             opacity: 0,
-                                            "&:hover": {
-                                                color: "rgb(144,202,249)",
-                                            }
+                                            "&:hover": { color: "rgb(144,202,249)" }
                                         }}
                                         className="play-icon"
                                     />

@@ -28,6 +28,7 @@ public class VideoStreamingController {
     @Autowired
     private VideoService videoService;
 
+    // TODO: Add .m3u8, .ts support for HLS streaming
     @GetMapping("/{id}")
     public ResponseEntity<Resource> streamVideo(@PathVariable String id, @RequestHeader HttpHeaders headers) {
         Optional<Video> optionalVideo = videoService.getVideoById(id);
