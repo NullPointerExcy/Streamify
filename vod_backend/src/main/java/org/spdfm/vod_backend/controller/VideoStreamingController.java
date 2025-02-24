@@ -1,6 +1,7 @@
 package org.spdfm.vod_backend.controller;
 
 import org.spdfm.vod_backend.models.Video;
+import org.spdfm.vod_backend.services.ConfigService;
 import org.spdfm.vod_backend.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,7 +30,13 @@ public class VideoStreamingController {
     @Autowired
     private VideoService videoService;
 
-    // TODO: Add .m3u8, .ts support for HLS streaming
+    @Autowired
+    private ConfigService configService;
+
+    private String getStoragePaths() {
+        return configService.getConfigByKey("video.storage.locations").getValue();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Resource> streamVideo(@PathVariable String id, @RequestHeader HttpHeaders headers) {
         Optional<Video> optionalVideo = videoService.getVideoById(id);
@@ -76,5 +84,43 @@ public class VideoStreamingController {
         }
     }
 
+    @GetMapping("/hls/{id}/{filename:.+}")
+    public ResponseEntity<Resource> streamHLS(@PathVariable String id, @PathVariable String filename) {
+        Optional<Video> optionalVideo = videoService.getVideoById(id);
+        if (optionalVideo.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
+        Video video = optionalVideo.get();
+        String gameId = video.getGame().getId();
+        String[] paths = getStoragePaths().split(",");
+
+        // Find the id and filename in the storage
+        for (String path : paths) {
+            Path filePath = Paths.get(path, gameId, id, "hls", filename);
+            System.out.println(filePath.toString());
+            if (Files.exists(filePath)) {
+                try {
+                    Resource resource = new UrlResource(filePath.toUri());
+                    String contentType = Files.probeContentType(filePath);
+
+                    if (filename.endsWith(".m3u8")) {
+                        contentType = "application/vnd.apple.mpegurl";
+                    } else if (filename.endsWith(".ts")) {
+                        contentType = "video/mp2t";
+                    }
+
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.CONTENT_TYPE, contentType)
+                            .body(resource);
+
+                } catch (MalformedURLException e) {
+                    return ResponseEntity.notFound().build();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return null;
+    }
 }

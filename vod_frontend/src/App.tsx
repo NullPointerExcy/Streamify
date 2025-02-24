@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {
     CssBaseline,
     ThemeProvider,
-    createTheme,
+    createTheme, CircularProgress, Stack, Box, Typography,
 } from "@mui/material";
 import TopBar from "./components/TopBar";
 import UserStatistics from "./components/UserStatistics";
@@ -78,8 +78,21 @@ function App() {
         });
     }, []);
 
-    // Render loading spinner or fallback UI if user data is being fetched
-    if (loading) return <div>Loading...</div>;
+    if (loading) return (
+        <Box sx={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            position: "fixed",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(5,5,5,0.82)",
+        }}>
+            <CircularProgress color="primary" size={100} />
+            <Typography variant={"h3"} sx={{ my: 2 }} color={"primary"}>Loading...</Typography>
+        </Box>
+    );
 
     return (
         <ThemeProvider theme={darkTheme}>

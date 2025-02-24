@@ -2,6 +2,7 @@ package org.spdfm.vod_backend.controller;
 
 import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.services.ConfigService;
+import org.spdfm.vod_backend.services.FFmpegService;
 import org.spdfm.vod_backend.services.VideoService;
 import org.spdfm.vod_backend.config.RabbitMQConfig;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -26,6 +27,9 @@ public class VideoController {
     private ConfigService configService;
 
     @Autowired
+    private FFmpegService ffmpegService;
+
+    @Autowired
     private AmqpTemplate rabbitTemplate;
 
     private String getStoragePath() {
@@ -44,7 +48,33 @@ public class VideoController {
 
     @PostMapping
     public Video addVideo(@RequestBody Video video) {
-        return videoService.addVideo(video);
+        Video v = videoService.addVideo(video);
+        // Rename video file to include video id {id}.mp4 / {id}.webm / {id}.mkv etc.
+        String oldPath = video.getFilePath();
+        // Create subdirectory for video with the videos id
+        String path = Paths.get(oldPath).getParent().toString();
+        String baseDir = path + "/" + v.getId() + "/";
+
+        try {
+            Files.createDirectories(Paths.get(baseDir));
+        } catch (Exception e) {
+            throw new RuntimeException("Video directory creation failed!", e);
+        }
+
+        String extension = oldPath.substring(oldPath.lastIndexOf("."));
+        String newPath = baseDir + v.getId() + extension;
+        try {
+            Files.move(Paths.get(oldPath), Paths.get(newPath), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            throw new RuntimeException("Video file renaming failed!", e);
+        }
+        v.setFilePath(newPath);
+
+        String outputDir = baseDir + "hls/";
+        String storagePath = getStoragePath();
+        ffmpegService.encodeToHLS(v.getGame().getId(), v.getId(), outputDir, storagePath);
+
+        return videoService.addVideo(v);
     }
 
     @PostMapping("/upload/{id}")
@@ -59,9 +89,6 @@ public class VideoController {
 
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
-
-            String message = "{\"videoId\": \"" + id + "\", \"filePath\": \"" + path.toString().replace("\\", "/") + "\"}";
-            // rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, message);
 
             return path.toString().replace("\\", "/");
         } catch (Exception e) {

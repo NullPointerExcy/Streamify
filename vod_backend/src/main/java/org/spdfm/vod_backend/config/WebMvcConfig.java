@@ -28,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             if (!location.startsWith("file:")) location = "file:" + location;
             if (!location.endsWith("/")) location += "/";
 
-            registry.addResourceHandler("/videos/**", "/video/stream/**")
+            registry.addResourceHandler("/videos/**", "/videos/stream/**", "/videos/stream/hls/**")
                     .addResourceLocations(location)
                     .setCachePeriod(3600)
                     .resourceChain(true);
@@ -42,6 +42,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 List<String> streamLocations = new ArrayList<>(List.of(config.getValue().split(",")));
                 streamLocations.replaceAll(s -> s.endsWith("/") ? s + "**" : s + "/**");
                 streamLocations.add("/videos/**");
+                streamLocations.add("/video/stream/**");
+                streamLocations.add("/video/stream/hls/**");
                 return streamLocations;
             }
         } catch (Exception e) {

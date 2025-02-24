@@ -41,6 +41,7 @@ public class SecurityConfig {
                     corsConfig.setAllowedOrigins(origins);
                     corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfig.setAllowedHeaders(List.of("*"));
+                    corsConfig.setExposedHeaders(List.of("Content-Type", "Accept", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
                     corsConfig.setAllowCredentials(true);
                     return corsConfig;
                 }))
@@ -49,6 +50,7 @@ public class SecurityConfig {
                                 "/videos/**",
                                 "/api/v1/videos/**",
                                 "/api/v1/videos/stream/**",
+                                "/api/v1/videos/stream/hls/**",
                                 "/api/v1/playlists/**",
                                 "/api/v1/topics/**",
                                 "/api/v1/settings/**",

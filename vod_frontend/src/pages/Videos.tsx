@@ -71,12 +71,22 @@ const Videos: React.FC = (props: {
     React.useEffect(() => {
         const fetchVideoUrl = async () => {
             if (selectedVideo) {
-                const url = await getStreamUrl(selectedVideo.id);
-                setVideoUrl(url);
+                const hlsUrl = await getHslStreamUrl(selectedVideo.id);
+                const isHlsAvailable = await checkHlsAvailability(hlsUrl);
+
+                if (isHlsAvailable) {
+                    console.log("HLS available:", hlsUrl);
+                    setVideoUrl(hlsUrl);
+                } else {
+                    console.log("HLS not available, falling back to normal stream");
+                    const fallbackUrl = await getStreamUrl(selectedVideo.id);
+                    setVideoUrl(fallbackUrl);
+                }
             }
         };
         fetchVideoUrl();
     }, [selectedVideo]);
+
 
     React.useEffect(() => {
         const handleLoadedMetadata = () => {
@@ -152,6 +162,11 @@ const Videos: React.FC = (props: {
         return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
     };
 
+    const getHslStreamUrl = async (videoId: string) => {
+        return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/hls/${videoId}/master.m3u8`;
+    };
+
+
     const handleIncrementViewerCount = (video: IVideo) => {
         const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
         if (user && alreadyWatched) {
@@ -171,6 +186,19 @@ const Videos: React.FC = (props: {
             setVideos(updatedVideos);
             setFilteredVideos(updatedVideos);
         });
+    };
+
+    const checkHlsAvailability = async (hlsUrl: string) => {
+        try {
+            const response = await fetch(hlsUrl, {
+                method: "HEAD",
+                cache: "no-cache"
+            });
+            return response.ok;
+        } catch (error) {
+            console.error("HLS check failed:", error);
+            return false;
+        }
     };
 
     const totalPages = Math.ceil(videos.length / itemsPerPage);
