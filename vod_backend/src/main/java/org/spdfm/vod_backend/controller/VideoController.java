@@ -1,5 +1,6 @@
 package org.spdfm.vod_backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.services.ConfigService;
 import org.spdfm.vod_backend.services.FFmpegService;
@@ -7,6 +8,7 @@ import org.spdfm.vod_backend.services.VideoService;
 import org.spdfm.vod_backend.config.RabbitMQConfig;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,8 +99,21 @@ public class VideoController {
     }
 
     @PutMapping("/{id}/view")
-    public Video incrementViewerCount(@PathVariable String id) {
-        return videoService.incrementViewerCount(id);
+    public ResponseEntity<Void> incrementViewerCount(@PathVariable String id, HttpServletRequest request) {
+        String ipAddress = getClientIp(request);
+        videoService.incrementViewerCount(id, ipAddress);
+        return ResponseEntity.ok().build();
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        } else {
+            // Multiple proxies, the first IP is the client IP
+            ip = ip.split(",")[0];
+        }
+        return ip;
     }
 
     @PutMapping("/{id}")

@@ -59,11 +59,12 @@ const AdminFeatureManager: React.FC = (props: {
             enabled: !features.find(f => f.id === feature.id)?.enabled
         };
         updateFeature(updatedFeature).then(() => {
-            const updatedFeatures = features.map(f =>
-                f.id === feature.id ? {...f, enabled: !feature.enabled} : f
+            setFeatures(prevFeatures =>
+                prevFeatures.map(f =>
+                    f.id === feature.id ? {...f, enabled: !f.enabled} : f
+                )
             );
-            // Mhhh, state is not updated here, but the API call is successful
-            setFeatures(updatedFeatures);
+            window.location.reload();
         });
     }
 

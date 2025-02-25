@@ -44,9 +44,6 @@ public class User {
     private Set<Comment> comments;
 
     @DBRef
-    private Set<Video> watchedVideos;
-
-    @DBRef
     private Video lastWatchedVideo;
 }
 

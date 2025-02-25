@@ -23,6 +23,9 @@ public class UserService {
     @Autowired
     private VideoRepository videoRepository;
 
+    @Autowired
+    private WatchedVideoService watchedVideoService;
+
     public User registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.USER));
@@ -60,28 +63,23 @@ public class UserService {
         Video video = videoOpt.get();
         User user = userOpt.get();
 
-        Set<Video> watchedVideos = Objects.requireNonNullElse(user.getWatchedVideos(), Collections.emptySet());
-
-        if (watchedVideos.contains(video)) {
+        // Check if the user has watched the video today
+        if (watchedVideoService.hasUserWatchedVideoToday(userId, video.getId())) {
+            // Already watched today, no need to increment count
             user.setLastWatchedVideo(video);
             userRepository.save(user);
-            // Video already watched, no other action needed
             return;
         }
+        watchedVideoService.addUserWatchedVideo(userId, video.getId());
 
-        int totalViewTime = Math.toIntExact(Objects.requireNonNullElse(user.getTotalViewTime(), 0L));
-        int totalVideosWatched = Objects.requireNonNullElse(user.getTotalVideosWatched(), 0);
+        int totalViewTime = Math.toIntExact(user.getTotalViewTime() != null ? user.getTotalViewTime() : 0L);
+        int totalVideosWatched = user.getTotalVideosWatched();
 
         user.setLastWatchedVideo(video);
         user.setTotalViewTime(totalViewTime + video.getDuration());
         user.setTotalVideosWatched(totalVideosWatched + 1);
 
-        if (watchedVideos.isEmpty()) {
-            watchedVideos = new HashSet<>();
-            user.setWatchedVideos(watchedVideos);
-        }
-
-        watchedVideos.add(video);
+        // Save the updated user
         userRepository.save(user);
     }
 

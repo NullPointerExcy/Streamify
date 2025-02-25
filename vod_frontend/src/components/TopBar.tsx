@@ -202,7 +202,9 @@ const TopBar: React.FC = (props: {
                             {getLoginLogoutLabel()}
                         </MenuItem>
                         <Divider sx={{ my: 1, boxShadow: 1 }}/>
-                        <MenuItem onClick={() => {}}>
+                        <MenuItem disabled={!user} onClick={() => {
+                            window.location.href = "/watchlist";
+                        }}>
                             <Box sx={{
                                 display: "flex",
                                 gap: 1,
@@ -212,7 +214,9 @@ const TopBar: React.FC = (props: {
                                 <TheatersIcon/> Watchlist
                             </Box>
                         </MenuItem>
-                        <MenuItem onClick={() => {}}>
+                        <MenuItem disabled={!user} onClick={() => {
+                            window.location.href = "/watched-history";
+                        }}>
                             <Box sx={{
                                 display: "flex",
                                 gap: 1,
@@ -222,7 +226,7 @@ const TopBar: React.FC = (props: {
                                 <HistoryIcon/> Watch History
                             </Box>
                         </MenuItem>
-                        <MenuItem onClick={() => {}}>
+                        <MenuItem disabled={!user} onClick={() => {}}>
                             <Box sx={{
                                 display: "flex",
                                 gap: 1,

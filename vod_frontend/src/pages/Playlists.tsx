@@ -13,7 +13,7 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem, IconButton, Divider,
+    MenuItem, IconButton, Divider, Tooltip,
 } from "@mui/material";
 import { getAllPlaylists } from "../services/playlist/PlaylistServices";
 import { IPlaylist } from "../models/IPlaylist";
@@ -25,6 +25,10 @@ import {addWatchedVideo} from "../services/users/UserServices";
 import {incrementViewerCount} from "../services/videos/VideoServices";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactHlsPlayer from "react-hls-player";
+import {getRelativeDate} from "../utility/DateUtils";
+import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import {addToWatchList, getWatchList, removeFromWatchList} from "../services/videos/WatchListServices";
 
 
 const Playlists: React.FC = (props: {
@@ -46,6 +50,7 @@ const Playlists: React.FC = (props: {
     const videoRef = React.useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [videoUrl, setVideoUrl] = React.useState("");
+    const [watchList, setWatchList] = React.useState<IVideo[]>([]);
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -91,6 +96,11 @@ const Playlists: React.FC = (props: {
             setPlaylists(data);
             setFilteredPlaylists(data);
         });
+        if (user && user.id) {
+            getWatchList(user.id).then((response) => {
+                setWatchList(response);
+            });
+        }
     }, []);
 
     React.useEffect(() => {
@@ -168,6 +178,30 @@ const Playlists: React.FC = (props: {
         return handleSort(filtered);
     };
 
+    const handleAddToWatchList = async (video: IVideo) => {
+        if (user && user.id) {
+            addToWatchList(user.id, video.id).then(() => {
+                if (isVideoInWatchList(video)) {
+                    setWatchList(watchList.filter((v) => v.id !== video.id));
+                } else {
+                    setWatchList([...watchList, video]);
+                }
+            })
+        }
+    }
+
+    const handleRemoveFromWatchList = async (video: IVideo) => {
+        if (user && user.id) {
+            removeFromWatchList(user.id, video.id).then(() => {
+                setWatchList(watchList.filter((v) => v.id !== video.id));
+            })
+        }
+    }
+
+    const isVideoInWatchList = (video: IVideo) => {
+        return watchList.some((v) => v.id === video.id);
+    }
+
     const getStreamUrl = async (videoId: string) => {
         return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
     };
@@ -177,26 +211,39 @@ const Playlists: React.FC = (props: {
     };
 
     const handleIncrementViewerCount = (video: IVideo) => {
-        addWatchedVideo(user.id, video).then(() => {
-            const updatedUser = { ...user, watchedVideos: [...user.watchedVideos, video] };
-            setUser(updatedUser);
-        });
-
-        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
-        if (user && alreadyWatched) {
-            return;
+        if (user && user.id) {
+            // User: Add the video to the watched list
+            addWatchedVideo(user.id, video)
+                .then(() => {
+                    const updatedVideos = videos.map((v) => {
+                        if (v.id === video.id) {
+                            return { ...v, viewerCount: v.viewerCount + 1 };
+                        }
+                        return v;
+                    });
+                    setVideos(updatedVideos);
+                })
+                .catch((err) => {
+                    console.error("Failed to add watched video:", err);
+                });
+        } else {
+            console.log("Incrementing viewer count for guest user")
+            // Guest: Increment viewer count using IP-based tracking
+            incrementViewerCount(video.id)
+                .then(() => {
+                    const updatedVideos = videos.map((v) => {
+                        if (v.id === video.id) {
+                            return { ...v, viewerCount: v.viewerCount + 1 };
+                        }
+                        return v;
+                    });
+                    setVideos(updatedVideos);
+                })
+                .catch((err) => {
+                    console.error("Failed to increment viewer count for guest user:", err);
+                });
         }
-
-        incrementViewerCount(video.id).then(() => {
-            const updatedVideos = videos.map((v) => {
-                if (v.id === video.id) {
-                    return { ...v, views: v.viewerCount + 1 };
-                }
-                return v;
-            });
-            setVideos(updatedVideos);
-        });
-    }
+    };
 
     const checkHlsAvailability = async (hlsUrl: string) => {
         try {
@@ -430,8 +477,25 @@ const Playlists: React.FC = (props: {
                                             Duration: {Math.floor(video.duration)}s
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
+                                            Uploaded: {getRelativeDate(video.uploadedAt)}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
                                             Views: {video.viewerCount || 0}
                                         </Typography>
+                                        <Tooltip title={
+                                            isVideoInWatchList(video) ? 'Remove from Watch List' : 'Add to Watch List'
+                                        }>
+                                            <IconButton onClick={(event) => {
+                                                event.stopPropagation();
+                                                if (isVideoInWatchList(video)) {
+                                                    handleRemoveFromWatchList(video);
+                                                } else {
+                                                    handleAddToWatchList(video);
+                                                }
+                                            }}>
+                                                {isVideoInWatchList(video) ? <PlaylistRemoveIcon color="error"/> : <PlaylistAddIcon color="primary"/>}
+                                            </IconButton>
+                                        </Tooltip>
                                     </CardContent>
                                 </Card>
                             ))}

@@ -1,10 +1,14 @@
 package org.spdfm.vod_backend.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.spdfm.vod_backend.models.Playlist;
+import org.spdfm.vod_backend.models.User;
 import org.spdfm.vod_backend.models.Video;
 import org.spdfm.vod_backend.repositories.PlaylistRepository;
 import org.spdfm.vod_backend.repositories.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,12 @@ public class VideoService {
 
     @Autowired
     private PlaylistRepository playlistRepository;
+
+    @Autowired
+    private GuestViewService guestViewService;
+
+    @Autowired
+    private WatchedVideoService watchedVideoService;
 
 
     public List<Video> getAllVideos() {
@@ -50,18 +60,54 @@ public class VideoService {
         return Optional.empty();
     }
 
-    public Video incrementViewerCount(String id) {
+    public Video incrementViewerCount(String id, String ipAddress) {
         Optional<Video> optionalVideo = videoRepository.findById(id);
-        if (optionalVideo.isPresent()) {
-            Video video = optionalVideo.get();
-            Long viewerCount = video.getViewerCount();
-            if (viewerCount == null) {
-                viewerCount = 0L;
-            }
-            video.setViewerCount(viewerCount + 1);
-            return videoRepository.save(video);
+        if (optionalVideo.isEmpty()) {
+            return null;
         }
-        return null;
+
+        Video video = optionalVideo.get();
+
+        // Get the currently authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+                authentication.getPrincipal() instanceof User) {
+
+            // Registered user logic
+            User userDetails = (User) authentication.getPrincipal();
+            String userId = userDetails.getName();
+
+            // Check if the user has already watched the video today
+            if (!watchedVideoService.hasUserWatchedVideoToday(userId, id)) {
+                watchedVideoService.addUserWatchedVideo(userId, id);
+                incrementVideoViewCount(video);
+            }
+        } else {
+            // Guest user logic
+            if (!guestViewService.hasGuestWatchedVideo(ipAddress, id)) {
+                guestViewService.addGuestView(ipAddress, id);
+                incrementVideoViewCount(video);
+            }
+        }
+
+        return video;
+    }
+
+    private void incrementVideoViewCount(Video video) {
+        Long viewerCount = video.getViewerCount();
+        if (viewerCount == null) {
+            viewerCount = 0L;
+        }
+        video.setViewerCount(viewerCount + 1);
+        videoRepository.save(video);
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 
     public void deleteVideo(String id) {

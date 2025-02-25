@@ -21,6 +21,8 @@ import { ISiteSettings } from "./models/ISiteSettings";
 import AdminRoute from "./components/AdminRoute";
 import { IUser } from "./models/IUser";
 import { getUserById } from "./services/users/UserServices";
+import WatchHistory from "./pages/WatchHistory";
+import WatchList from "./pages/WatchList";
 
 const darkTheme = createTheme({
     palette: {
@@ -105,6 +107,8 @@ function App() {
                     <Route path="/playlists" element={<Playlists user={user} setUser={setUser} />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/community" element={<Community user={user} setUser={setUser} />} />
+                    <Route path="/watchlist" element={<WatchList user={user} setUser={setUser} />} />
+                    <Route path="/watched-history" element={<WatchHistory user={user} setUser={setUser} />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/admin_panel" element={<AdminRoute user={user}><AdminPanel siteSettings={siteSettings} user={user} setUser={setUser} /></AdminRoute>} />
                     <Route path="/playlists/videos/:game/:id" element={<PlaylistVideos user={user} setUser={setUser} />} />

@@ -15,6 +15,5 @@ export interface IUser {
     isBanned: boolean;
     topics: Array<string>;
     comments: Array<string>;
-    watchedVideos: Array<IVideo>;
     lastWatchedVideo: IVideo;
 }

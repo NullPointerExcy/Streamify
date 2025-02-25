@@ -15,17 +15,21 @@ import {
     TextField,
     IconButton,
     Paper,
-    Divider,
+    Divider, Tooltip,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import CloseIcon from "@mui/icons-material/Close";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import { getAllVideos, incrementViewerCount } from "../services/videos/VideoServices";
 import { addWatchedVideo } from "../services/users/UserServices";
 import { IVideo } from "../models/IVideo";
 import { IUser } from "../models/IUser";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ReactHlsPlayer from "react-hls-player";
+import {getRelativeDate} from "../utility/DateUtils";
+import {addToWatchList, getWatchList, removeFromWatchList} from "../services/videos/WatchListServices";
 
 const Videos: React.FC = (props: {
     user: IUser,
@@ -42,6 +46,7 @@ const Videos: React.FC = (props: {
     const [selectedVideo, setSelectedVideo] = React.useState<IVideo | null>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [videoUrl, setVideoUrl] = React.useState("");
+    const [watchList, setWatchList] = React.useState<IVideo[]>([]);
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -58,6 +63,11 @@ const Videos: React.FC = (props: {
             setVideos(response);
             setFilteredVideos(response);
         });
+        if (user && user.id) {
+            getWatchList(user.id).then((response) => {
+                setWatchList(response);
+            });
+        }
     }, []);
 
     React.useEffect(() => {
@@ -158,6 +168,26 @@ const Videos: React.FC = (props: {
         });
     };
 
+    const handleAddToWatchList = async (video: IVideo) => {
+        if (user && user.id) {
+            addToWatchList(user.id, video.id).then(() => {
+                if (isVideoInWatchList(video)) {
+                    setWatchList(watchList.filter((v) => v.id !== video.id));
+                } else {
+                    setWatchList([...watchList, video]);
+                }
+            })
+        }
+    }
+
+    const handleRemoveFromWatchList = async (video: IVideo) => {
+        if (user && user.id) {
+            removeFromWatchList(user.id, video.id).then(() => {
+                setWatchList(watchList.filter((v) => v.id !== video.id));
+            })
+        }
+    }
+
     const getStreamUrl = async (videoId: string) => {
         return `${process.env.REACT_APP_API_URL}/api/v1/videos/stream/${videoId}`;
     };
@@ -168,27 +198,42 @@ const Videos: React.FC = (props: {
 
 
     const handleIncrementViewerCount = (video: IVideo) => {
-        addWatchedVideo(user.id, video).then(() => {
-            const updatedUser = { ...user, watchedVideos: [...user.watchedVideos, video] };
-            setUser(updatedUser);
-        });
-
-        const alreadyWatched = user.watchedVideos.map((v) => v.id).includes(video.id);
-        if (user && alreadyWatched) {
-            return;
+        if (user && user.id) {
+            // User: Add the video to the watched list
+            addWatchedVideo(user.id, video)
+                .then(() => {
+                    const updatedVideos = videos.map((v) => {
+                        if (v.id === video.id) {
+                            return { ...v, viewerCount: v.viewerCount + 1 };
+                        }
+                        return v;
+                    });
+                    setVideos(updatedVideos);
+                    setFilteredVideos(updatedVideos);
+                })
+                .catch((err) => {
+                    console.error("Failed to add watched video:", err);
+                });
+        } else {
+            console.log("Incrementing viewer count for guest user")
+            // Guest: Increment viewer count using IP-based tracking
+            incrementViewerCount(video.id)
+                .then(() => {
+                    const updatedVideos = videos.map((v) => {
+                        if (v.id === video.id) {
+                            return { ...v, viewerCount: v.viewerCount + 1 };
+                        }
+                        return v;
+                    });
+                    setVideos(updatedVideos);
+                    setFilteredVideos(updatedVideos);
+                })
+                .catch((err) => {
+                    console.error("Failed to increment viewer count for guest user:", err);
+                });
         }
-
-        incrementViewerCount(video.id).then(() => {
-            const updatedVideos = videos.map((v) => {
-                if (v.id === video.id) {
-                    return { ...v, views: v.viewerCount + 1 };
-                }
-                return v;
-            });
-            setVideos(updatedVideos);
-            setFilteredVideos(updatedVideos);
-        });
     };
+
 
     const checkHlsAvailability = async (hlsUrl: string) => {
         try {
@@ -223,6 +268,10 @@ const Videos: React.FC = (props: {
         }
         setFilteredVideos(handleSort(filtered));
     };
+
+    const isVideoInWatchList = (video: IVideo) => {
+        return watchList.some((v) => v.id === video.id);
+    }
 
     return (
         <Container maxWidth={true} sx={{ width: !selectedVideo ? "80%" : "100%" }}>
@@ -438,20 +487,35 @@ const Videos: React.FC = (props: {
                                         Game: {video.game.title}
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
-                                        Uploaded at: {new Date(video.uploadedAt).toLocaleDateString()}
+                                        Uploaded: {getRelativeDate(video.uploadedAt)}
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Duration: {Math.floor(video.duration)}s
                                     </Typography>
                                     <Divider sx={{ my: 1 }} />
-                                    <Typography variant="body2" color="textSecondary">
-                                        Views: {video.viewerCount || 0}
-                                    </Typography>
-                                    {video.playlist && (
+                                    <Box sx={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center"
+                                    }}>
                                         <Typography variant="body2" color="textSecondary">
-                                            Playlist: {video.playlist.title}
+                                            Views: {video.viewerCount || 0}
                                         </Typography>
-                                    )}
+                                        <Tooltip title={
+                                            isVideoInWatchList(video) ? 'Remove from Watch List' : 'Add to Watch List'
+                                        }>
+                                            <IconButton onClick={(event) => {
+                                                event.stopPropagation();
+                                                if (isVideoInWatchList(video)) {
+                                                    handleRemoveFromWatchList(video);
+                                                } else {
+                                                    handleAddToWatchList(video);
+                                                }
+                                            }}>
+                                                {isVideoInWatchList(video) ? <PlaylistRemoveIcon color="error"/> : <PlaylistAddIcon color="primary"/>}
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
                                 </CardContent>
                             </Card>
                         </Grid>

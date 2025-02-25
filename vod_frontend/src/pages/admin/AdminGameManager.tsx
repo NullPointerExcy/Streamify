@@ -40,6 +40,8 @@ import {IVideo} from "../../models/IVideo";
 import {getAllVideos} from "../../services/videos/VideoServices";
 import {IUser} from "../../models/IUser";
 import {getAllUsers} from "../../services/users/UserServices";
+import {getGuestViews, getWatchedVideos} from "../../services/videos/WatchedVideoServices";
+import {IGuestView} from "../../models/IGuestView";
 
 const AdminGameManager: React.FC = (props: {
     user: IUser,
@@ -52,7 +54,8 @@ const AdminGameManager: React.FC = (props: {
     const [games, setGames] = React.useState<Array<IGame>>([]);
     const [genres, setGenres] = React.useState<Array<IGenre>>([]);
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
-    const [users, setUsers] = React.useState<Array<IUser>>([]);
+    const [watchedVideos, setWatchedVideos] = React.useState<Array<IVideo>>([]);
+    const [guestViews, setGuestViews] = React.useState<Array<IGuestView>>([]);
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -84,7 +87,8 @@ const AdminGameManager: React.FC = (props: {
         getAllGenres().then((response) => setGenres(response));
         getAllGames().then((response) => setGames(response));
         getAllVideos().then((response) => setVideos(response));
-        getAllUsers().then((response) => setUsers(response));
+        getWatchedVideos().then((response) => setWatchedVideos(response));
+        getGuestViews().then((response) => setGuestViews(response));
     }, []);
 
     const handleCoverChange = (event) => {
@@ -247,7 +251,7 @@ const AdminGameManager: React.FC = (props: {
             <Grid container spacing={2}>
                 {currentGames.map((game) => (
                     <Grid item xs={9} md={4} lg={3} key={game.id}>
-                        <GameCard game={game} onDelete={handleDeleteGame} videos={videos} users={users}/>
+                        <GameCard game={game} onDelete={handleDeleteGame} videos={videos} watchedVideos={watchedVideos} guestViews={guestViews} />
                     </Grid>
                 ))}
             </Grid>

@@ -60,6 +60,7 @@ export const getPlaylistById = async (id: string) => {
 
 
 export const addPlaylist = async (playlist: any) => {
+    // http://localhost:8080/api/v1/playlists/67bce549cce2485a961a74c0
     return await axios.post('/playlists', playlist, {
         headers: {
             'Authorization': `Bearer ${token}`

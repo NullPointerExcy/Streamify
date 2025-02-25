@@ -54,8 +54,7 @@ public class AuthController {
                     userDetails.put("totalComments", u.getTotalComments());
                     userDetails.put("topics", Optional.ofNullable(u.getTopics()).orElse(Collections.emptySet()));
                     userDetails.put("comments", Optional.ofNullable(u.getComments()).orElse(Collections.emptySet()));
-                    userDetails.put("watchedVideos", Optional.ofNullable(u.getWatchedVideos()).orElse(Collections.emptySet()));
-                    userDetails.put("lastWatchedVideo", Optional.ofNullable(u.getLastWatchedVideo()).orElse(null));
+                    userDetails.put("lastWatchedVideo", u.getLastWatchedVideo());
 
                     response.put("user", userDetails);
                     return ResponseEntity.ok(response);

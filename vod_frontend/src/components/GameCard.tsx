@@ -17,23 +17,25 @@ import {
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import EditGame from "./EditGame";
 import {IUser} from "../models/IUser";
+import {IGuestView} from "../models/IGuestView";
 
 
 const GameCard = (props: {
     game: IGame,
     onDelete: (id: string) => void,
     videos: Array<IVideo>,
-    users: Array<IUser>
+    watchedVideos: Array<IVideo>,
+    guestViews: Array<IGuestView>,
 }) => {
 
-    const { game, onDelete, videos, users } = props;
+    const { game, onDelete, videos, watchedVideos, guestViews } = props;
 
     const [flipped, setFlipped] = React.useState(false);
     const [showEditButton, setShowEditButton] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
     const [totalVideos, setTotalVideos] = React.useState(0);
     const [totalDuration, setTotalDuration] = React.useState(0);
-    const [totalUsers, setTotalUsers] = React.useState(0);
+    const [totalViews, setTotalViews] = React.useState(0);
 
     const navigate = useNavigate();
 
@@ -41,8 +43,8 @@ const GameCard = (props: {
         const stats = getGameStats(game);
         setTotalVideos(stats.totalVideos);
         setTotalDuration(stats.totalDuration);
-        setTotalUsers(stats.totalUsers);
-    }, []);
+        setTotalViews(stats.totalViews);
+    }, [videos, watchedVideos, guestViews, game.id]);
 
     const handleCardClick = () => {
         setFlipped(!flipped);
@@ -50,11 +52,18 @@ const GameCard = (props: {
     };
 
     const getGameStats = (game: IGame) => {
-        const totalVideos = videos.filter((video) => video.game.id === game.id).length;
-        const totalDuration = videos.reduce((acc, video) => acc + video.duration, 0);
-        const totalUsers = users?.watchedVideos?.filter((video) => video.game.id === game.id).length;
-        return { totalVideos, totalDuration, totalUsers };
+        const gameVideos = videos.filter((video) => video.game.id === game.id);
+        const totalVideos = gameVideos.length;
+        const totalDuration = gameVideos.reduce((acc, video) => acc + video.duration, 0);
+
+        const totalViewsUsers = watchedVideos.filter((video) => video.game.id === game.id).length;
+        // Get the video views from guests
+        const totalViewsGuests = guestViews.filter((view) => gameVideos.some((video) => video.id === view.videoId)).length;
+        const totalViews = totalViewsUsers + totalViewsGuests;
+
+        return { totalVideos, totalDuration, totalViews };
     }
+
 
     return (
         <>
@@ -181,7 +190,7 @@ const GameCard = (props: {
                             <CardContent>
                                 <Typography variant="h6">Game Statistics</Typography>
                                 <Typography variant="body2">Videos: {totalVideos || 0}</Typography>
-                                <Typography variant="body2">Watchers: {totalUsers || 0}</Typography>
+                                <Typography variant="body2">Views: {totalViews || 0}</Typography>
                                 <Typography variant="body2">Total Duration: {totalDuration || 0} sec</Typography>
                             </CardContent>
                         </Card>

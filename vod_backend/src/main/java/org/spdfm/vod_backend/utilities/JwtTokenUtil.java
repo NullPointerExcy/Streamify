@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -56,15 +58,29 @@ public class JwtTokenUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
         claims.put("name", user.getName());
-        claims.put("roles", user.getRoles());
-        claims.put("userImage", user.getUserImage());
+
+        // Prefix roles with "ROLE_"
+        List<String> rolesWithPrefix = user.getRoles().stream()
+                .map(role -> "ROLE_" + role)
+                .toList();
+        claims.put("roles", rolesWithPrefix);
+
         return Jwts.builder()
                 .setClaims(claims)
-                .subject(user.getEmail())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+
+    public List<String> getRolesFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        List<String> roles = claims.get("roles", List.class);
+        return roles.stream()
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                .toList();
     }
 
     public Boolean validateToken(String token, String email) {
