@@ -23,16 +23,18 @@ const defaultConfigs = [
     {
         key: "video.storage.locations",
         label: "Video Storage Locations",
-        description: "Add path for storing videos. Only one location is required.",
-        placeholder: "e.g., D:/backup/TestVideoFolder/",
+        description: "Add path for storing videos. Only one location is allowed! " +
+            "Change this carefully (e.g.: Harddrive is full etc.). " +
+            "But keep this in Stream Resource Locations! Otherwise, the videos will not be displayed.",
+        placeholder: "e.g., D:/Videos/FolderA/",
         value: "",
         isMultiple: false,
     },
     {
         key: "web.stream.resource.locations",
         label: "Stream Resource Locations",
-        description: "Add paths for storing streams. Multiple locations are allowed.",
-        placeholder: "e.g., D:/backup/TestVideoFolder/",
+        description: "Add paths for your stored streams. Multiple locations are allowed.",
+        placeholder: "e.g., D:/Videos/FolderA/",
         value: [],
         isMultiple: true,
     },
@@ -94,12 +96,16 @@ const AdminConfigSettings: React.FC = (props: {
         updatedConfigs[index].value = values;
         updatedConfigs[index].tempValue = "";
         setConfigs(updatedConfigs);
+
+        handleSave();
     };
 
     const handleDeleteItem = (index, itemIndex) => {
         const updatedConfigs = [...configs];
         updatedConfigs[index].value.splice(itemIndex, 1);
         setConfigs(updatedConfigs);
+
+        handleSave();
     };
 
     const handleSave = async () => {

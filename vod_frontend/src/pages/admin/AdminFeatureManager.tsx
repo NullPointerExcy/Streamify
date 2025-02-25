@@ -64,7 +64,6 @@ const AdminFeatureManager: React.FC = (props: {
                     f.id === feature.id ? {...f, enabled: !f.enabled} : f
                 )
             );
-            window.location.reload();
         });
     }
 

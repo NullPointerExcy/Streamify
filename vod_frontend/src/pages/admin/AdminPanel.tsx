@@ -45,11 +45,7 @@ const AdminPanel: React.FC = (props: {
         {name: "Video Management", component: <AdminVideoManager user={user} setUser={setUser}/>, icon: <VideoLibraryIcon/>},
         {name: "Playlist Management", component: <AdminPlaylistManager user={user} setUser={setUser}/>, icon: <SubscriptionsIcon/>},
         {name: "User Management", component: <AdminUserManager user={user} setUser={setUser}/>, icon: <PeopleIcon/>},
-        {
-            name: "Design Settings",
-            component: <AdminDesignSettings siteSettings={siteSettings} user={user} setUser={setUser}/>,
-            icon: <BrushIcon/>
-        },
+        {name: "Design Settings", component: <AdminDesignSettings siteSettings={siteSettings} user={user} setUser={setUser}/>, icon: <BrushIcon/>},
         {name: "Feature Management", component: <AdminFeatureManager user={user} setUser={setUser}/>, icon: <FeaturedPlayListIcon/>},
         {name: "Application.Properties Management", component: <AdminConfigSettings user={user} setUser={setUser}/>, icon: <TuneIcon/>},
     ];

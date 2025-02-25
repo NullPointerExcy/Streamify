@@ -71,6 +71,7 @@ const GameCard = (props: {
             <Box
                 sx={{
                     cursor: "pointer",
+                    width: "100%",
                     height: 400,
                 }}
                 onClick={handleCardClick}

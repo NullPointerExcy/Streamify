@@ -63,6 +63,24 @@ const AdminDesignSettings: React.FC = (props: {
     const [backgroundColor, setBackgroundColor] = React.useState("#000000");
     const [showColorPicker, setShowColorPicker] = React.useState(false);
 
+    const [defaultSettings, setDefaultSettings] = React.useState<ISiteSettings>({
+        siteName: "Streamify",
+        siteTitle: "Streamify-VODs",
+        siteDescription: "Streamify VODs",
+        siteTheme: {
+            titleColor: "#ffffffff",
+            fontSize: "h3",
+            fontFamily: "Arial",
+            textShadow: "1px 1px 2px #00000024",
+            backgroundColor: "#00000024",
+            backgroundImage: "none"
+        },
+        siteLogo: "",
+        siteFavicon: "",
+        siteLanguage: "en",
+        isActive: true
+    });
+
     React.useEffect(() => {
         getAllBackgroundImages().then((images) => {
             setBackgroundImages(images);
@@ -109,6 +127,17 @@ const AdminDesignSettings: React.FC = (props: {
         updateSettings(settings).then(() => {
         });
     };
+
+    const handleDefaultSettings = () => {
+        setTitle(defaultSettings.siteTitle);
+        setTitleColor(defaultSettings.siteTheme.titleColor);
+        setTitleTextShadow(defaultSettings.siteTheme.textShadow);
+        setFontSize(defaultSettings.siteTheme.fontSize);
+        setFontFamily(defaultSettings.siteTheme.fontFamily);
+        setBackgroundImage(defaultSettings.siteTheme.backgroundImage);
+        setBackgroundColor(defaultSettings.siteTheme.backgroundColor);
+        disassembleTextShadow(defaultSettings.siteTheme.textShadow);
+    }
 
     const handleUploadBackgroundImage = async (event) => {
         const file = event.target.files[0];
@@ -160,11 +189,25 @@ const AdminDesignSettings: React.FC = (props: {
     }
 
     return (
-        <Container maxWidth="lg" sx={{mt: 4}}>
-            <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-                Admin Panel - Design Settings
-            </Typography>
+        <Container maxWidth={true} sx={{ width: "80%" }}>
+            <Box sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexDirection: "row",
+                alignItems: "center",
+                p: 2
+            }}>
+                <Typography variant="h4" component="h1" gutterBottom textAlign="center">
+                    Admin Panel - Design Settings
+                </Typography>
+                <Button variant="contained">
+                    <Typography sx={{
 
+                    }}>
+                        Default Settings
+                    </Typography>
+                </Button>
+            </Box>
             <Paper elevation={3} sx={{p: 4, mb: 4}}>
                 <Typography variant="h4" gutterBottom mb={4}>
                     Top bar Settings
@@ -371,42 +414,16 @@ const AdminDesignSettings: React.FC = (props: {
                                                         "&:hover": {
                                                             transition: "all 0.3s",
                                                             boxShadow: 5,
-                                                            borderColor: "primary.main",
-                                                            borderWidth: 2,
-                                                            borderStyle: "solid",
                                                             backgroundColor: "primary.light"
                                                         }
                                                     }}
-                                                    onClick={() => {
-                                                        img.isDefault = !img.isDefault;
-                                                        backgroundImages.forEach((image) => {
-                                                            if (image.id !== img.id) {
-                                                                image.isDefault = !image.isDefault;
-                                                            }
-                                                        });
-                                                        setBackgroundImage(img);
-                                                    }}
+                                                    onClick={() => setBackgroundImage(img)}
                                                 >
                                                     <img
                                                         src={img?.imageUrl || img?.name}
                                                         alt={`Background ${index}`}
-                                                        style={{width: "100%", height: 150, objectFit: "cover"}}
+                                                        style={{ width: "100%", height: 150, objectFit: "cover" }}
                                                     />
-                                                    {
-                                                        <CardContent>
-                                                            <Button fullWidth
-                                                                    sx={{
-                                                                        backgroundColor: "primary.main",
-                                                                        color: "black",
-                                                                        border: 1,
-                                                                        borderColor: "black",
-                                                                        borderStyle: "solid"
-                                                                    }}
-                                                            >
-                                                                {img.isDefault ? "Selected" : "Select"}
-                                                            </Button>
-                                                        </CardContent>
-                                                    }
                                                 </Card>
                                             </Grid>
                                         ))}

@@ -113,7 +113,7 @@ function App() {
                     <Route path="/admin_panel" element={<AdminRoute user={user}><AdminPanel siteSettings={siteSettings} user={user} setUser={setUser} /></AdminRoute>} />
                     <Route path="/playlists/videos/:game/:id" element={<PlaylistVideos user={user} setUser={setUser} />} />
                 </Routes>
-                <UserStatistics user={user} />
+                {user && <UserStatistics user={user} />}
             </BrowserRouter>
         </ThemeProvider>
     );

@@ -59,7 +59,7 @@ const AdminGameManager: React.FC = (props: {
 
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
-    const itemsPerPage = 8;
+    const itemsPerPage = 12;
 
     // Dialog state for adding a game
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -82,6 +82,10 @@ const AdminGameManager: React.FC = (props: {
     const [searchTitle, setSearchTitle] = React.useState("");
     const [searchGenre, setSearchGenre] = React.useState("");
     const [searchDate, setSearchDate] = React.useState("");
+
+    // Delete dialog state
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+    const [gameToDelete, setGameToDelete] = React.useState<IGame | null>(null);
 
     React.useEffect(() => {
         getAllGenres().then((response) => setGenres(response));
@@ -190,6 +194,26 @@ const AdminGameManager: React.FC = (props: {
         setGames(updatedGames);
     };
 
+    const handleOpenDeleteDialog = (game: IGame) => {
+        setGameToDelete(game);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setGameToDelete(null);
+        setIsDeleteDialogOpen(false);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (gameToDelete) {
+            const response = await deleteGame(gameToDelete.id);
+            if (response) {
+                setGames(games.filter((game) => game.id !== gameToDelete.id));
+            }
+            handleCloseDeleteDialog();
+        }
+    };
+
     const filteredGames = games.filter((game) => {
         const matchesTitle = game.title.toLowerCase().includes(searchTitle.toLowerCase());
         const matchesDate = searchDate ? game.releaseDate.includes(searchDate) : true;
@@ -250,8 +274,15 @@ const AdminGameManager: React.FC = (props: {
             )}
             <Grid container spacing={2}>
                 {currentGames.map((game) => (
-                    <Grid item xs={9} md={4} lg={3} key={game.id}>
-                        <GameCard game={game} onDelete={handleDeleteGame} videos={videos} watchedVideos={watchedVideos} guestViews={guestViews} />
+                    <Grid item
+                          xs={12}
+                          sm={6}
+                          md={4}
+                          lg={2}
+                          xl={2}
+                          key={game.id}
+                    >
+                        <GameCard game={game} onDelete={() => handleOpenDeleteDialog(game)} videos={videos} watchedVideos={watchedVideos} guestViews={guestViews} />
                     </Grid>
                 ))}
             </Grid>
@@ -434,6 +465,36 @@ const AdminGameManager: React.FC = (props: {
                     </Button>
                     <Button fullWidth onClick={saveEditGenre} variant="contained">
                         Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={isDeleteDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                fullWidth
+                maxWidth="xs"
+            >
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1">
+                        Are you sure you want to delete the game <strong>{gameToDelete?.title}</strong>?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={handleCloseDeleteDialog}
+                        color="primary"
+                        variant="contained"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
+                        variant="contained"
+                    >
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>

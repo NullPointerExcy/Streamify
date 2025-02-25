@@ -158,19 +158,6 @@ const TopBar: React.FC = (props: {
                             </Button>
                         ))}
                     </Box>
-                    <Box
-                        sx={{
-                            position: "absolute",
-                            left: 0,
-                            width: "10%",
-                            height: "auto",
-                            opacity: 0.8,
-                            zIndex: 5,
-                            objectFit: "contain",
-                        }}
-                    >
-                        <img src={logo} alt="Logo" style={{width: "100%", height: "auto"}}/>
-                    </Box>
                 </Box>
 
                 <Box sx={{ml: "auto"}}>
