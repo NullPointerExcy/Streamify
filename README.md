@@ -56,26 +56,26 @@ If you need help, have issues, questions, or feature requests:
 
 | Feature	| Status	| Notes| 
 |---------|---------|--------|
-| Community Module	| ✅ Completed	Create topics, comment on them, filter by title, creator, or related games/videos.|
-| OAuth Integration	| 🔜 Planned	Support for Google and Twitch OAuth login.|
-| Playlist Management	| ✅ Completed	Create, sort, and search playlists.|
-| Video Playback	| ⚠️ Bugged	HLS video streaming has issues.|
-| Watch List Integration| 	✅ Completed	Add or remove videos from the watch list.|
-| Video Thumbnails	| ✅ Completed	Display thumbnails for each video in a playlist.|
-| Responsive Design| 	✅ Completed	Adaptive grid layout for various screen sizes.|
-| Hover Effects	| ✅ Completed	Interactive hover effects for modern UI.|
-| Profile Management	| ✅ Completed	Change username, email, and password.|
-| Profile Picture Upload	| ✅ Completed	Upload and preview profile pictures.|
-| Dynamic Update| 	✅ Completed	Real-time updates without page refreshes.|
-| Video Library	| ✅ Completed	Browse and filter videos by name, game, or playlist.|
-| Dynamic Filtering and Sorting	| ✅ Completed	Real-time search and sorting options.|
-| Watch Time Tracking	| ✅ Completed	Track watch time for personalized analytics.|
-| View History	| ✅ Completed	List of previously watched videos.|
-| Interactive Navigation	| ✅ Completed	Navigate directly to the watched video from history.|
-| Personalized Watch List	| ✅ Completed	Save videos to a personalized watch list.|
-| Dynamic Removal	| ✅ Completed	Easily remove videos from the watch list.|
-| Comprehensive Admin Dashboard	| ✅ Completed	Centralized control of the platform.|
-| Multi-Section Management	| ✅ Completed	Manage Games, Videos, Playlists, Users, Design, Features, and Application Properties.|
+| Community Module	| ✅ Completed	|Create topics, comment on them, filter by title, creator, or related games/videos.|
+| OAuth Integration	| 🔜 Planned	|Support for Google and Twitch OAuth login.|
+| Playlist Management	| ✅ Completed	|Create, sort, and search playlists.|
+| Video Playback	| ⚠️ Bugged	|HLS video streaming has issues.|
+| Watch List Integration| 	✅ Completed	|Add or remove videos from the watch list.|
+| Video Thumbnails	| ✅ Completed	|Display thumbnails for each video in a playlist.|
+| Responsive Design| 	✅ Completed	|Adaptive grid layout for various screen sizes.|
+| Hover Effects	| ✅ Completed	|Interactive hover effects for modern UI.|
+| Profile Management	| ✅ Completed	|Change username, email, and password.|
+| Profile Picture Upload	| ✅ Completed	|Upload and preview profile pictures.|
+| Dynamic Update| 	✅ Completed	|Real-time updates without page refreshes.|
+| Video Library	| ✅ Completed	|Browse and filter videos by name, game, or playlist.|
+| Dynamic Filtering and Sorting	| ✅ Completed	|Real-time search and sorting options.|
+| Watch Time Tracking	| ✅ Completed	|Track watch time for personalized analytics.|
+| View History	| ✅ Completed	|List of previously watched videos.|
+| Interactive Navigation	| ✅ Completed	|Navigate directly to the watched video from history.|
+| Personalized Watch List	| ✅ Completed	|Save videos to a personalized watch list.|
+| Dynamic Removal	| ✅ Completed	|Easily remove videos from the watch list.|
+| Comprehensive Admin Dashboard	| ✅ Completed	|Centralized control of the platform.|
+| Multi-Section Management	| ✅ Completed	|Manage Games, Videos, Playlists, Users, Design, Features, and Application Properties.|
 
 </details>
 
