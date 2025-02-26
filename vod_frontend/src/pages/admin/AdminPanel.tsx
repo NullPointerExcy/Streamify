@@ -81,8 +81,8 @@ const AdminPanel: React.FC = (props: {
                                     },
                                     backgroundColor:
                                         selectedSection === index
-                                            ? "rgba(0, 0, 0, 0.2)"
-                                            : "inherit",
+                                            ? "rgba(144,202,249,0.2)" : "inherit",
+                                    color: selectedSection === index ? "#fff" : "inherit",
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 1

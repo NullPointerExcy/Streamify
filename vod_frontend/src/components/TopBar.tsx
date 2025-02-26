@@ -29,6 +29,7 @@ import {getAllFeatures} from "../services/feature/FeatureServices";
 import {IUser} from "../models/IUser";
 
 import logo from "../resources/Streamify.png";
+import {useLocation} from "react-router-dom";
 
 
 const TopBar: React.FC = (props: {
@@ -57,6 +58,10 @@ const TopBar: React.FC = (props: {
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isMenuOpen = Boolean(anchorEl);
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
 
     React.useEffect(() => {
         getAllFeatures().then((features) => {
@@ -192,7 +197,12 @@ const TopBar: React.FC = (props: {
                                     fullWidth
                                     sx={{
                                         opacity: isFeatureDisabledForUser(item.id) ? 0.5 : 1,
-                                        // pointerEvents: isFeatureDisabledForUser(item.id) ? 'none' : 'auto'
+                                        backgroundColor: currentPath === item.link ? "rgba(144,202,249,0.2)" : "transparent",
+                                        color: currentPath === item.link ? "#fff" : "inherit",
+                                        borderRadius: 2,
+                                        "&:hover": {
+                                            backgroundColor: "rgba(144,202,249,0.3)"
+                                        }
                                     }}
                                 >
                                     {item.label}
