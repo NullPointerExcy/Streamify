@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Map;
 
 @Data
-@Document(collection = "side_settings")
+@Document(collection = "site_settings")
 public class SiteSettings {
 
     @Id

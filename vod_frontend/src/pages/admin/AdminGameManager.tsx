@@ -89,10 +89,19 @@ const AdminGameManager: React.FC = (props: {
 
     React.useEffect(() => {
         getAllGenres().then((response) => setGenres(response));
-        getAllGames().then((response) => setGames(response));
+        getAllGames().then((response) => {
+            setGames(
+                response.map((game) => ({
+                    ...game,
+                    genres: game.genres.sort((a, b) => a.name.localeCompare(b.name)),
+                }))
+            );
+        });
         getAllVideos().then((response) => setVideos(response));
         getWatchedVideos().then((response) => setWatchedVideos(response));
         getGuestViews().then((response) => setGuestViews(response));
+
+        console.log(games);
     }, []);
 
     const handleCoverChange = (event) => {

@@ -30,6 +30,8 @@ import {IUser} from "../models/IUser";
 
 import logo from "../resources/Streamify.png";
 import {useLocation} from "react-router-dom";
+import {getAllBackgroundImages} from "../services/backgroundImage/BackgroundImageServices";
+import {IBackgroundImage} from "../models/IBackgroundImage";
 
 
 const TopBar: React.FC = (props: {
@@ -59,6 +61,9 @@ const TopBar: React.FC = (props: {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const isMenuOpen = Boolean(anchorEl);
 
+    const [backgroundImages, setBackgroundImages] = React.useState<Array<IBackgroundImage>>([]);
+    const [activeBackgroundImage, setActiveBackgroundImage] = React.useState<IBackgroundImage | null>(null);
+
     const location = useLocation();
     const currentPath = location.pathname;
 
@@ -67,6 +72,11 @@ const TopBar: React.FC = (props: {
         getAllFeatures().then((features) => {
             setFeatures(features);
         });
+        getAllBackgroundImages().then((images) => {
+            setBackgroundImages(images);
+            setActiveBackgroundImage(images.filter(image => image.isDefault)[0]);
+        });
+
     }, []);
 
     const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -141,7 +151,14 @@ const TopBar: React.FC = (props: {
     };
 
     return (
-        <AppBar position="sticky" sx={{mb: 0.1}}>
+        <AppBar position="sticky" sx={{
+            mb: 0.1,
+            backgroundImage: `url(${activeBackgroundImage?.imageUrl || null})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            boxShadow: 'none',
+        }}>
             <Toolbar sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -241,7 +258,7 @@ const TopBar: React.FC = (props: {
                         }}>
                             {getLoginLogoutLabel()}
                         </MenuItem>
-                        <Divider sx={{ my: 1, boxShadow: 1 }}/>
+                        <Divider sx={{my: 1, boxShadow: 1}}/>
                         <MenuItem disabled={!user} onClick={() => {
                             window.location.href = "/watchlist";
                         }}>

@@ -37,7 +37,8 @@ export const uploadUserImage = async (image: File) => {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
-        }
+        },
+        timeout: 10000,
     });
 }
 

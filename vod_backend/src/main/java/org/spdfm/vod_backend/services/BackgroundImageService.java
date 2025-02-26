@@ -26,9 +26,15 @@ public class BackgroundImageService {
         return backgroundImageRepository.save(backgroundImage);
     }
 
-    public BackgroundImage updateBackgroundImage(String id, BackgroundImage backgroundImage) {
-        backgroundImage.setId(id);
-        return backgroundImageRepository.save(backgroundImage);
+    public BackgroundImage updateBackgroundImage(BackgroundImage backgroundImage) {
+        BackgroundImage existingBackgroundImage = backgroundImageRepository.findById(backgroundImage.getId()).orElse(null);
+        if (existingBackgroundImage == null) {
+            return null;
+        }
+        existingBackgroundImage.setName(backgroundImage.getName());
+        existingBackgroundImage.setImageUrl(backgroundImage.getImageUrl());
+        existingBackgroundImage.setIsDefault(backgroundImage.getIsDefault());
+        return backgroundImageRepository.save(existingBackgroundImage);
     }
 
     public void deleteBackgroundImage(String id) {

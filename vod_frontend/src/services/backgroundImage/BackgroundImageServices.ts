@@ -1,4 +1,5 @@
 import axios from '../../config/AxiosConfig';
+import {IBackgroundImage} from "../../models/IBackgroundImage";
 
 const token = localStorage.getItem('token');
 
@@ -30,7 +31,7 @@ export const getBackgroundImageById = async (id: string) => {
 }
 
 
-export const uploadBackgroundImage = async (backgroundImage: any) => {
+export const uploadBackgroundImage = async (backgroundImage: IBackgroundImage) => {
     return await axios.post('/background-images/upload-background', backgroundImage, {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -40,7 +41,16 @@ export const uploadBackgroundImage = async (backgroundImage: any) => {
 };
 
 
-export const addBackgroundImage = async (backgroundImage: any) => {
+export const updateBackgroundImage = async (backgroundImage: IBackgroundImage) => {
+    return await axios.put(`/background-images`, backgroundImage, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(response => response.data);
+};
+
+
+export const addBackgroundImage = async (backgroundImage: IBackgroundImage) => {
     return await axios.post('/background-images', backgroundImage, {
         headers: {
             'Authorization': `Bearer ${token}`

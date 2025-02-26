@@ -28,7 +28,7 @@ const GameCard = (props: {
     guestViews: Array<IGuestView>,
 }) => {
 
-    const { game, onDelete, videos, watchedVideos, guestViews } = props;
+    const {game, onDelete, videos, watchedVideos, guestViews} = props;
 
     const [flipped, setFlipped] = React.useState(false);
     const [showEditButton, setShowEditButton] = React.useState(false);
@@ -61,13 +61,13 @@ const GameCard = (props: {
         const totalViewsGuests = guestViews.filter((view) => gameVideos.some((video) => video.id === view.videoId)).length;
         const totalViews = totalViewsUsers + totalViewsGuests;
 
-        return { totalVideos, totalDuration, totalViews };
+        return {totalVideos, totalDuration, totalViews};
     }
 
 
     return (
         <>
-            <EditGame gameId={game.id} open={isEditing} onClose={() => setIsEditing(false)} />
+            <EditGame gameId={game.id} open={isEditing} onClose={() => setIsEditing(false)}/>
             <Box
                 sx={{
                     cursor: "pointer",
@@ -106,7 +106,7 @@ const GameCard = (props: {
                                 backgroundColor: "rgba(144,202,249,0.13)"
                             }
                         }}>
-                            <Box sx={{ height: "60%", overflow: "hidden" }}>
+                            <Box sx={{height: "60%", overflow: "hidden"}}>
                                 <IconButton
                                     variant="contained"
                                     color="primary"
@@ -116,17 +116,17 @@ const GameCard = (props: {
                                     }}
                                     disabled={flipped}
                                 >
-                                    <DriveFileRenameOutlineIcon />
+                                    <DriveFileRenameOutlineIcon/>
                                 </IconButton>
                                 {game.coverImage && (
                                     <img
                                         src={game.coverImage}
                                         alt={game.title}
-                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                        style={{width: "100%", height: "100%", objectFit: "cover"}}
                                     />
                                 )}
                             </Box>
-                            <CardContent sx={{ flexGrow: 1 }}>
+                            <CardContent sx={{flexGrow: 1}}>
                                 <Typography variant="h6">{game.title}</Typography>
                                 <Typography variant="body2" color="textSecondary">
                                     {game.developer}
@@ -134,9 +134,69 @@ const GameCard = (props: {
                                 <Typography variant="body2" color="textSecondary">
                                     {game.releaseDate}
                                 </Typography>
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        overflowX: "auto",
+                                        whiteSpace: "nowrap",
+                                        gap: 0.5,
+                                        mt: 1,
+                                        pb: 1,
+                                        cursor: "grab",
+                                        '&:active': {
+                                            cursor: "grabbing",
+                                        },
+                                        '&::-webkit-scrollbar': {
+                                            height: 6,
+                                        },
+                                        '&::-webkit-scrollbar-thumb': {
+                                            backgroundColor: '#90caf9',
+                                            borderRadius: 3,
+                                        },
+                                        '&::-webkit-scrollbar-track': {
+                                            backgroundColor: 'transparent',
+                                        }
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onMouseDown={(e) => {
+                                        e.stopPropagation();
+                                        const container = e.currentTarget;
+                                        container.style.cursor = 'grabbing';
+                                        container.style.userSelect = 'none';
+
+                                        let startX = e.pageX - container.offsetLeft;
+                                        let scrollLeft = container.scrollLeft;
+
+                                        const onMouseMove = (event) => {
+                                            const x = event.pageX - container.offsetLeft;
+                                            const walk = (x - startX) * 1.5;
+                                            container.scrollLeft = scrollLeft - walk;
+                                        };
+
+                                        const onMouseUp = () => {
+                                            container.style.cursor = 'grab';
+                                            container.style.userSelect = 'auto';
+                                            window.removeEventListener('mousemove', onMouseMove);
+                                            window.removeEventListener('mouseup', onMouseUp);
+                                        };
+
+                                        window.addEventListener('mousemove', onMouseMove);
+                                        window.addEventListener('mouseup', onMouseUp);
+                                    }}
+                                >
                                     {game.genres.map((genre) => (
-                                        <Chip key={genre.id} label={genre.name} sx={{ backgroundColor: genre.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />
+                                        <Chip
+                                            key={genre.id}
+                                            label={genre.name}
+                                            sx={{
+                                                backgroundColor: genre.color,
+                                                color: "white",
+                                                borderRadius: 3,
+                                                border: 1,
+                                                borderColor: "#000000",
+                                                whiteSpace: "nowrap",
+                                                flexShrink: 0,
+                                            }}/>
                                     ))}
                                 </Box>
                             </CardContent>
@@ -148,7 +208,7 @@ const GameCard = (props: {
                                         e.stopPropagation();
                                         onDelete(game.id);
                                     }}
-                                    sx={{ mt: 1, backgroundColor: "#782d28", color: "white" }}
+                                    sx={{mt: 1, backgroundColor: "#782d28", color: "white"}}
                                     disabled={flipped}
                                 >
                                     Delete
@@ -186,13 +246,29 @@ const GameCard = (props: {
                                 }
                             }}
                         >
-                            <Typography variant="h4" align="center" >{game.title}</Typography>
-                            <Divider sx={{ width: "100%", my: 2, boxShadow: "0px 0px 10px 0px #000000" }} />
+                            <Typography variant="h4" align="center">{game.title}</Typography>
+                            <Divider sx={{width: "100%", my: 2, boxShadow: "0px 0px 10px 0px #000000"}}/>
                             <CardContent>
                                 <Typography variant="h6">Game Statistics</Typography>
                                 <Typography variant="body2">Videos: {totalVideos || 0}</Typography>
                                 <Typography variant="body2">Views: {totalViews || 0}</Typography>
                                 <Typography variant="body2">Total Duration: {totalDuration || 0} sec</Typography>
+                                <Divider sx={{my: 2}}/>
+                                {
+                                    game.genres.map((genre) => (
+                                        <Chip
+                                            key={genre.id}
+                                            label={genre.name}
+                                            sx={{
+                                                backgroundColor: genre.color,
+                                                color: "white",
+                                                borderRadius: 3,
+                                                border: 1,
+                                                borderColor: "#000000",
+                                            }}
+                                        />
+                                    ))
+                                }
                             </CardContent>
                         </Card>
                     </Box>

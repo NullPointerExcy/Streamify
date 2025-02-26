@@ -21,7 +21,7 @@ import {getAllSettings, getSettings, saveSettings, updateSettings} from "../../s
 import {ISiteSettings} from "../../models/ISiteSettings";
 import {
     addBackgroundImage,
-    getAllBackgroundImages,
+    getAllBackgroundImages, updateBackgroundImage,
     uploadBackgroundImage
 } from "../../services/backgroundImage/BackgroundImageServices";
 import {IBackgroundImage} from "../../models/IBackgroundImage";
@@ -65,15 +65,14 @@ const AdminDesignSettings: React.FC = (props: {
 
     const [defaultSettings, setDefaultSettings] = React.useState<ISiteSettings>({
         siteName: "Streamify",
-        siteTitle: "Streamify-VODs",
-        siteDescription: "Streamify VODs",
+        siteTitle: "Streamify",
+        siteDescription: "NullPointerExcy's Streamify",
         siteTheme: {
             titleColor: "#ffffffff",
             fontSize: "h3",
             fontFamily: "Arial",
             textShadow: "1px 1px 2px #00000024",
             backgroundColor: "#00000024",
-            backgroundImage: "none"
         },
         siteLogo: "",
         siteFavicon: "",
@@ -116,19 +115,18 @@ const AdminDesignSettings: React.FC = (props: {
                 fontSize: fontSize,
                 fontFamily: fontFamily,
                 textShadow: titleTextShadow,
-                backgroundColor: backgroundColor,
-                backgroundImage: backgroundImage
+                backgroundColor: backgroundColor
             },
             siteLogo: siteSettings.siteLogo,
             siteFavicon: siteSettings.siteFavicon,
-            siteLanguage: siteSettings.siteLanguage,
-            isActive: siteSettings.isActive
+            siteLanguage: siteSettings.siteLanguage
         };
         updateSettings(settings).then(() => {
         });
     };
 
-    const handleDefaultSettings = () => {
+    const handleDefaultSettings = async () => {
+        defaultSettings.id = siteSettings.id;
         setTitle(defaultSettings.siteTitle);
         setTitleColor(defaultSettings.siteTheme.titleColor);
         setTitleTextShadow(defaultSettings.siteTheme.textShadow);
@@ -137,6 +135,34 @@ const AdminDesignSettings: React.FC = (props: {
         setBackgroundImage(defaultSettings.siteTheme.backgroundImage);
         setBackgroundColor(defaultSettings.siteTheme.backgroundColor);
         disassembleTextShadow(defaultSettings.siteTheme.textShadow);
+
+        const updatedImages = backgroundImages.map((image) => {
+            image.isDefault = false;
+            return image;
+        });
+
+        setBackgroundImages(updatedImages);
+        for (const image of updatedImages) {
+            await updateBackgroundImage(image);
+        }
+        await updateSettings(defaultSettings);
+    }
+
+    const handleUpdateBackgroundImage = async (img: IBackgroundImage) => {
+        const updatedImages = backgroundImages.map((image) => {
+            if (image.id === img.id) {
+                image.isDefault = !image.isDefault;
+            } else {
+                image.isDefault = false;
+            }
+            return image;
+        });
+
+        console.log(updatedImages);
+        setBackgroundImages(updatedImages);
+        for (const image of updatedImages) {
+            await updateBackgroundImage(image);
+        }
     }
 
     const handleUploadBackgroundImage = async (event) => {
@@ -200,7 +226,7 @@ const AdminDesignSettings: React.FC = (props: {
                 <Typography variant="h4" component="h1" gutterBottom textAlign="center">
                     Admin Panel - Design Settings
                 </Typography>
-                <Button variant="contained">
+                <Button variant="contained" onClick={handleDefaultSettings}>
                     <Typography sx={{
 
                     }}>
@@ -411,13 +437,14 @@ const AdminDesignSettings: React.FC = (props: {
                                                 <Card
                                                     sx={{
                                                         cursor: "pointer",
+                                                        backgroundColor: img.isDefault ? "primary.light" : "background.default",
                                                         "&:hover": {
                                                             transition: "all 0.3s",
                                                             boxShadow: 5,
                                                             backgroundColor: "primary.light"
                                                         }
                                                     }}
-                                                    onClick={() => setBackgroundImage(img)}
+                                                    onClick={() => handleUpdateBackgroundImage(img)}
                                                 >
                                                     <img
                                                         src={img?.imageUrl || img?.name}

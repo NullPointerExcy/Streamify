@@ -70,9 +70,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/settings/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/settings/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
 
                         .requestMatchers(HttpMethod.PUT, "/api/v1/games/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/games/**").hasAuthority("ROLE_ADMIN")
@@ -112,6 +112,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/upload-user-image").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/background-images/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/background-images/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/background-images/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
 
                         .anyRequest().authenticated()
                 )

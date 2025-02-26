@@ -37,9 +37,6 @@ const UserSettings: React.FC = (props: {
         setEmail(user.email);
         setUsername(user.name);
         setPreviewImage(user.userImage);
-        setProfilePicture(user.userImage);
-
-        console.log("file", profilePicture)
     }, []);
 
     const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,21 +65,25 @@ const UserSettings: React.FC = (props: {
                 ...user,
                 userImage: data.imageData,
             });
+            setProfilePicture(data.imageData);
+            setPreviewImage(data.imageData);
         }
     };
 
-    const handleSaveChanges = () => {
+    const handleSaveChanges = async () => {
         // Send password only if it's changed
         const updatedUser: IUser = {
             ...user,
             name: username,
             email,
             password: password || undefined,
-            userImage: user.userImage,
+            userImage: profilePicture || undefined,
         };
 
         updateUser(updatedUser).then((response) => {
             setUser(response);
+        }).finally(() => {
+            window.location.reload();
         });
     };
 

@@ -48,9 +48,9 @@ public class BackgroundImageController {
         return backgroundImageService.addBackgroundImage(backgroundImage);
     }
 
-    @PutMapping("/{id}")
-    public BackgroundImage updateBackgroundImage(@PathVariable String id, @RequestBody BackgroundImage backgroundImage) {
-        return backgroundImageService.updateBackgroundImage(id, backgroundImage);
+    @PutMapping
+    public BackgroundImage updateBackgroundImage(@RequestBody BackgroundImage backgroundImage) {
+        return backgroundImageService.updateBackgroundImage(backgroundImage);
     }
 
     @DeleteMapping("/{id}")
