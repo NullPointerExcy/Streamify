@@ -2,7 +2,7 @@
 
 > ⚠️ WIP: Not ready for production use yet, just started development on this project.
 
-Streamify is a self-hosted video streaming platform built using Java Spring Boot, 
+**Streamify** is a self-hosted video streaming platform built using Java Spring Boot, 
 React TypeScript, MongoDB, and Nginx as a reverse proxy. It allows users to 
 easily deploy their own streaming service without the need to hire developers. 
 Just install Docker (or later, a standalone `.exe` or `.deb` package) and you're ready 

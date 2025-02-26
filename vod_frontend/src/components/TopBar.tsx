@@ -47,7 +47,7 @@ const TopBar: React.FC = (props: {
         {id: "streamify-videos-ft", label: "Videos", icon: <OndemandVideoIcon/>, link: "/videos"},
         {id: "streamify-community-ft", label: "Community", icon: <ForumIcon/>, link: "/community"},
         {id: "streamify-about-ft", label: "About", icon: <EditNoteIcon/>, link: "/about"},
-        user?.roles?.indexOf("ADMIN") > -1 && {
+        (user?.roles?.indexOf("ADMIN") > -1 || user?.roles?.indexOf("MODERATOR") > -1) && {
             id: "streamify-admin-panel-ft",
             label: "Admin-Panel",
             icon: <AdminPanelSettingsIcon/>,
@@ -92,7 +92,7 @@ const TopBar: React.FC = (props: {
                         flexDirection: "row",
                         alignContent: "center",
                     }}>
-                        <LoginIcon/> Login
+                        <LoginIcon color="primary"/> Login
                     </Box>
                 )
                 :
@@ -103,7 +103,7 @@ const TopBar: React.FC = (props: {
                         flexDirection: "row",
                         alignContent: "center",
                     }}>
-                        <LogoutIcon/> Logout
+                        <LogoutIcon color="error"/> Logout
                     </Box>
                 )
         );

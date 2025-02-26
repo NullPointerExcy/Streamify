@@ -519,11 +519,13 @@ const Community: React.FC = (props: {
                                     setNewComment({...newComment, [topic.id]: e.target.value})
                                 }
                                 sx={{mt: 2}}
+                                disabled={!user}
                             />
                             <Button
                                 variant="contained"
                                 endIcon={<SendIcon/>}
                                 onClick={() => handleAddComment(topic.id)}
+                                disabled={!user}
                             >
                                 Add comment
                             </Button>

@@ -93,6 +93,9 @@ const Videos: React.FC = (props: {
     }, []);
 
     React.useEffect(() => {
+        if (!user || !user.id) {
+            return;
+        }
         const videoElement = videoRef.current;
 
         const handleTimeUpdate = () => {
@@ -138,9 +141,12 @@ const Videos: React.FC = (props: {
                 videoElement.removeEventListener("ended", saveWatchedTime);
             }
         };
-    }, [selectedVideo, watchedTime, user.id]);
+    }, [selectedVideo, watchedTime, user?.id]);
 
     React.useEffect(() => {
+        if (!user || !user.id) {
+            return;
+        }
         const interval = setInterval(() => {
             if (watchedTime > 0) {
                 addWatchTime({
@@ -159,7 +165,7 @@ const Videos: React.FC = (props: {
         }, 10000);
 
         return () => clearInterval(interval);
-    }, [watchedTime, user.id, selectedVideo]);
+    }, [watchedTime, user?.id, selectedVideo]);
 
 
     React.useEffect(() => {
