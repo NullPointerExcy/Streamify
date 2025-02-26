@@ -84,8 +84,8 @@ const WatchList: React.FC = (props: {
                 </Typography>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     <List>
-                        {watchList.map((video) => (
-                            <React.Fragment key={video.id}>
+                        {watchList.map((video, index) => (
+                            <React.Fragment key={video.id + index}>
                                 <ListItem
                                     sx={{
                                         transition: "background-color 0.3s",
@@ -112,11 +112,11 @@ const WatchList: React.FC = (props: {
                                         primary={video.title}
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    Views: {video.viewerCount || 0} |
-                                                    Duration: {Math.floor(video.duration / 60)} min
+                                                <Typography component="span" variant="body2" color="textSecondary">
+                                                    Views: {video.viewerCount || 0} | Duration: {Math.floor(video.duration / 60)} min
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <br />
+                                                <Typography component="span" variant="body2" color="textSecondary">
                                                     Uploaded: {getRelativeDate(video.uploadedAt)}
                                                 </Typography>
                                             </>

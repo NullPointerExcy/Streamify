@@ -8,7 +8,7 @@ export interface IUser {
     password: string;
     roles: Array<string>;
     userImage: string;
-    totalWatchTime: number;
+    totalViewTime: number;
     totalWatchedVideos: number;
     totalCreatedTopics: number;
     totalComments: number;

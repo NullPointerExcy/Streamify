@@ -87,7 +87,7 @@ const UserStatistics: React.FC = (props: {
                             <ListItem>
                                 <ListItemText
                                     primary="Total watched Hours"
-                                    secondary={`${user.totalWatchTime || 0} Hours`}
+                                    secondary={`${(user.totalViewTime / 60 ).toFixed(2) || 0} Minutes`}
                                 />
                             </ListItem>
                             <ListItem>

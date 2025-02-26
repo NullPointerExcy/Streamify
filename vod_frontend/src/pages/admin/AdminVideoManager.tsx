@@ -38,6 +38,7 @@ import {IGenre} from "../../models/IGenre";
 import {getAllGenres} from "../../services/genre/GenreServices";
 import {IUser} from "../../models/IUser";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import {useUploadProgress} from "../../context/UploadProgressContext";
 
 const ThumbnailInput = styled("input")({
     display: "none",
@@ -84,6 +85,7 @@ const AdminVideoManager: React.FC = (props: {
     const [useFirstFrameAsThumbnail, setUseFirstFrameAsThumbnail] = React.useState(false);
 
     const videoRef = React.useRef<HTMLVideoElement>(null);
+    const { startUpload, isUploading } = useUploadProgress();
 
     React.useEffect(() => {
         if (selectedVideo && videoRef.current) {
@@ -120,36 +122,36 @@ const AdminVideoManager: React.FC = (props: {
 
             let uploadedVideoPath = "";
             try {
-                const uploadResponse = await uploadVideo(selectedGame.id, videoFile);
+                setIsDialogOpen(false);
+                const uploadResponse = await startUpload(selectedGame.id, videoFile);
                 uploadedVideoPath = uploadResponse.data;
             } catch (err) {
                 console.error("Video upload failed", err);
-                alert("Video upload failed");
                 return;
+            } finally {
+                const newVideo: IVideo = {
+                    title: title,
+                    description: "",
+                    filePath: uploadedVideoPath,
+                    thumbnail: thumbnailUrl || customThumbnail,
+                    duration: duration,
+                    game: selectedGame,
+                    uploadedAt: new Date().toISOString(),
+                };
+
+                addVideo(selectedGame.id, newVideo).then((response) => {
+                    console.log(response);
+                    setVideos([...videos, response]);
+                    setTitle("");
+                    setGame("");
+                    setVideoUrl("");
+                    setVideoFile(null);
+                    setThumbnailUrl("");
+                    setThumbnailFile(null);
+                    setDuration(0);
+                    setIsDialogOpen(false);
+                });
             }
-
-            const newVideo: IVideo = {
-                title: title,
-                description: "",
-                filePath: uploadedVideoPath,
-                thumbnail: thumbnailUrl || customThumbnail,
-                duration: duration,
-                game: selectedGame,
-                uploadedAt: new Date().toISOString(),
-            };
-
-            addVideo(selectedGame.id, newVideo).then((response) => {
-                console.log(response);
-                setVideos([...videos, response]);
-                setTitle("");
-                setGame("");
-                setVideoUrl("");
-                setVideoFile(null);
-                setThumbnailUrl("");
-                setThumbnailFile(null);
-                setDuration(0);
-                setIsDialogOpen(false);
-            });
         } else {
             alert("Please fill out all fields.");
         }

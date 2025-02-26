@@ -8,28 +8,42 @@ import {
     Paper,
     Card,
     CardContent,
-    CardActions, Divider, Box
+    CardActions,
+    Divider,
+    Box,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Chip,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
+    IconButton
 } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import BlockIcon from '@mui/icons-material/Block';
 import ForumIcon from "@mui/icons-material/Forum";
-import GoogleIcon from '@mui/icons-material/Google';
-import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {IFeature} from "../../models/IFeature";
 import {getAllFeatures, updateFeature} from "../../services/feature/FeatureServices";
 import {IUser} from "../../models/IUser";
+import {getAllUsers} from "../../services/users/UserServices";
 
 // Hardcoded for now!
 const controllableFeatures = [
     {id: "streamify-community-ft", label: "Community", icon: <ForumIcon/>, link: "/forum"},
 ];
 
-const availableFeatures = [
+const availableFeatures: Array<IFeature> = [
     {
         id: "streamify-community-ft",
         title: "Community",
         description: "A place to discuss and share ideas with other users.",
-        enabled: true
+        enabled: true,
+        roleRestriction: "ALL",
+        allowedUsers: [],
     },
 ];
 
@@ -38,34 +52,92 @@ const AdminFeatureManager: React.FC = (props: {
     setUser: (usr: IUser) => void,
 }) => {
 
-    const { user, setUser } = props;
+    const {user, setUser} = props;
 
     const [features, setFeatures] = React.useState<Array<IFeature>>([]);
+    const [allUsers, setAllUsers] = React.useState<Array<IUser>>([]);
+    const [selectedUsersCommunity, setSelectedUsersCommunity] = React.useState<Array<String>>([]);
 
     React.useEffect(() => {
-        // Features are only in the Database, if they are controllable and the user (admin) has changed them once, otherwise use the hardcoded features
-        getAllFeatures().then((features) => {
-            if (features.length === 0) {
+        getAllFeatures().then((fs) => {
+            if (fs.length === 0) {
                 setFeatures(availableFeatures);
             } else {
-                setFeatures(features);
+                fs.forEach((feature) => {
+                    if (!feature.allowedUsers) {
+                        feature.allowedUsers = [];
+                    }
+                });
+                setFeatures(fs);
             }
+        });
+
+        // Get all users for specific user restrictions
+        getAllUsers().then((users) => {
+            setAllUsers(users);
         });
     }, []);
 
+    React.useEffect(() => {
+        if (features.length > 0 && allUsers.length > 0) {
+            const communityFeature = features.find(f => f.id === "streamify-community-ft");
+            if (communityFeature) {
+                setSelectedUsersCommunity(communityFeature.allowedUsers.map(u => u.id));
+            }
+        }
+    }, [features, allUsers])
+
     const handleUpdateFeature = (feature: IFeature) => {
-        const updatedFeature: IFeature = {
+        const users: Array<IUser> = allUsers.filter(user => selectedUsersCommunity.includes(user.id));
+
+        const updatedFeature = {
             ...feature,
-            enabled: !features.find(f => f.id === feature.id)?.enabled
+            allowedUsers: users
         };
+
         updateFeature(updatedFeature).then(() => {
             setFeatures(prevFeatures =>
                 prevFeatures.map(f =>
-                    f.id === feature.id ? {...f, enabled: !f.enabled} : f
+                    f.id === feature.id ? {...feature} : f
                 )
             );
+
         });
     }
+
+    const handleRoleRestrictionChange = (feature: IFeature, role: string) => {
+        const updatedFeature = {
+            ...feature,
+            roleRestriction: role,
+            allowedUsers: role !== 'SPECIFIC_USERS' ? [] : feature.allowedUsers
+        };
+        handleUpdateFeature(updatedFeature);
+    };
+
+    const handleAddUsersToFeature = (feature: IFeature) => {
+        // Get all user objects from selected user ids
+        const users: Array<IUser> = allUsers.filter(user => selectedUsersCommunity.includes(user.id));
+
+        const updatedFeature = {
+            ...feature,
+            allowedUsers: users
+        };
+
+        updateFeature(updatedFeature).then(() => {
+            handleUpdateFeature(
+                {...feature, allowedUsers: selectedUsersCommunity}
+            );
+        })
+    };
+
+    const handleRemoveUserFromFeature = (feature: IFeature, user: IUser) => {
+        const updatedFeature = {
+            ...feature,
+            allowedUsers: feature.allowedUsers.filter((u) => u.id !== user.id)
+        };
+
+        handleUpdateFeature(updatedFeature);
+    };
 
     return (
         <Container maxWidth={false} sx={{mt: 4, width: "80%"}}>
@@ -91,7 +163,103 @@ const AdminFeatureManager: React.FC = (props: {
                                     <Typography variant="body2" color="textSecondary">
                                         Status: {feature.enabled ? "active" : "inactive"}
                                     </Typography>
+                                    <Divider sx={{my: 2}}/>
+
+                                    <FormControl fullWidth sx={{mb: 2}}>
+                                        <InputLabel>Access Restriction</InputLabel>
+                                        <Select
+                                            value={feature.roleRestriction || "ALL"}
+                                            onChange={(e) => handleRoleRestrictionChange(feature, e.target.value)}
+                                            label="Access Restriction"
+                                        >
+                                            <MenuItem value="ALL">All Users</MenuItem>
+                                            <MenuItem value="USER">Registered Users</MenuItem>
+                                            <MenuItem value="ADMIN">Admins Only</MenuItem>
+                                            <MenuItem value="MODERATOR">Moderators (+Admins) Only</MenuItem>
+                                            <MenuItem value="SPECIFIC_USERS">Specific Users</MenuItem>
+                                        </Select>
+                                    </FormControl>
+
+                                    {feature.roleRestriction === "SPECIFIC_USERS" && (
+                                        <>
+                                            <Typography variant="subtitle1">Allowed Users:</Typography>
+                                            <FormControl fullWidth>
+                                                <InputLabel>Select Users</InputLabel>
+                                                <Select
+                                                    multiple
+                                                    value={selectedUsersCommunity}
+                                                    onChange={(e) => setSelectedUsersCommunity(e.target.value)}
+                                                    renderValue={(selected) => (
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                            {selected.map((user) => {
+                                                                const userObj = allUsers.find(u => u.id === user);
+                                                                return (
+                                                                    <Chip key={userObj?.id} label={userObj?.name}/>
+                                                                );
+                                                            })}
+                                                        </Box>
+                                                    )}
+                                                >
+                                                    {allUsers.map(user => (
+                                                        <MenuItem
+                                                            key={user.id} value={user.id}
+                                                        >
+                                                            {user.name}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleAddUsersToFeature(feature)}
+                                                sx={{mt: 2}}
+                                                fullWidth
+                                            >
+                                                Save Selected Users
+                                            </Button>
+
+                                            <Divider sx={{ my: 2 }}/>
+
+                                            <Typography variant="subtitle1">Selected Users:</Typography>
+                                            <List
+                                                dense
+                                                sx={{maxHeight: 200, overflow: "auto"}}
+                                            >
+                                                {feature.allowedUsers && feature.allowedUsers?.map((user) => {
+                                                    return (
+                                                        <ListItem
+                                                            key={user.id}
+                                                            sx={{
+                                                                "&:hover": {
+                                                                    cursor: "pointer",
+                                                                    boxShadow: 2,
+                                                                    backgroundColor: "rgba(144,202,249,0.13)"
+                                                                }
+                                                            }}
+                                                        >
+                                                            <ListItemText
+                                                                primary={user?.name || user.id}
+                                                            />
+                                                            <ListItemSecondaryAction>
+                                                                <IconButton
+                                                                    edge="end"
+                                                                    aria-label="delete"
+                                                                    color="error"
+                                                                    onClick={() => handleRemoveUserFromFeature(feature, user)}
+                                                                >
+                                                                    <DeleteIcon/>
+                                                                </IconButton>
+                                                            </ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    );
+                                                })}
+                                            </List>
+                                        </>
+                                    )}
                                 </CardContent>
+
                                 <CardActions>
                                     {feature.enabled ? (
                                         <Button

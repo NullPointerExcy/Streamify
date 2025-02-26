@@ -23,7 +23,7 @@ import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import { getAllVideos, incrementViewerCount } from "../services/videos/VideoServices";
-import { addWatchedVideo } from "../services/users/UserServices";
+import {addWatchedVideo, addWatchTime} from "../services/users/UserServices";
 import { IVideo } from "../models/IVideo";
 import { IUser } from "../models/IUser";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -48,6 +48,8 @@ const Videos: React.FC = (props: {
     const [videoUrl, setVideoUrl] = React.useState("");
     const [watchList, setWatchList] = React.useState<IVideo[]>([]);
 
+    const [watchedTime, setWatchedTime] = React.useState(0);
+
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 8;
@@ -69,6 +71,96 @@ const Videos: React.FC = (props: {
             });
         }
     }, []);
+
+    React.useEffect(() => {
+        const videoElement = videoRef.current;
+
+        const handleTimeUpdate = () => {
+            if (videoElement && !videoElement.paused && !videoElement.seeking) {
+                setWatchedTime((prev) => prev + 1);
+            }
+        };
+
+        if (videoElement) {
+            videoElement.addEventListener("timeupdate", handleTimeUpdate);
+        }
+
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+            }
+        };
+    }, []);
+
+    React.useEffect(() => {
+        const videoElement = videoRef.current;
+
+        const handleTimeUpdate = () => {
+            if (videoElement && !videoElement.paused && !videoElement.seeking) {
+                setWatchedTime((prev) => prev + 1);
+
+                // For short videos, save when the video ends
+                if (videoElement.duration && videoElement.duration <= 10) {
+                    saveWatchedTime();
+                }
+            }
+        };
+
+        const saveWatchedTime = () => {
+            if (watchedTime > 0) {
+                addWatchTime({
+                    id: user.id,
+                    totalViewTime: watchedTime
+                }).then(() => {
+                    setUser(prevUser => ({
+                        ...prevUser,
+                        totalViewTime: prevUser.totalViewTime + watchedTime
+                    }));
+                    setWatchedTime(0);
+                }).catch(err => {
+                    console.error("Failed to save watch time:", err);
+                });
+            }
+        };
+
+        // Register Event Listeners
+        if (videoElement) {
+            videoElement.addEventListener("timeupdate", handleTimeUpdate);
+            videoElement.addEventListener("pause", saveWatchedTime);
+            videoElement.addEventListener("ended", saveWatchedTime);
+        }
+
+        // Clean up listeners when component unmounts or selectedVideo changes
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+                videoElement.removeEventListener("pause", saveWatchedTime);
+                videoElement.removeEventListener("ended", saveWatchedTime);
+            }
+        };
+    }, [selectedVideo, watchedTime, user.id]);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            if (watchedTime > 0) {
+                addWatchTime({
+                    id: user.id,
+                    totalViewTime: watchedTime
+                }).then(() => {
+                    setUser(prevUser => ({
+                        ...prevUser,
+                        totalViewTime: prevUser.totalViewTime + watchedTime
+                    }));
+                    setWatchedTime(0);
+                }).catch(err => {
+                    console.error("Failed to add watch time:", err);
+                });
+            }
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [watchedTime, user.id, selectedVideo]);
+
 
     React.useEffect(() => {
         if (videoRef.current && !isPlaying) {

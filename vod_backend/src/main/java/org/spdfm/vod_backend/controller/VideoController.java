@@ -50,6 +50,7 @@ public class VideoController {
 
     @PostMapping
     public Video addVideo(@RequestBody Video video) {
+        System.out.println("Sending message...");
         Video v = videoService.addVideo(video);
         // Rename video file to include video id {id}.mp4 / {id}.webm / {id}.mkv etc.
         String oldPath = video.getFilePath();

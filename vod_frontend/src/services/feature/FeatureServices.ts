@@ -32,6 +32,7 @@ export const getFeatureById = async (id: string) => {
 
 
 export const updateFeature = async (feature: IFeature) => {
+    console.log(feature);
     return await axios.put('/features', feature, {
         headers: {
             'Authorization': `Bearer ${token}`

@@ -32,7 +32,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/videos/**",
             "/videos/stream/**",
             "/videos/stream/hls/**",
-            "/api/v1/videos/**",
             "/api/v1/videos/stream/**",
             "/api/v1/videos/stream/hls/**"
     );

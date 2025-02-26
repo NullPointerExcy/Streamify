@@ -63,7 +63,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/videos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/videos/**").hasAuthority("ROLE_ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, "/api/v1/videos/upload/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
+
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
 
                         .requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
@@ -87,37 +91,27 @@ public class SecurityConfig {
 
                         // Community endpoints
                         // Comments
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
                         // Topics
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/topics/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/topics/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/topics/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/topics/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
                         // User endpoints
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_MODERATOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
+
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/upload-user-image").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR")
 
                         .anyRequest().authenticated()
                 )

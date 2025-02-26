@@ -1,7 +1,10 @@
+import {IUser} from "./IUser";
 
 export interface IFeature {
     id: number;
-    name: string;
+    title: string;
     description: string;
     enabled: boolean;
+    roleRestriction: string;
+    allowedUsers: Array<IUser>;
 }

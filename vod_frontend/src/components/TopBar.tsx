@@ -22,6 +22,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import TheatersIcon from '@mui/icons-material/Theaters';
 import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LockIcon from '@mui/icons-material/Lock';
 import {ISiteSettings} from "../models/ISiteSettings";
 import {IFeature} from "../models/IFeature";
 import {getAllFeatures} from "../services/feature/FeatureServices";
@@ -108,6 +109,32 @@ const TopBar: React.FC = (props: {
         );
     }
 
+    const isFeatureVisible = (featureId: string): boolean => {
+        const feature = features.find(f => f.id === featureId);
+        if (!feature) return true; // Default to visible if not found in features list
+
+        const isAdmin = user?.roles?.includes("ADMIN");
+        const isAllowedUser = feature.allowedUsers?.includes(user?.id);
+
+        // Admins always see it (even if disabled)
+        if (isAdmin) return true;
+
+        // Check if feature is enabled or user is specifically allowed
+        return feature.enabled || isAllowedUser;
+    };
+
+    const isFeatureDisabledForUser = (featureId: string): boolean => {
+        const feature = features.find(f => f.id === featureId);
+        if (!feature) return false;
+
+        const isAdmin = user?.roles?.includes("ADMIN");
+
+        // If admin, check if it's disabled, but still show it greyed out
+        if (isAdmin && !feature.enabled) return true;
+
+        return false;
+    };
+
     return (
         <AppBar position="sticky" sx={{mb: 0.1}}>
             <Toolbar sx={{
@@ -143,25 +170,41 @@ const TopBar: React.FC = (props: {
                     <Box sx={{
                         display: "flex",
                         gap: 2,
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        width: "100%",
                     }}>
                         {menuItems.map((item) => (
-                            (features.find(f => f.id === item.id && f.enabled) || features.find(f => f.id === item.id) === undefined) &&
-                            <Button
-                                key={item.label}
-                                color="inherit"
-                                startIcon={item.icon}
-                                onClick={() => window.location.href = item.link}
-                                fullWidth
-                            >
-                                {item.label}
-                            </Button>
+                            isFeatureVisible(item.id) && (
+                                <Button
+                                    key={item.label}
+                                    color="inherit"
+                                    startIcon={
+                                        isFeatureDisabledForUser(item.id) ? <LockIcon/> : item.icon
+                                    }
+                                    onClick={() => {
+                                        if (!isFeatureDisabledForUser(item.id)) {
+                                            window.location.href = item.link;
+                                        }
+                                        if (user?.roles?.includes("ADMIN")) {
+                                            window.location.href = item.link;
+                                        }
+                                    }}
+                                    fullWidth
+                                    sx={{
+                                        opacity: isFeatureDisabledForUser(item.id) ? 0.5 : 1,
+                                        // pointerEvents: isFeatureDisabledForUser(item.id) ? 'none' : 'auto'
+                                    }}
+                                >
+                                    {item.label}
+                                </Button>
+                            )
                         ))}
                     </Box>
                 </Box>
 
                 <Box sx={{ml: "auto"}}>
                     <Avatar
+                        src={user?.userImage}
                         alt="User Avatar"
                         sx={{cursor: "pointer"}}
                         onClick={handleAvatarClick}
@@ -213,7 +256,9 @@ const TopBar: React.FC = (props: {
                                 <HistoryIcon/> Watch History
                             </Box>
                         </MenuItem>
-                        <MenuItem disabled={!user} onClick={() => {}}>
+                        <MenuItem disabled={!user} onClick={() => {
+                            window.location.href = "/user-settings";
+                        }}>
                             <Box sx={{
                                 display: "flex",
                                 gap: 1,

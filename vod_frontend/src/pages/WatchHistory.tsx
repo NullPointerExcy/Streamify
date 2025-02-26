@@ -75,8 +75,8 @@ const WatchHistory: React.FC = (props: {
                 </Typography>
                 <Paper elevation={3} sx={{p: 2}}>
                     <List>
-                        {watchedVideos.map((video) => (
-                            <React.Fragment key={video.id}>
+                        {watchedVideos.map((video, index) => (
+                            <React.Fragment key={video.id + index}>
                                 <ListItem
                                     sx={{
                                         transition: "background-color 0.3s",
@@ -103,11 +103,11 @@ const WatchHistory: React.FC = (props: {
                                         primary={video.title}
                                         secondary={
                                             <>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" component="span">
                                                     Views: {video.viewerCount || 0} |
                                                     Duration: {Math.floor(video.duration / 60)} min
                                                 </Typography>
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Typography variant="body2" color="textSecondary" component="span">
                                                     Uploaded: {getRelativeDate(video.uploadedAt)}
                                                 </Typography>
                                             </>

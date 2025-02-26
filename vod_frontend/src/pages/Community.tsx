@@ -71,13 +71,13 @@ const Community: React.FC = (props: {
 
     React.useEffect(() => {
         getAllTopics().then((data) => {
-            setTopics(data);
+            setTopics(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         });
         getAllGames().then((data) => {
-            setGames(data);
+            setGames(data.sort((a, b) => a.title.localeCompare(b.title)));
         });
         getAllVideos().then((data) => {
-            setVideos(data);
+            setVideos(data.sort((a, b) => a.title.localeCompare(b.title)));
         });
     }, []);
 
@@ -196,7 +196,6 @@ const Community: React.FC = (props: {
         if (!searchTerm && selectedGameFilter.length === 0 && selectedVideoFilter.length === 0) return true;
         const lowerTerm = searchTerm.toLowerCase();
 
-        // Check Search Term
         let matchesSearch = true;
         if (searchTerm) {
             switch (searchFilter) {

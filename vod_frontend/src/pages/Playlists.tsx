@@ -21,7 +21,7 @@ import {IUser} from "../models/IUser";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import {IVideo} from "../models/IVideo";
-import {addWatchedVideo} from "../services/users/UserServices";
+import {addWatchedVideo, addWatchTime} from "../services/users/UserServices";
 import {incrementViewerCount} from "../services/videos/VideoServices";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ReactHlsPlayer from "react-hls-player";
@@ -52,6 +52,9 @@ const Playlists: React.FC = (props: {
     const [videoUrl, setVideoUrl] = React.useState("");
     const [watchList, setWatchList] = React.useState<IVideo[]>([]);
 
+    const [watchedTime, setWatchedTime] = React.useState(0);
+
+
     // Pagination state
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 8;
@@ -60,6 +63,51 @@ const Playlists: React.FC = (props: {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const startTime = parseInt(searchParams.get("startTime")) || 0;
+
+    React.useEffect(() => {
+        const videoElement = videoRef.current;
+
+        const handleTimeUpdate = () => {
+            if (videoElement && !videoElement.paused && !videoElement.seeking) {
+                setWatchedTime((prev) => prev + 1);
+            }
+        };
+
+        if (videoElement) {
+            videoElement.addEventListener("timeupdate", handleTimeUpdate);
+        }
+
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("timeupdate", handleTimeUpdate);
+            }
+        };
+    }, []);
+
+    React.useEffect(() => {
+        const videoElement = videoRef.current;
+
+        const saveTimeOnPauseOrEnd = () => {
+            if (watchedTime > 0) {
+                console.log("Adding watched time on pause/end:", watchedTime);
+                addWatchTime(user.id, watchedTime).then(() => {
+                    setWatchedTime(0);
+                });
+            }
+        };
+
+        if (videoElement) {
+            videoElement.addEventListener("pause", saveTimeOnPauseOrEnd);
+            videoElement.addEventListener("ended", saveTimeOnPauseOrEnd);
+        }
+
+        return () => {
+            if (videoElement) {
+                videoElement.removeEventListener("pause", saveTimeOnPauseOrEnd);
+                videoElement.removeEventListener("ended", saveTimeOnPauseOrEnd);
+            }
+        };
+    }, [watchedTime, selectedVideo]);
 
     React.useEffect(() => {
         if (videoRef.current && !isPlaying) {

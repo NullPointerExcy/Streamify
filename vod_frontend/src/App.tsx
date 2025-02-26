@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import {
     CssBaseline,
     ThemeProvider,
@@ -16,22 +16,26 @@ import Login from "./pages/Login";
 import Community from "./pages/Community";
 import PlaylistVideos from "./pages/PlaylistVideos";
 import AdminPanel from "./pages/admin/AdminPanel";
-import { getAllSettings, saveSettings } from "./services/settings/SettingsServices";
-import { ISiteSettings } from "./models/ISiteSettings";
+import {getAllSettings, saveSettings} from "./services/settings/SettingsServices";
+import {ISiteSettings} from "./models/ISiteSettings";
 import AdminRoute from "./components/AdminRoute";
-import { IUser } from "./models/IUser";
-import { getUserById } from "./services/users/UserServices";
+import {IUser} from "./models/IUser";
+import {getUserById} from "./services/users/UserServices";
 import WatchHistory from "./pages/WatchHistory";
-import { GlobalStyles } from "@mui/material";
+import {GlobalStyles} from "@mui/material";
 import WatchList from "./pages/WatchList";
+import UserSettings from "./pages/UserSettings";
+import {UploadProgressProvider} from "./context/UploadProgressContext";
+import GlobalUploadProgress from "./components/GlobalUploadProgress";
+import UploadProgressBar from "./components/UploadProgressBar";
 
 
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
-        primary: { main: "#90caf9" },
-        secondary: { main: "#f48fb1" },
-        error: { main: "#791f19" },
+        primary: {main: "#90caf9"},
+        secondary: {main: "#f48fb1"},
+        error: {main: "#791f19"},
     },
 });
 
@@ -93,14 +97,14 @@ function App() {
             height: "100%",
             backgroundColor: "rgba(5,5,5,0.82)",
         }}>
-            <CircularProgress color="primary" size={100} />
-            <Typography variant={"h3"} sx={{ my: 2 }} color={"primary"}>Loading...</Typography>
+            <CircularProgress color="primary" size={100}/>
+            <Typography variant={"h3"} sx={{my: 2}} color={"primary"}>Loading...</Typography>
         </Box>
     );
 
     return (
         <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
+            <CssBaseline/>
             <GlobalStyles styles={{
                 "::-webkit-scrollbar": {
                     width: "8px",
@@ -116,39 +120,45 @@ function App() {
                 "::-webkit-scrollbar-track": {
                     backgroundColor: "transparent"
                 }
-            }} />
-            <BrowserRouter>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100vh',
-                    overflow: 'hidden'
-                }}>
-                    <TopBar siteSettings={siteSettings} user={user} setUser={setUser} />
+            }}/>
+            <UploadProgressProvider>
+                <BrowserRouter>
+                    <GlobalUploadProgress />
                     <Box sx={{
-                        flex: 1,
-                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100vh',
+                        overflow: 'hidden'
                     }}>
-                        <Routes>
-                            <Route path="/" element={<Home user={user} />} />
-                            <Route path="/videos/:videoId?" element={<Videos user={user} setUser={setUser} />} />
-                            <Route path="/playlists" element={<Playlists user={user} setUser={setUser} />} />
-                            <Route path="/about" element={<About />} />
-                            <Route path="/community" element={<Community user={user} setUser={setUser} />} />
-                            <Route path="/watchlist" element={<WatchList user={user} setUser={setUser} />} />
-                            <Route path="/watched-history" element={<WatchHistory user={user} setUser={setUser} />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/admin_panel" element={
-                                <AdminRoute user={user}>
-                                    <AdminPanel siteSettings={siteSettings} user={user} setUser={setUser} />
-                                </AdminRoute>
-                            } />
-                            <Route path="/playlists/videos/:game/:id" element={<PlaylistVideos user={user} setUser={setUser} />} />
-                        </Routes>
+                        <TopBar siteSettings={siteSettings} user={user} setUser={setUser}/>
+                        <Box sx={{
+                            flex: 1,
+                            overflowY: 'auto',
+                        }}>
+                            <Routes>
+                                <Route path="/" element={<Home user={user}/>}/>
+                                <Route path="/videos/:videoId?" element={<Videos user={user} setUser={setUser}/>}/>
+                                <Route path="/playlists" element={<Playlists user={user} setUser={setUser}/>}/>
+                                <Route path="/about" element={<About/>}/>
+                                <Route path="/community" element={<Community user={user} setUser={setUser}/>}/>
+                                <Route path="/watchlist" element={<WatchList user={user} setUser={setUser}/>}/>
+                                <Route path="/watched-history" element={<WatchHistory user={user} setUser={setUser}/>}/>
+                                <Route path="/login" element={<Login/>}/>
+                                <Route path="/user-settings" element={<UserSettings user={user} setUser={setUser}/>}/>
+                                <Route path="/admin_panel" element={
+                                    <AdminRoute user={user}>
+                                        <AdminPanel siteSettings={siteSettings} user={user} setUser={setUser}/>
+                                    </AdminRoute>
+                                }/>
+                                <Route path="/playlists/videos/:game/:id"
+                                       element={<PlaylistVideos user={user} setUser={setUser}/>}/>
+                            </Routes>
+                        </Box>
                     </Box>
-                </Box>
-                {user && <UserStatistics user={user} />}
-            </BrowserRouter>
+                    {user && <UserStatistics user={user}/>}
+                </BrowserRouter>
+                <UploadProgressBar/>
+            </UploadProgressProvider>
         </ThemeProvider>
 
     );

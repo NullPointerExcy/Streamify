@@ -32,6 +32,30 @@ export const getUserById = async (id: string) => {
 }
 
 
+export const uploadUserImage = async (image: File) => {
+    return await axios.post(`/users/upload-user-image`, image, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+}
+
+
+export const addWatchTime = async (data: { id: string, totalViewTime: number }) => {
+    return await axios.put(`/users/addWatchTime`, data, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(
+        (response: any) => {
+            return response.data;
+        }
+    );
+};
+
+
+
 export const updateUser = async (user: IUser) => {
     return await axios.put(`/users`, user, {
         headers: {

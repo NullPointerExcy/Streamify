@@ -31,7 +31,7 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import BlockIcon from "@mui/icons-material/Block";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { IUser } from "../../models/IUser";
+import {IUser} from "../../models/IUser";
 import {getAllUsers, updateUser} from "../../services/users/UserServices";
 import Pagination from "@mui/material/Pagination";
 
@@ -40,7 +40,7 @@ const AdminUserManager: React.FC = (props: {
     setUser: (usr: IUser) => void,
 }) => {
 
-    const { user, setUser } = props;
+    const {user, setUser} = props;
 
     const roles = [
         "USER",
@@ -85,7 +85,7 @@ const AdminUserManager: React.FC = (props: {
 
     const handleConfirmRoleChange = async () => {
         if (selectedUser) {
-            const updatedUser = { ...selectedUser, roles: [newRole] };
+            const updatedUser = {...selectedUser, roles: [newRole]};
             console.log("Updated User:", updatedUser);
             try {
                 await updateUser(updatedUser);
@@ -102,14 +102,14 @@ const AdminUserManager: React.FC = (props: {
 
     const handleBanUser = (userId) => {
         const updatedUsers = userList.map((user) =>
-            user.id === userId ? { ...user, isBanned: true } : user
+            user.id === userId ? {...user, isBanned: true} : user
         );
         setUserList(updatedUsers);
     };
 
     const handleUnbanUser = (userId) => {
         const updatedUsers = userList.map((user) =>
-            user.id === userId ? { ...user, isBanned: false } : user
+            user.id === userId ? {...user, isBanned: false} : user
         );
         setUserList(updatedUsers);
     };
@@ -131,7 +131,7 @@ const AdminUserManager: React.FC = (props: {
     return (
         <>
             <AppBar position="sticky" sx={{mb: 2}}>
-                <Paper elevation={3} sx={{ p: 2 }}>
+                <Paper elevation={3} sx={{p: 2}}>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -160,24 +160,24 @@ const AdminUserManager: React.FC = (props: {
                     </Grid>
                 </Paper>
             </AppBar>
-            <Container maxWidth={false} sx={{ width: "80%" }}>
+            <Container maxWidth={false} sx={{width: "80%"}}>
                 {totalPages > 1 && (
                     <Pagination
                         count={totalPages}
                         page={currentPage}
                         onChange={(event, value) => setCurrentPage(value)}
-                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                        sx={{display: "flex", justifyContent: "center", marginY: 2}}
                     />
                 )}
 
-                <Paper elevation={3} sx={{ p: 1 }}>
+                <Paper elevation={3} sx={{p: 1}}>
                     <Grid container spacing={2}>
                         {filteredUsers.map((user) => (
                             <Grid item xs={12} md={6} key={user.id}>
-                                <Card sx={{ height: "100%", backgroundColor: "#1e1e1e", color: "white" }}>
+                                <Card sx={{height: "100%", backgroundColor: "#1e1e1e", color: "white"}}>
                                     <CardContent>
-                                        <Accordion sx={{ backgroundColor: "#2a2a2a", color: "white" }}>
-                                            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}>
+                                        <Accordion sx={{backgroundColor: "#2a2a2a", color: "white"}}>
+                                            <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color: "white"}}/>}>
                                                 <Box
                                                     sx={{
                                                         display: "flex",
@@ -186,62 +186,68 @@ const AdminUserManager: React.FC = (props: {
                                                         width: "100%",
                                                     }}
                                                 >
-                                                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                    <Box sx={{display: "flex", alignItems: "center"}}>
                                                         <Avatar
                                                             sx={{
                                                                 backgroundColor: user.isBanned ? "error.main" : "primary.main",
                                                                 mr: 2,
                                                             }}
-                                                        >
-                                                            {user.name.charAt(0)}
-                                                        </Avatar>
+                                                            src={user.userImage || user.name.charAt(0)}
+                                                            alt={user.name.charAt(0)}
+                                                        />
                                                         <Typography variant="h6">{user.name}</Typography>
                                                     </Box>
                                                     <Box>
                                                         {!user.isBanned ? (
                                                             <Tooltip title="Ban User">
-                                                                <IconButton
-                                                                    color="error"
+                                                                <Box
+                                                                    component="span"
+                                                                    sx={{cursor: "pointer"}}
                                                                     onClick={(e) => {
+                                                                        if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
+                                                                            return;
+                                                                        }
                                                                         e.stopPropagation();
                                                                         handleBanUser(user.id);
                                                                     }}
-                                                                    disabled={user.id === JSON.parse(localStorage.getItem("user") || "{}").id}
                                                                 >
-                                                                    <BlockIcon />
-                                                                </IconButton>
+                                                                    <BlockIcon color={
+                                                                        user.id === JSON.parse(localStorage.getItem("user") || "{}").id ?
+                                                                        "#666666" : "error"
+                                                                    }/>
+                                                                </Box>
                                                             </Tooltip>
                                                         ) : (
                                                             <Tooltip title="Unban User">
-                                                                <IconButton
-                                                                    color="primary"
+                                                                <Box
+                                                                    component="span"
+                                                                    sx={{cursor: "pointer"}}
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         handleUnbanUser(user.id);
                                                                     }}
-                                                                    disabled={user.id === JSON.parse(localStorage.getItem("user") || "{}").id}
                                                                 >
-                                                                    <AddCircleIcon />
-                                                                </IconButton>
+                                                                    <AddCircleIcon color="primary"/>
+                                                                </Box>
                                                             </Tooltip>
                                                         )}
                                                     </Box>
                                                 </Box>
                                             </AccordionSummary>
                                             <AccordionDetails>
-                                                <Divider sx={{ my: 2 }} />
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Divider sx={{my: 2}}/>
+                                                <Typography component="span" variant="body2" color="textSecondary">
                                                     Email: {user.email}
                                                 </Typography>
-                                                <Divider sx={{ my: 2 }} />
-                                                <Typography variant="body2" color="textSecondary">
+                                                <Divider sx={{my: 2}}/>
+                                                <Typography component="span" variant="body2" color="textSecondary">
                                                     <strong>User Stats</strong>
                                                 </Typography>
                                                 <Table size="small">
                                                     <TableBody>
                                                         <TableRow>
                                                             <TableCell>Total Watch Time</TableCell>
-                                                            <TableCell>{user.totalWatchTime || 0} minutes</TableCell>
+                                                            <TableCell>{(user.totalViewTime / 60 ).toFixed(2) || 0} Minutes</TableCell>
                                                         </TableRow>
                                                         <TableRow>
                                                             <TableCell>Total Watched Videos</TableCell>
@@ -257,11 +263,11 @@ const AdminUserManager: React.FC = (props: {
                                                         </TableRow>
                                                     </TableBody>
                                                 </Table>
-                                                <Box sx={{ my: 2 }}>
-                                                    <Typography variant="body2" color="textSecondary">
+                                                <Box sx={{my: 2}}>
+                                                    <Typography component="span" variant="body2" color="textSecondary">
                                                         <strong>Roles</strong>
                                                     </Typography>
-                                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                                                    <Box sx={{display: "flex", flexWrap: "wrap", gap: 1}}>
                                                         {user.roles.map((role) => (
                                                             <Chip
                                                                 key={role}
@@ -311,14 +317,14 @@ const AdminUserManager: React.FC = (props: {
                         count={totalPages}
                         page={currentPage}
                         onChange={(event, value) => setCurrentPage(value)}
-                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                        sx={{display: "flex", justifyContent: "center", marginY: 2}}
                     />
                 )}
 
                 <Dialog open={openDialog} onClose={handleCloseDialog}>
                     <DialogTitle>Change Role</DialogTitle>
                     <DialogContent>
-                        <FormControl fullWidth sx={{ mt: 2 }}>
+                        <FormControl fullWidth sx={{mt: 2}}>
                             <InputLabel>Role</InputLabel>
                             <Select value={newRole} onChange={handleRoleChange}>
                                 {roles.map((role) => (

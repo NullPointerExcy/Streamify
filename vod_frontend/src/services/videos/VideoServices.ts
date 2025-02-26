@@ -43,15 +43,11 @@ export const getVideoById = async (id: string) => {
 }
 
 
-export const uploadVideo = async (gameId: string, file: File) => {
-    const formData = new FormData();
-    formData.append("file", file); // key must be 'file'
-    return await axios.post(`/videos/upload/${gameId}`, formData, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+export const uploadVideo = async (gameId: string, formData: FormData, config: any) => {
+    // const formData = new FormData();
+    // formData.append("file", file);
+
+    return await axios.post(`/videos/upload/${gameId}`, formData, config);
 };
 
 export const addVideo = async (gameId: string, video: IVideo) => {

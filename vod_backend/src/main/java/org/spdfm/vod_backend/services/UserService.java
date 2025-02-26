@@ -91,4 +91,19 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void addWatchTime(String userId, int watchedTime) {
+        User existingUser = userRepository.findById(userId).orElse(null);
+        if (existingUser == null) {
+            return;
+        }
+
+        // Accumulate watch time
+        long currentWatchTime = existingUser.getTotalViewTime() != null ? existingUser.getTotalViewTime() : 0L;
+        existingUser.setTotalViewTime(currentWatchTime + watchedTime);
+
+        System.out.println("Adding watch time: " + watchedTime + " to user: " + existingUser.getEmail());
+        userRepository.save(existingUser);
+    }
+
+
 }
