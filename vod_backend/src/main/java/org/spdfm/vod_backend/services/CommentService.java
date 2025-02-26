@@ -30,10 +30,6 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Set<Comment> getCommentsByTopicId(String topicId) {
-        return commentRepository.findByTopicId(topicId);
-    }
-
     public Set<Comment> getCommentsByUserId(String userId) {
         return commentRepository.findByCreatedById(userId);
     }

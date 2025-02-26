@@ -23,6 +23,9 @@ public class Comment {
     @DBRef
     private User createdBy;
 
-    @DBRef
-    private Topic topic;
+    public Comment(String content, User createdBy) {
+        this.content = content;
+        this.createdBy = createdBy;
+        this.createdAt = LocalDateTime.now();
+    }
 }

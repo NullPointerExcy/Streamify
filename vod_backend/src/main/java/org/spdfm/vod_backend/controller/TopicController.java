@@ -19,23 +19,33 @@ public class TopicController {
     private TopicService topicService;
 
     @GetMapping
-    public List<Topic> getAllGames() {
+    public List<Topic> getAllTopics() {
         return topicService.getAllTopics();
     }
 
     @GetMapping("/{id}")
-    public Optional<Topic> getGameById(@PathVariable String id) {
+    public Optional<Topic> getTopicById(@PathVariable String id) {
         return topicService.getTopicById(id);
     }
 
-    @GetMapping("/topics/user/{id}")
+    @GetMapping("/user/{id}")
     public Set<Topic> getTopicsByUserId(@PathVariable String id) {
         return topicService.getTopicsByUserId(id);
     }
 
     @PostMapping
-    public Topic addGame(@RequestBody Topic topic) {
+    public Topic addTopic(@RequestBody Topic topic) {
         return topicService.addTopic(topic);
+    }
+
+    @PutMapping("/{topicId}/addComment/{commentId}")
+    public Optional<Topic> addCommentToTopic(@PathVariable String topicId, @PathVariable String commentId) {
+        return topicService.addCommentToTopic(topicId, commentId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTopic(@PathVariable String id) {
+        topicService.deleteTopic(id);
     }
 
 }

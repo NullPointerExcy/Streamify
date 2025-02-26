@@ -19,7 +19,8 @@ public class Topic {
     @NotBlank(message = "Title is mandatory")
     private String title;
 
-    private String description;
+    @NotBlank(message = "Content is mandatory")
+    private String content;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -28,4 +29,11 @@ public class Topic {
 
     @DBRef
     private Set<Comment> comments;
+
+    public Topic(String title, String content, User createdBy) {
+        this.title = title;
+        this.content = content;
+        this.createdBy = createdBy;
+        this.createdAt = LocalDateTime.now();
+    }
 }

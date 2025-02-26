@@ -30,15 +30,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/api/v1/auth/**",
             "/api/v1/users/register",
             "/api/v1/users/**",
-            "/api/v1/comments/**",
             "/videos/**",
             "/videos/stream/**",
             "/videos/stream/hls/**",
             "/api/v1/videos/**",
             "/api/v1/videos/stream/**",
-            "/api/v1/videos/stream/hls/**",
-            "/api/v1/topics/**",
-            "/api/v1/comments/**"
+            "/api/v1/videos/stream/hls/**"
     );
 
     @Override

@@ -27,19 +27,14 @@ public class CommentController {
         return commentService.getCommentById(id);
     }
 
-    @GetMapping("/comments/topic/{id}")
-    public Set<Comment> getCommentsByTopicId(@PathVariable String id) {
-        return commentService.getCommentsByTopicId(id);
-    }
-
-    @GetMapping("/comments/user/{id}")
+    @GetMapping("/user/{id}")
     public Set<Comment> getCommentsByUserId(@PathVariable String id) {
         return commentService.getCommentsByUserId(id);
     }
 
     @PostMapping
-    public Comment addComment(@RequestBody Comment topic) {
-        return commentService.addComment(topic);
+    public Comment addComment(@RequestBody Comment comment) {
+        return commentService.addComment(comment);
     }
 
 }
