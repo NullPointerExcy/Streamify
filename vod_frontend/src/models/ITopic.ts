@@ -1,6 +1,7 @@
 import {IUser} from "./IUser";
 import {IComment} from "./IComment";
 import {IGame} from "./IGame";
+import {IVideo} from "./IVideo";
 
 
 export interface ITopic {
@@ -11,4 +12,5 @@ export interface ITopic {
     createdBy: IUser;
     comments: Array<IComment>;
     relatedGames: Array<IGame>;
+    relatedVideos: Array<IVideo>;
 }

@@ -39,6 +39,9 @@ import {
 } from "../services/community/CommunityServices";
 import {IGame} from "../models/IGame";
 import {getAllGames} from "../services/game/GameServices";
+import {IVideo} from "../models/IVideo";
+import {getAllVideos} from "../services/videos/VideoServices";
+import {Link, useNavigate} from "react-router-dom";
 
 const Community: React.FC = (props: {
     user: IUser,
@@ -49,17 +52,21 @@ const Community: React.FC = (props: {
 
     const [topics, setTopics] = React.useState<Array<ITopic>>([]);
     const [games, setGames] = React.useState<Array<IGame>>([]);
+    const [videos, setVideos] = React.useState<Array<IVideo>>([]);
     const [newTopicTitle, setNewTopicTitle] = React.useState("");
     const [newTopicContent, setNewTopicContent] = React.useState("");
     const [newComment, setNewComment] = React.useState({});
     const [expandedTopic, setExpandedTopic] = React.useState(null);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [relatedGames, setRelatedGames] = React.useState<Array<IGame>>([]);
+    const [relatedVideos, setRelatedVideos] = React.useState<Array<IVideo>>([]);
 
     const [searchTerm, setSearchTerm] = React.useState("");
     const [searchFilter, setSearchFilter] = React.useState("title");
-    const [selectedGameFilter, setSelectedGameFilter] = React.useState([]);
+    const [selectedGameFilter, setSelectedGameFilter] = React.useState<Array<IGame>>([]);
+    const [selectedVideoFilter, setSelectedVideoFilter] = React.useState<Array<IVideo>>([]);
 
+    const navigate = useNavigate();
 
 
     React.useEffect(() => {
@@ -68,6 +75,9 @@ const Community: React.FC = (props: {
         });
         getAllGames().then((data) => {
             setGames(data);
+        });
+        getAllVideos().then((data) => {
+            setVideos(data);
         });
     }, []);
 
@@ -79,6 +89,7 @@ const Community: React.FC = (props: {
                 comments: [],
                 createdBy: user,
                 relatedGames: relatedGames,
+                relatedVideos: relatedVideos,
             };
 
             createTopic(newTopic).then((data) => {
@@ -87,6 +98,7 @@ const Community: React.FC = (props: {
                 setNewTopicContent("");
                 setIsDialogOpen(false);
                 setRelatedGames([]);
+                setRelatedVideos([]);
             });
         } else {
             alert("Please fill in title and content.");
@@ -181,7 +193,7 @@ const Community: React.FC = (props: {
     const closeDialog = () => setIsDialogOpen(false);
 
     const filteredTopics = topics.filter((topic) => {
-        if (!searchTerm && selectedGameFilter.length === 0) return true;
+        if (!searchTerm && selectedGameFilter.length === 0 && selectedVideoFilter.length === 0) return true;
         const lowerTerm = searchTerm.toLowerCase();
 
         // Check Search Term
@@ -206,9 +218,16 @@ const Community: React.FC = (props: {
             );
         }
 
-        return matchesSearch && matchesGame;
-    });
+        // Check Video Filter
+        let matchesVideo = true;
+        if (selectedVideoFilter.length > 0) {
+            matchesVideo = topic.relatedVideos?.some(video =>
+                selectedVideoFilter.includes(video.title)
+            );
+        }
 
+        return matchesSearch && matchesGame && matchesVideo;
+    });
 
 
     return (
@@ -249,7 +268,10 @@ const Community: React.FC = (props: {
                                     renderValue={(selected) => (
                                         <div>
                                             {selected.map((value) => (
-                                                <Chip key={value} label={value} />
+                                                <Chip key={value} label={value} sx={{
+                                                    border: 1,
+                                                    boxShadow: 1,
+                                                }}/>
                                             ))}
                                         </div>
                                     )}
@@ -262,7 +284,36 @@ const Community: React.FC = (props: {
                                 </Select>
                             </FormControl>
                         </Grid>
-
+                        <Grid item xs={12} sm={4}>
+                            <FormControl fullWidth>
+                                <InputLabel>Filter by Video</InputLabel>
+                                <Select
+                                    multiple
+                                    value={selectedVideoFilter}
+                                    onChange={(e) => setSelectedVideoFilter(e.target.value)}
+                                    label="Filter by Video"
+                                    renderValue={(selected) => (
+                                        <div>
+                                            {selected.map((value) => (
+                                                <Chip key={value} label={value}
+                                                      sx={{
+                                                          border: 1,
+                                                          boxShadow: 1,
+                                                          backgroundColor: "rgba(46,83,81,0.8)",
+                                                      }}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                >
+                                    {videos.map((video) => (
+                                        <MenuItem key={video.id} value={video.title}>
+                                            {video.title}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
                     </Grid>
                 </Paper>
                 {filteredTopics && filteredTopics.map((topic) => (
@@ -303,6 +354,34 @@ const Community: React.FC = (props: {
                                                           m: 1,
                                                           border: 1,
                                                           boxShadow: 1,
+                                                      }}
+                                                />
+                                            ))}
+                                        </Box>
+                                    )
+                                }
+                                {
+                                    topic.relatedVideos && (
+                                        <Box>
+                                            {topic.relatedVideos.map((video) => (
+                                                <Chip key={video.id} label={video.title}
+                                                      sx={{
+                                                          m: 1,
+                                                          border: 1,
+                                                          boxShadow: 1,
+                                                          backgroundColor: "rgba(46,83,81,0.8)",
+                                                          "&:hover": {
+                                                              backgroundColor: "rgba(46,83,81,0.8)",
+                                                              cursor: "pointer",
+                                                              transition: "all 0.3s ease",
+                                                              boxShadow: 2,
+                                                              transform: "scale(1.1)",
+                                                          }
+                                                      }}
+                                                      onClick={(event) => {
+                                                          // Move to video page and play the video
+                                                          event.stopPropagation();
+                                                          navigate(`/videos/${video.id}`);
                                                       }}
                                                 />
                                             ))}
@@ -522,6 +601,28 @@ const Community: React.FC = (props: {
                                 {games.map((game) => (
                                     <MenuItem key={game.id} value={game}>
                                         {game.title}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>Related Videos</InputLabel>
+                            <Select
+                                multiple
+                                value={relatedVideos}
+                                onChange={(e) => setRelatedVideos(e.target.value)}
+                                label="Related Videos"
+                                renderValue={(selected) => (
+                                    <div>
+                                        {selected.map((value) => (
+                                            <Chip key={value.id} label={value.title}/>
+                                        ))}
+                                    </div>
+                                )}
+                            >
+                                {videos.map((video) => (
+                                    <MenuItem key={video.id} value={video}>
+                                        {video.title}
                                     </MenuItem>
                                 ))}
                             </Select>
