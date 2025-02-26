@@ -29,7 +29,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_URLS = Arrays.asList(
             "/api/v1/auth/**",
             "/api/v1/users/register",
-            "/api/v1/users/**",
             "/videos/**",
             "/videos/stream/**",
             "/videos/stream/hls/**",

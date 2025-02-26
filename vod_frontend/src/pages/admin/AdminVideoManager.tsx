@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as React from "react";
 import {
+    AppBar,
     Box,
     Button,
     Card,
@@ -235,344 +236,348 @@ const AdminVideoManager: React.FC = (props: {
     });
 
     return (
-        <Container maxWidth={false} sx={{ width: "80%" }}>
-            <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Name"
-                            variant="outlined"
-                            fullWidth
-                            value={searchTitle}
-                            onChange={(e) => setSearchTitle(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Genre"
-                            variant="outlined"
-                            fullWidth
-                            value={searchGenre}
-                            onChange={(e) => setSearchGenre(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Upload Date"
-                            variant="outlined"
-                            fullWidth
-                            type="date"
-                            InputLabelProps={{ shrink: true }}
-                            value={searchDate}
-                            onChange={(e) => setSearchDate(e.target.value)}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
-            <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="md" fullWidth>
-                <DialogTitle>Add New Video</DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6}>
+        <>
+            <AppBar position="sticky" sx={{mb: 2}}>
+                <Paper elevation={3} sx={{ p: 2 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
                             <TextField
-                                label="Title"
+                                label="Search by Name"
                                 variant="outlined"
                                 fullWidth
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
+                                value={searchTitle}
+                                onChange={(e) => setSearchTitle(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Game</InputLabel>
-                                <Select
-                                    value={game}
-                                    onChange={(e) => setGame(e.target.value)}
-                                    label="Game"
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Search by Genre"
+                                variant="outlined"
+                                fullWidth
+                                value={searchGenre}
+                                onChange={(e) => setSearchGenre(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Search by Upload Date"
+                                variant="outlined"
+                                fullWidth
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                value={searchDate}
+                                onChange={(e) => setSearchDate(e.target.value)}
+                            />
+                        </Grid>
+                    </Grid>
+                </Paper>
+            </AppBar>
+            <Container maxWidth={false} sx={{ width: "80%" }}>
+                <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="md" fullWidth>
+                    <DialogTitle>Add New Video</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    label="Title"
+                                    variant="outlined"
                                     fullWidth
-                                >
-                                    {games.map((g) => (
-                                        <MenuItem key={g.id} value={g.id}>
-                                            {g.title}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                <Box>
-                                    <FormControl fullWidth>
-                                        <label htmlFor="video-upload">
-                                            <VideoInput
-                                                accept="video/*"
-                                                id="video-upload"
-                                                type="file"
-                                                onChange={handleVideoUpload}
-                                            />
-                                            <Button
-                                                variant="contained"
-                                                component="span"
-                                                startIcon={<VideoLibraryIcon />}
-                                                fullWidth
-                                            >
-                                                Select Video
-                                            </Button>
-                                        </label>
-                                    </FormControl>
-                                    {!isPlaying && (
-                                        <IconButton
-                                            onClick={() => {
-                                                if (videoRef.current) {
-                                                    videoRef.current.play().catch((err) => {
-                                                        console.error("Manual play failed", err);
-                                                    });
-                                                }
-                                            }}
-                                            sx={{
-                                                position: "absolute",
-                                                top: "50%",
-                                                left: "50%",
-                                                transform: "translate(-50%, -50%)",
-                                                color: "white",
-                                                backgroundColor: "rgba(0,0,0,0.5)",
-                                                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-                                                zIndex: (theme) => theme.zIndex.modal + 101,
-                                            }}
-                                        >
-                                            <PlayCircleOutlineIcon fontSize="large" />
-                                        </IconButton>
-                                    )}
-                                    {selectedVideo && videoUrl && (
-                                        <video
-                                            ref={videoRef}
-                                            controls
-                                            autoPlay
-                                            crossOrigin="anonymous"
-                                            style={{
-                                                width: "85%",
-                                                height: "auto",
-                                                objectFit: "contain",
-                                                backgroundColor: "black",
-                                            }}
-                                            src={videoUrl}
-                                            onPlay={() => setIsPlaying(true)}
-                                            onPause={() => setIsPlaying(false)}
-                                        />
-                                    )}
-                                </Box>
-                                <Box>
-                                    <Card sx={{ position: "relative" }}>
-                                        <CardMedia
-                                            component="img"
-                                            image={
-                                                (useFirstFrameAsThumbnail ? thumbnailUrl : customThumbnail) ||
-                                                ""
-                                            }
-                                            alt="Thumbnail"
-                                            sx={{ height: "100%", objectFit: "cover" }}
-                                        />
-                                        <Box
-                                            sx={{
-                                                position: "absolute",
-                                                top: 0,
-                                                right: 0,
-                                                m: 1,
-                                            }}
-                                        >
-                                            <label htmlFor="thumbnail-upload">
-                                                <ThumbnailInput
-                                                    accept="image/*"
-                                                    id="thumbnail-upload"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Game</InputLabel>
+                                    <Select
+                                        value={game}
+                                        onChange={(e) => setGame(e.target.value)}
+                                        label="Game"
+                                        fullWidth
+                                    >
+                                        {games.map((g) => (
+                                            <MenuItem key={g.id} value={g.id}>
+                                                {g.title}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                    <Box>
+                                        <FormControl fullWidth>
+                                            <label htmlFor="video-upload">
+                                                <VideoInput
+                                                    accept="video/*"
+                                                    id="video-upload"
                                                     type="file"
-                                                    onChange={handleThumbnailUpload}
+                                                    onChange={handleVideoUpload}
                                                 />
-                                                <IconButton component="span" color="primary">
-                                                    <AddPhotoAlternateIcon />
-                                                </IconButton>
+                                                <Button
+                                                    variant="contained"
+                                                    component="span"
+                                                    startIcon={<VideoLibraryIcon />}
+                                                    fullWidth
+                                                >
+                                                    Select Video
+                                                </Button>
                                             </label>
-                                        </Box>
-                                    </Card>
+                                        </FormControl>
+                                        {!isPlaying && (
+                                            <IconButton
+                                                onClick={() => {
+                                                    if (videoRef.current) {
+                                                        videoRef.current.play().catch((err) => {
+                                                            console.error("Manual play failed", err);
+                                                        });
+                                                    }
+                                                }}
+                                                sx={{
+                                                    position: "absolute",
+                                                    top: "50%",
+                                                    left: "50%",
+                                                    transform: "translate(-50%, -50%)",
+                                                    color: "white",
+                                                    backgroundColor: "rgba(0,0,0,0.5)",
+                                                    "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                                    zIndex: (theme) => theme.zIndex.modal + 101,
+                                                }}
+                                            >
+                                                <PlayCircleOutlineIcon fontSize="large" />
+                                            </IconButton>
+                                        )}
+                                        {selectedVideo && videoUrl && (
+                                            <video
+                                                ref={videoRef}
+                                                controls
+                                                autoPlay
+                                                crossOrigin="anonymous"
+                                                style={{
+                                                    width: "85%",
+                                                    height: "auto",
+                                                    objectFit: "contain",
+                                                    backgroundColor: "black",
+                                                }}
+                                                src={videoUrl}
+                                                onPlay={() => setIsPlaying(true)}
+                                                onPause={() => setIsPlaying(false)}
+                                            />
+                                        )}
+                                    </Box>
+                                    <Box>
+                                        <Card sx={{ position: "relative" }}>
+                                            <CardMedia
+                                                component="img"
+                                                image={
+                                                    (useFirstFrameAsThumbnail ? thumbnailUrl : customThumbnail) ||
+                                                    ""
+                                                }
+                                                alt="Thumbnail"
+                                                sx={{ height: "100%", objectFit: "cover" }}
+                                            />
+                                            <Box
+                                                sx={{
+                                                    position: "absolute",
+                                                    top: 0,
+                                                    right: 0,
+                                                    m: 1,
+                                                }}
+                                            >
+                                                <label htmlFor="thumbnail-upload">
+                                                    <ThumbnailInput
+                                                        accept="image/*"
+                                                        id="thumbnail-upload"
+                                                        type="file"
+                                                        onChange={handleThumbnailUpload}
+                                                    />
+                                                    <IconButton component="span" color="primary">
+                                                        <AddPhotoAlternateIcon />
+                                                    </IconButton>
+                                                </label>
+                                            </Box>
+                                        </Card>
+                                    </Box>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                        <Typography>Use first frame as thumbnail?</Typography>
+                                        <Switch
+                                            checked={useFirstFrameAsThumbnail}
+                                            onChange={(e) => setUseFirstFrameAsThumbnail(e.target.checked)}
+                                        />
+                                    </Box>
                                 </Box>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                    <Typography>Use first frame as thumbnail?</Typography>
-                                    <Switch
-                                        checked={useFirstFrameAsThumbnail}
-                                        onChange={(e) => setUseFirstFrameAsThumbnail(e.target.checked)}
-                                    />
-                                </Box>
-                            </Box>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={closeDialog} fullWidth variant="contained" color="error">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleAddVideo}
-                        startIcon={<CloudUploadIcon />}
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                    >
-                        Add Video
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog
-                open={Boolean(selectedVideo)}
-                onClose={() => setSelectedVideo(null)}
-                maxWidth="md"
-                fullWidth
-            >
-                <DialogTitle>{selectedVideo?.title}</DialogTitle>
-                <DialogContent>
-                    {selectedVideo && !isPlaying && (
-                        <IconButton
-                            onClick={() => {
-                                if (videoRef.current) {
-                                    videoRef.current.play().catch((err) => {
-                                        console.error("Manual play failed", err);
-                                    });
-                                }
-                            }}
-                            sx={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                transform: "translate(-50%, -50%)",
-                                color: "white",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-                                zIndex: (theme) => theme.zIndex.modal + 101,
-                            }}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={closeDialog} fullWidth variant="contained" color="error">
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleAddVideo}
+                            startIcon={<CloudUploadIcon />}
+                            fullWidth
+                            variant="contained"
+                            color="primary"
                         >
-                            <PlayCircleOutlineIcon fontSize="large" />
-                        </IconButton>
-                    )}
-                    {selectedVideo && videoUrl && (
-                        <video
-                            controls
-                            style={{ width: "100%" }}
-                            src={videoUrl}
-                            onPlay={() => setIsPlaying(true)}
-                            onPause={() => setIsPlaying(false)}
-                        />
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setSelectedVideo(null)} fullWidth variant="contained">Close</Button>
-                </DialogActions>
-            </Dialog>
+                            Add Video
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
-            {totalPages > 1 && (
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(event, value) => setCurrentPage(value)}
-                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
-                />
-            )}
-            <Grid container spacing={4}>
-                {filteredVideos.map((video, index) => (
-                    <Grid
-                        item
-                        xs={12} sm={6} md={4}
-                        key={index}
-                        onClick={() => setSelectedVideo(video)}
-                        sx={{ cursor: "pointer" }}
-                    >
-                        <Card sx={{
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            "&:hover": {
-                                boxShadow: 5,
-                                cursor: "pointer",
-                                transform: "scale(1.05)",
-                                transition: "all 0.3s ease",
-                                backgroundColor: "rgba(144,202,249,0.13)"
-                            }
-                        }}>
-                            <CardMedia
-                                component="img"
-                                image={video.thumbnail}
-                                alt={video.title}
-                                sx={{
-                                    height: 200,
-                                    objectFit: "cover",
-                            }}
-                            />
-                            <CardContent>
-                                <Typography variant="h6" component="h2">
-                                    {video.title}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Game: {video.game.title}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Uploaded at: {video.uploadedAt}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Duration: {Math.floor(video.duration)}s
-                                </Typography>
-                                <Divider sx={{ my: 1 }} />
-                                <Typography variant="body2" color="textSecondary">
-                                    Views: {video.viewerCount || 0}
-                                </Typography>
-                            </CardContent>
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteVideo(video);
+                <Dialog
+                    open={Boolean(selectedVideo)}
+                    onClose={() => setSelectedVideo(null)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogTitle>{selectedVideo?.title}</DialogTitle>
+                    <DialogContent>
+                        {selectedVideo && !isPlaying && (
+                            <IconButton
+                                onClick={() => {
+                                    if (videoRef.current) {
+                                        videoRef.current.play().catch((err) => {
+                                            console.error("Manual play failed", err);
+                                        });
+                                    }
                                 }}
-                                sx={{ mt: 1, backgroundColor: "#782d28", color: "white" }}
+                                sx={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    color: "white",
+                                    backgroundColor: "rgba(0,0,0,0.5)",
+                                    "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                    zIndex: (theme) => theme.zIndex.modal + 101,
+                                }}
                             >
-                                Delete
-                            </Button>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
-            {totalPages > 1 && (
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(event, value) => setCurrentPage(value)}
-                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
-                />
-            )}
-            <Fab
-                color="primary"
-                aria-label="add"
-                sx={{
-                    position: "fixed",
-                    bottom: 16,
-                    left: 16,
-                    width: 200,
-                    height: 60,
-                    borderRadius: 1,
-                    boxShadow: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "left",
-                    "&:hover": {
-                        backgroundColor: "#2c9b98",
-                    },
-                }}
-                onClick={openDialog}
-            >
-                <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
-                <Typography variant="button" sx={{ fontSize: 16 }}>
-                    Add Video
-                </Typography>
-            </Fab>
-        </Container>
+                                <PlayCircleOutlineIcon fontSize="large" />
+                            </IconButton>
+                        )}
+                        {selectedVideo && videoUrl && (
+                            <video
+                                controls
+                                style={{ width: "100%" }}
+                                src={videoUrl}
+                                onPlay={() => setIsPlaying(true)}
+                                onPause={() => setIsPlaying(false)}
+                            />
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setSelectedVideo(null)} fullWidth variant="contained">Close</Button>
+                    </DialogActions>
+                </Dialog>
+
+                {totalPages > 1 && (
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(event, value) => setCurrentPage(value)}
+                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                    />
+                )}
+                <Grid container spacing={4}>
+                    {filteredVideos.map((video, index) => (
+                        <Grid
+                            item
+                            xs={12} sm={6} md={4}
+                            key={index}
+                            onClick={() => setSelectedVideo(video)}
+                            sx={{ cursor: "pointer" }}
+                        >
+                            <Card sx={{
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                "&:hover": {
+                                    boxShadow: 5,
+                                    cursor: "pointer",
+                                    transform: "scale(1.05)",
+                                    transition: "all 0.3s ease",
+                                    backgroundColor: "rgba(144,202,249,0.13)"
+                                }
+                            }}>
+                                <CardMedia
+                                    component="img"
+                                    image={video.thumbnail}
+                                    alt={video.title}
+                                    sx={{
+                                        height: 200,
+                                        objectFit: "cover",
+                                    }}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6" component="h2">
+                                        {video.title}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Game: {video.game.title}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Uploaded at: {video.uploadedAt}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Duration: {Math.floor(video.duration)}s
+                                    </Typography>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Typography variant="body2" color="textSecondary">
+                                        Views: {video.viewerCount || 0}
+                                    </Typography>
+                                </CardContent>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteVideo(video);
+                                    }}
+                                    sx={{ mt: 1, backgroundColor: "#782d28", color: "white" }}
+                                >
+                                    Delete
+                                </Button>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+                {totalPages > 1 && (
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(event, value) => setCurrentPage(value)}
+                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                    />
+                )}
+                <Fab
+                    color="primary"
+                    aria-label="add"
+                    sx={{
+                        position: "fixed",
+                        bottom: 16,
+                        left: 16,
+                        width: 200,
+                        height: 60,
+                        borderRadius: 1,
+                        boxShadow: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "left",
+                        "&:hover": {
+                            backgroundColor: "#2c9b98",
+                        },
+                    }}
+                    onClick={openDialog}
+                >
+                    <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
+                    <Typography variant="button" sx={{ fontSize: 16 }}>
+                        Add Video
+                    </Typography>
+                </Fab>
+            </Container>
+        </>
     );
 };
 

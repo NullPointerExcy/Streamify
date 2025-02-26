@@ -58,23 +58,29 @@ public class SecurityConfig {
                         // Admin endpoints
                         .requestMatchers(HttpMethod.PUT, "/api/v1/playlists/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/playlists/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/videos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/videos/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/videos/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/features/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/settings/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/games/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/games/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/games/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/background-images/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/background-images/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/background-images/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/configs/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/configs/**").hasAuthority("ROLE_ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/v1/genres/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/genres/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/genres/**").hasAuthority("ROLE_ADMIN")
@@ -105,6 +111,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_MODERATOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/**").hasAuthority("ROLE_USER")
+
+                        // User endpoints
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_MODERATOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("ROLE_USER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("ROLE_ADMIN")
 
                         .anyRequest().authenticated()
                 )

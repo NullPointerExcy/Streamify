@@ -1,5 +1,6 @@
 import {IUser} from "./IUser";
 import {IComment} from "./IComment";
+import {IGame} from "./IGame";
 
 
 export interface ITopic {
@@ -9,4 +10,5 @@ export interface ITopic {
     createdAt: string;
     createdBy: IUser;
     comments: Array<IComment>;
+    relatedGames: Array<IGame>;
 }

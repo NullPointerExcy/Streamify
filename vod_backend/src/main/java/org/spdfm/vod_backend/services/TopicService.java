@@ -49,6 +49,13 @@ public class TopicService {
     }
 
     public void deleteTopic(String id) {
+        // Delete all comments of the topic
+        Optional<Topic> topic = topicRepository.findById(id);
+        if (topic.isPresent()) {
+            for (Comment comment : topic.get().getComments()) {
+                commentRepository.deleteById(comment.getId());
+            }
+        }
         topicRepository.deleteById(id);
     }
 

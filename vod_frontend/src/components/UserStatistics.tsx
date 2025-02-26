@@ -138,11 +138,10 @@ const UserStatistics: React.FC = (props: {
                                         <Chip
                                             key={index}
                                             label={role}
-                                            color="primary"
                                             sx={{
                                                 mb: 1,
-                                                fontWeight: "bold",
                                                 boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                                                border: 1,
                                                 "&:hover": {
                                                     boxShadow: "0 2px 4px rgba(0,0,0,0.4)",
                                                     cursor: "pointer"

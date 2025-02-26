@@ -30,10 +30,15 @@ public class Topic {
     @DBRef
     private Set<Comment> comments;
 
-    public Topic(String title, String content, User createdBy) {
+    @DBRef
+    private Set<Game> relatedGames;
+
+    public Topic(String title, String content, User createdBy, Set<Comment> comments, Set<Game> relatedGames) {
         this.title = title;
         this.content = content;
         this.createdBy = createdBy;
+        this.relatedGames = relatedGames;
+        this.comments = comments;
         this.createdAt = LocalDateTime.now();
     }
 }

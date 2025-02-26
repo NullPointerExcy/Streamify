@@ -56,7 +56,7 @@ const AdminPanel: React.FC = (props: {
 
     return (
         <>
-            <AppBar position="static" sx={{
+            <AppBar position="sticky" sx={{
                 display: "flex",
                 justifyContent: "center",
                 flexDirection: "row",
@@ -99,7 +99,7 @@ const AdminPanel: React.FC = (props: {
             </AppBar>
             <Box
                 component="main"
-                sx={{flexGrow: 1, p: 3}}
+                sx={{ flexGrow: 1, p: 3 }}
             >
                 <Container maxWidth={false}>
                     {adminSections[selectedSection].component}

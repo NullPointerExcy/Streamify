@@ -33,7 +33,7 @@ export const getUserById = async (id: string) => {
 
 
 export const updateUser = async (user: IUser) => {
-    return await axios.put(`/users/${user.id}`, user, {
+    return await axios.put(`/users`, user, {
         headers: {
             'Authorization': `Bearer ${token}`
         }

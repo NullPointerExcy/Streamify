@@ -37,11 +37,15 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        List<User> allUsers = userRepository.findAll();
+        allUsers.forEach(user -> user.setPassword(null));
+        return allUsers;
     }
 
     public Optional<User> getUserById(String id) {
-        return userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(value -> value.setPassword(null));
+        return user;
     }
 
     public void deleteUser(User user) {
@@ -49,6 +53,11 @@ public class UserService {
     }
 
     public void updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        if (existingUser == null) {
+            return;
+        }
+        user.setPassword(existingUser.getPassword());
         userRepository.save(user);
     }
 
@@ -79,7 +88,6 @@ public class UserService {
         user.setTotalViewTime(totalViewTime + video.getDuration());
         user.setTotalVideosWatched(totalVideosWatched + 1);
 
-        // Save the updated user
         userRepository.save(user);
     }
 

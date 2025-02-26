@@ -109,7 +109,7 @@ const TopBar: React.FC = (props: {
     }
 
     return (
-        <AppBar position="static" sx={{mb: 0.1}}>
+        <AppBar position="sticky" sx={{mb: 0.1}}>
             <Toolbar sx={{
                 display: "flex",
                 justifyContent: "space-between",

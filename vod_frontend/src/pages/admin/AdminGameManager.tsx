@@ -22,7 +22,7 @@ import {
     Card,
     CardContent,
     Divider,
-    CardHeader,
+    CardHeader, AppBar,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import AddIcon from "@mui/icons-material/Add";
@@ -230,303 +230,308 @@ const AdminGameManager: React.FC = (props: {
     const closeDialog = () => setIsDialogOpen(false);
 
     return (
-        <Container maxWidth={false} sx={{ width: "80%" }}>
-            <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Name"
-                            variant="outlined"
-                            fullWidth
-                            value={searchTitle}
-                            onChange={(e) => setSearchTitle(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Genre"
-                            variant="outlined"
-                            fullWidth
-                            value={searchGenre}
-                            onChange={(e) => setSearchGenre(e.target.value)}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Search by Release Date"
-                            variant="outlined"
-                            fullWidth
-                            type="date"
-                            InputLabelProps={{ shrink: true }}
-                            value={searchDate}
-                            onChange={(e) => setSearchDate(e.target.value)}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
-            {totalPages > 1 && (
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(event, value) => setCurrentPage(value)}
-                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
-                />
-            )}
-            <Grid container spacing={2}>
-                {currentGames.map((game) => (
-                    <Grid item
-                          xs={12}
-                          sm={6}
-                          md={4}
-                          lg={2}
-                          xl={2}
-                          key={game.id}
-                    >
-                        <GameCard game={game} onDelete={() => handleOpenDeleteDialog(game)} videos={videos} watchedVideos={watchedVideos} guestViews={guestViews} />
-                    </Grid>
-                ))}
-            </Grid>
-
-            {totalPages > 1 && (
-                <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={(event, value) => setCurrentPage(value)}
-                    sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
-                />
-            )}
-
-            <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth="md">
-                <DialogTitle>Add New Game</DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6}>
-                            <TextField label="Title" variant="outlined" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField label="Developer" variant="outlined" fullWidth value={developer} onChange={(e) => setDeveloper(e.target.value)} />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
+        <>
+            <AppBar position="sticky" sx={{mb: 2}}>
+                <Paper elevation={3} sx={{ p: 2 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
                             <TextField
-                                label="Release Date"
+                                label="Search by Name"
+                                variant="outlined"
+                                fullWidth
+                                value={searchTitle}
+                                onChange={(e) => setSearchTitle(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Search by Genre"
+                                variant="outlined"
+                                fullWidth
+                                value={searchGenre}
+                                onChange={(e) => setSearchGenre(e.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                            <TextField
+                                label="Search by Release Date"
                                 variant="outlined"
                                 fullWidth
                                 type="date"
-                                value={releaseDate}
-                                onChange={(e) => setReleaseDate(e.target.value)}
                                 InputLabelProps={{ shrink: true }}
+                                value={searchDate}
+                                onChange={(e) => setSearchDate(e.target.value)}
                             />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField type="file" fullWidth onChange={handleCoverChange} />
-                            {coverPreview && (
-                                <Box mt={2}>
-                                    <Typography variant="subtitle1">Cover Preview:</Typography>
-                                    <img
-                                        src={coverPreview}
-                                        alt="Cover Preview"
-                                        style={{
-                                            width: "100%",
-                                            height: "auto",
-                                            aspectRatio: "4/3",
-                                            objectFit: "contain",
-                                            borderRadius: "8px",
-                                            border: "1px solid #000000"
-                                        }}
-                                    />
-                                </Box>
-                            )}
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <FormControl fullWidth>
-                                <InputLabel>Genres</InputLabel>
-                                <Select
-                                    multiple
-                                    value={selectedGenres}
-                                    onChange={(e) => setSelectedGenres(e.target.value)}
-                                    renderValue={(selected) => (
-                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                            {selected.map((value) => {
-                                                const genre = genres.find((g) => g.id === value);
-                                                return <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />;
-                                            })}
-                                        </Box>
-                                    )}
-                                >
-                                    {genres.map((genre) => (
-                                        <MenuItem key={genre.id} value={genre.id}>
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    justifyContent: "space-between",
-                                                    width: "100%",
-                                                    alignItems: "center",
-                                                }}
-                                            >
-                                                <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                                                    <Box sx={{ width: 20, height: 20, backgroundColor: genre.color, borderRadius: "50%", mr: 1 }} />
-                                                    <TextField
-                                                        id={genre.id}
-                                                        value={genre.name}
-                                                        disabled={!editName}
-                                                        onClick={(event) => {
-                                                            if (editName) event.stopPropagation();
-                                                        }}
-                                                        onChange={(event) => {
-                                                            if (editName) {
-                                                                setEditName(event.target.value);
-                                                                genre.name = event.target.value;
-                                                            }
-                                                        }}
-                                                        size="small"
-                                                    />
-                                                    <IconButton
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            if (editName) {
-                                                                updateGenre({ ...genre, name: editName }).then(() => {
-                                                                    setEditName(null);
-                                                                    return;
-                                                                });
-                                                            }
-                                                            setEditName(genre.name);
-                                                        }}
-                                                    >
-                                                        <FormatColorTextIcon sx={{ color: editName ? "#518733" : "#ffffff" }} />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            openEditDialog(genre);
-                                                        }}
-                                                    >
-                                                        <PaletteIcon />
-                                                    </IconButton>
-                                                </Box>
-                                                <IconButton
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
-                                                        const newGenres = genres.filter((g) => g.id !== genre.id);
-                                                        setGenres(newGenres);
-                                                        const newSelectedGenres = selectedGenres.filter((g) => g !== genre.id);
-                                                        setSelectedGenres(newSelectedGenres);
-                                                        handleDeleteGenre(genre.id);
-                                                    }}
-                                                    sx={{ color: "#893a3a" }}
-                                                >
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Add new Genre"
-                                variant="outlined"
-                                fullWidth
-                                value={newGenre}
-                                onChange={(e) => setNewGenre(e.target.value)}
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        handleAddNewGenre();
-                                    }
-                                }}
-                            />
-                            <Button variant="outlined" onClick={handleAddNewGenre} fullWidth sx={{ mt: 1 }}>
-                                Add Genre
-                            </Button>
                         </Grid>
                     </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={closeDialog} fullWidth color="error" variant="contained">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleAddGame} startIcon={<AddCircleIcon />} fullWidth variant="contained">
-                        Add Game
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                </Paper>
+            </AppBar>
+            <Container maxWidth={false} sx={{ width: "80%" }}>
 
-            <Dialog open={Boolean(editGenre)} onClose={closeEditDialog}>
-                <DialogTitle>Color for Genre: {editGenre?.name}</DialogTitle>
-                <DialogContent>
-                    <SketchPicker color={editColor} onChangeComplete={(color) => setEditColor(color.hex)} />
-                </DialogContent>
-                <DialogActions>
-                    <Button fullWidth onClick={closeEditDialog} color="error" variant="contained">
-                        Cancel
-                    </Button>
-                    <Button fullWidth onClick={saveEditGenre} variant="contained">
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                {totalPages > 1 && (
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(event, value) => setCurrentPage(value)}
+                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                    />
+                )}
+                <Grid container spacing={2}>
+                    {currentGames.map((game) => (
+                        <Grid item
+                              xs={12}
+                              sm={6}
+                              md={4}
+                              lg={2}
+                              xl={2}
+                              key={game.id}
+                        >
+                            <GameCard game={game} onDelete={() => handleOpenDeleteDialog(game)} videos={videos} watchedVideos={watchedVideos} guestViews={guestViews} />
+                        </Grid>
+                    ))}
+                </Grid>
 
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={handleCloseDeleteDialog}
-                fullWidth
-                maxWidth="xs"
-            >
-                <DialogTitle>Confirm Deletion</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body1">
-                        Are you sure you want to delete the game <strong>{gameToDelete?.title}</strong>?
+                {totalPages > 1 && (
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={(event, value) => setCurrentPage(value)}
+                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                    />
+                )}
+
+                <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth="md">
+                    <DialogTitle>Add New Game</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                            <Grid item xs={12} md={6}>
+                                <TextField label="Title" variant="outlined" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField label="Developer" variant="outlined" fullWidth value={developer} onChange={(e) => setDeveloper(e.target.value)} />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    label="Release Date"
+                                    variant="outlined"
+                                    fullWidth
+                                    type="date"
+                                    value={releaseDate}
+                                    onChange={(e) => setReleaseDate(e.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField type="file" fullWidth onChange={handleCoverChange} />
+                                {coverPreview && (
+                                    <Box mt={2}>
+                                        <Typography variant="subtitle1">Cover Preview:</Typography>
+                                        <img
+                                            src={coverPreview}
+                                            alt="Cover Preview"
+                                            style={{
+                                                width: "100%",
+                                                height: "auto",
+                                                aspectRatio: "4/3",
+                                                objectFit: "contain",
+                                                borderRadius: "8px",
+                                                border: "1px solid #000000"
+                                            }}
+                                        />
+                                    </Box>
+                                )}
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Genres</InputLabel>
+                                    <Select
+                                        multiple
+                                        value={selectedGenres}
+                                        onChange={(e) => setSelectedGenres(e.target.value)}
+                                        renderValue={(selected) => (
+                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                                {selected.map((value) => {
+                                                    const genre = genres.find((g) => g.id === value);
+                                                    return <Chip key={value} label={genre?.name} sx={{ backgroundColor: genre?.color, color: "white", borderRadius: 3, border: 1, borderColor: "#000000" }} />;
+                                                })}
+                                            </Box>
+                                        )}
+                                    >
+                                        {genres.map((genre) => (
+                                            <MenuItem key={genre.id} value={genre.id}>
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        flexDirection: "row",
+                                                        justifyContent: "space-between",
+                                                        width: "100%",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                                                        <Box sx={{ width: 20, height: 20, backgroundColor: genre.color, borderRadius: "50%", mr: 1 }} />
+                                                        <TextField
+                                                            id={genre.id}
+                                                            value={genre.name}
+                                                            disabled={!editName}
+                                                            onClick={(event) => {
+                                                                if (editName) event.stopPropagation();
+                                                            }}
+                                                            onChange={(event) => {
+                                                                if (editName) {
+                                                                    setEditName(event.target.value);
+                                                                    genre.name = event.target.value;
+                                                                }
+                                                            }}
+                                                            size="small"
+                                                        />
+                                                        <IconButton
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                if (editName) {
+                                                                    updateGenre({ ...genre, name: editName }).then(() => {
+                                                                        setEditName(null);
+                                                                        return;
+                                                                    });
+                                                                }
+                                                                setEditName(genre.name);
+                                                            }}
+                                                        >
+                                                            <FormatColorTextIcon sx={{ color: editName ? "#518733" : "#ffffff" }} />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                openEditDialog(genre);
+                                                            }}
+                                                        >
+                                                            <PaletteIcon />
+                                                        </IconButton>
+                                                    </Box>
+                                                    <IconButton
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            const newGenres = genres.filter((g) => g.id !== genre.id);
+                                                            setGenres(newGenres);
+                                                            const newSelectedGenres = selectedGenres.filter((g) => g !== genre.id);
+                                                            setSelectedGenres(newSelectedGenres);
+                                                            handleDeleteGenre(genre.id);
+                                                        }}
+                                                        sx={{ color: "#893a3a" }}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Add new Genre"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={newGenre}
+                                    onChange={(e) => setNewGenre(e.target.value)}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleAddNewGenre();
+                                        }
+                                    }}
+                                />
+                                <Button variant="outlined" onClick={handleAddNewGenre} fullWidth sx={{ mt: 1 }}>
+                                    Add Genre
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={closeDialog} fullWidth color="error" variant="contained">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleAddGame} startIcon={<AddCircleIcon />} fullWidth variant="contained">
+                            Add Game
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog open={Boolean(editGenre)} onClose={closeEditDialog}>
+                    <DialogTitle>Color for Genre: {editGenre?.name}</DialogTitle>
+                    <DialogContent>
+                        <SketchPicker color={editColor} onChangeComplete={(color) => setEditColor(color.hex)} />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button fullWidth onClick={closeEditDialog} color="error" variant="contained">
+                            Cancel
+                        </Button>
+                        <Button fullWidth onClick={saveEditGenre} variant="contained">
+                            Save
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog
+                    open={isDeleteDialogOpen}
+                    onClose={handleCloseDeleteDialog}
+                    fullWidth
+                    maxWidth="xs"
+                >
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        <Typography variant="body1">
+                            Are you sure you want to delete the game <strong>{gameToDelete?.title}</strong>?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={handleCloseDeleteDialog}
+                            color="primary"
+                            variant="contained"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConfirmDelete}
+                            color="error"
+                            variant="contained"
+                        >
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Fab
+                    color="primary"
+                    aria-label="add"
+                    sx={{
+                        position: "fixed",
+                        bottom: 16,
+                        left: 16,
+                        width: 200,
+                        height: 60,
+                        borderRadius: 1,
+                        boxShadow: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        "&:hover": { backgroundColor: "#2c9b98" },
+                    }}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        openDialog();
+                    }}
+                >
+                    <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
+                    <Typography variant="button" sx={{ fontSize: 16 }}>
+                        Add New Game
                     </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={handleCloseDeleteDialog}
-                        color="primary"
-                        variant="contained"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleConfirmDelete}
-                        color="error"
-                        variant="contained"
-                    >
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Fab
-                color="primary"
-                aria-label="add"
-                sx={{
-                    position: "fixed",
-                    bottom: 16,
-                    left: 16,
-                    width: 200,
-                    height: 60,
-                    borderRadius: 1,
-                    boxShadow: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "center",
-                    "&:hover": { backgroundColor: "#2c9b98" },
-                }}
-                onClick={(event) => {
-                    event.stopPropagation();
-                    openDialog();
-                }}
-            >
-                <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
-                <Typography variant="button" sx={{ fontSize: 16 }}>
-                    Add New Game
-                </Typography>
-            </Fab>
-        </Container>
+                </Fab>
+            </Container>
+        </>
     );
 };
 

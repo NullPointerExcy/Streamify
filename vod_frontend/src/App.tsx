@@ -22,7 +22,9 @@ import AdminRoute from "./components/AdminRoute";
 import { IUser } from "./models/IUser";
 import { getUserById } from "./services/users/UserServices";
 import WatchHistory from "./pages/WatchHistory";
+import { GlobalStyles } from "@mui/material";
 import WatchList from "./pages/WatchList";
+
 
 const darkTheme = createTheme({
     palette: {
@@ -58,8 +60,8 @@ function App() {
             if (settings.length === 0) {
                 const newSettings: ISiteSettings = {
                     siteName: "Streamify",
-                    siteTitle: "Streamify-VODs",
-                    siteDescription: "Streamify VODs",
+                    siteTitle: "Streamify",
+                    siteDescription: "Streamify",
                     siteTheme: {
                         titleColor: "#000000",
                         fontSize: "h3",
@@ -99,23 +101,56 @@ function App() {
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
+            <GlobalStyles styles={{
+                "::-webkit-scrollbar": {
+                    width: "8px",
+                    backgroundColor: "transparent",
+                },
+                "::-webkit-scrollbar-thumb": {
+                    backgroundColor: "#444",
+                    borderRadius: "4px",
+                    "&:hover": {
+                        backgroundColor: "#666"
+                    }
+                },
+                "::-webkit-scrollbar-track": {
+                    backgroundColor: "transparent"
+                }
+            }} />
             <BrowserRouter>
-                <TopBar siteSettings={siteSettings} user={user} setUser={setUser}/>
-                <Routes>
-                    <Route path="/" element={<Home user={user} />} />
-                    <Route path="/videos/:videoId?" element={<Videos user={user} setUser={setUser} />} />
-                    <Route path="/playlists" element={<Playlists user={user} setUser={setUser} />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/community" element={<Community user={user} setUser={setUser} />} />
-                    <Route path="/watchlist" element={<WatchList user={user} setUser={setUser} />} />
-                    <Route path="/watched-history" element={<WatchHistory user={user} setUser={setUser} />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/admin_panel" element={<AdminRoute user={user}><AdminPanel siteSettings={siteSettings} user={user} setUser={setUser} /></AdminRoute>} />
-                    <Route path="/playlists/videos/:game/:id" element={<PlaylistVideos user={user} setUser={setUser} />} />
-                </Routes>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100vh',
+                    overflow: 'hidden'
+                }}>
+                    <TopBar siteSettings={siteSettings} user={user} setUser={setUser} />
+                    <Box sx={{
+                        flex: 1,
+                        overflowY: 'auto',
+                    }}>
+                        <Routes>
+                            <Route path="/" element={<Home user={user} />} />
+                            <Route path="/videos/:videoId?" element={<Videos user={user} setUser={setUser} />} />
+                            <Route path="/playlists" element={<Playlists user={user} setUser={setUser} />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/community" element={<Community user={user} setUser={setUser} />} />
+                            <Route path="/watchlist" element={<WatchList user={user} setUser={setUser} />} />
+                            <Route path="/watched-history" element={<WatchHistory user={user} setUser={setUser} />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/admin_panel" element={
+                                <AdminRoute user={user}>
+                                    <AdminPanel siteSettings={siteSettings} user={user} setUser={setUser} />
+                                </AdminRoute>
+                            } />
+                            <Route path="/playlists/videos/:game/:id" element={<PlaylistVideos user={user} setUser={setUser} />} />
+                        </Routes>
+                    </Box>
+                </Box>
                 {user && <UserStatistics user={user} />}
             </BrowserRouter>
         </ThemeProvider>
+
     );
 }
 
