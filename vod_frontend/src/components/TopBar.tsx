@@ -165,7 +165,7 @@ const TopBar: React.FC = (props: {
                 justifyContent: "space-between",
                 alignItems: "center",
                 width: "100vw",
-                backgroundColor: siteSettings?.siteTheme.backgroundColor,
+                backgroundColor: !activeBackgroundImage?.imageUrl ? siteSettings?.siteTheme.backgroundColor : "transparent",
             }}>
                 <Box sx={{
                     display: "flex",
