@@ -14,8 +14,13 @@ import java.util.Set;
 @RequestMapping("/api/v1/comments")
 public class CommentController {
 
+    private final CommentService commentService;
+
     @Autowired
-    private CommentService commentService;
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
 
     @GetMapping
     public List<Comment> getAllComments() {

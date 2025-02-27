@@ -12,8 +12,13 @@ import java.util.*;
 @RequestMapping("/api/v1/playlists")
 public class PlaylistController {
 
+    private final PlaylistService playlistService;
+
     @Autowired
-    private PlaylistService playlistService;
+    public PlaylistController(PlaylistService playlistService) {
+        this.playlistService = playlistService;
+    }
+
 
     @GetMapping
     public List<Playlist> getAllPlaylists() {

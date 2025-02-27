@@ -13,8 +13,13 @@ import java.util.List;
 @RequestMapping("/api/v1/configs")
 public class ConfigController {
 
+
+    private final ConfigService configService;
+
     @Autowired
-    private ConfigService configService;
+    public ConfigController(ConfigService configService) {
+        this.configService = configService;
+    }
 
 
     @GetMapping

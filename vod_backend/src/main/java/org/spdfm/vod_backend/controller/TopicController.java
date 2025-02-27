@@ -15,8 +15,13 @@ import java.util.Set;
 @RequestMapping("/api/v1/topics")
 public class TopicController {
 
+    private final TopicService topicService;
+
     @Autowired
-    private TopicService topicService;
+    public TopicController(TopicService topicService) {
+        this.topicService = topicService;
+    }
+
 
     @GetMapping
     public List<Topic> getAllTopics() {

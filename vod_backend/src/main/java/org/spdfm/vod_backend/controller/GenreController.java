@@ -12,8 +12,13 @@ import java.util.Optional;
 @RequestMapping("/api/v1/genres")
 public class GenreController {
 
+    private final GenreService genreService;
+
     @Autowired
-    private GenreService genreService;
+    public GenreController(GenreService genreService) {
+        this.genreService = genreService;
+    }
+
 
     @GetMapping
     public List<Genre> getAllGenres() {

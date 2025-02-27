@@ -14,17 +14,25 @@ import java.util.*;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final VideoRepository videoRepository;
+    private final WatchedVideoService watchedVideoService;
+
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, VideoRepository videoRepository, WatchedVideoService watchedVideoService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.videoRepository = videoRepository;
+        this.watchedVideoService = watchedVideoService;
+    }
 
-    @Autowired
-    private VideoRepository videoRepository;
 
-    @Autowired
-    private WatchedVideoService watchedVideoService;
+    public User addUser(User user) {
+        return userRepository.save(user);
+    }
 
     public User registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));

@@ -12,8 +12,13 @@ import java.util.Optional;
 @RequestMapping("/api/v1/settings")
 public class SiteSettingsController {
 
+    private final SiteSettingsService siteSettingsService;
+
     @Autowired
-    private SiteSettingsService siteSettingsService;
+    public SiteSettingsController(SiteSettingsService siteSettingsService) {
+        this.siteSettingsService = siteSettingsService;
+    }
+
 
     @GetMapping
     public List<SiteSettings> getAllSettings() {

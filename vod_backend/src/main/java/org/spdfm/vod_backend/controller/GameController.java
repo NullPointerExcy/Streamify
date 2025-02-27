@@ -15,8 +15,13 @@ import java.util.*;
 @RequestMapping("/api/v1/games")
 public class GameController {
 
+    private final GameService gameService;
+
     @Autowired
-    private GameService gameService;
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
+    }
+
 
     @GetMapping
     public List<Game> getAllGames() {

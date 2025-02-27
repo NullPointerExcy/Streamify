@@ -14,8 +14,13 @@ import java.util.List;
 @RequestMapping("/api/v1/guest-views")
 public class GuestViewController {
 
+    private final GuestViewService guestViewService;
+
     @Autowired
-    private GuestViewService guestViewService;
+    public GuestViewController(GuestViewService guestViewService) {
+        this.guestViewService = guestViewService;
+    }
+
 
     @GetMapping
     public List<GuestView> getAllGuestViews() {

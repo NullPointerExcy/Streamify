@@ -27,11 +27,15 @@ import java.util.Optional;
 @RequestMapping("/api/v1/videos/stream")
 public class VideoStreamingController {
 
-    @Autowired
-    private VideoService videoService;
+    private final VideoService videoService;
+    private final ConfigService configService;
 
     @Autowired
-    private ConfigService configService;
+    public VideoStreamingController(VideoService videoService, ConfigService configService) {
+        this.videoService = videoService;
+        this.configService = configService;
+    }
+
 
     private String getStoragePaths() {
         return configService.getConfigByKey("video.storage.locations").getValue();

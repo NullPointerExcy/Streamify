@@ -13,8 +13,13 @@ import java.util.List;
 @RequestMapping("/api/v1/watched-videos")
 public class WatchedVideoController {
 
+    private final WatchedVideoService watchedVideoService;
+
     @Autowired
-    private WatchedVideoService watchedVideoService;
+    public WatchedVideoController(WatchedVideoService watchedVideoService) {
+        this.watchedVideoService = watchedVideoService;
+    }
+
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Video>> getWatchedVideosByUser(@PathVariable String userId) {

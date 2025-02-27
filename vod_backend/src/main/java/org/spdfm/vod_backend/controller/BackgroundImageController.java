@@ -15,8 +15,12 @@ import java.util.*;
 @RequestMapping("/api/v1/background-images")
 public class BackgroundImageController {
 
+    private final BackgroundImageService backgroundImageService;
+
     @Autowired
-    private BackgroundImageService backgroundImageService;
+    public BackgroundImageController(BackgroundImageService backgroundImageService) {
+        this.backgroundImageService = backgroundImageService;
+    }
 
     @GetMapping
     public List<BackgroundImage> getAllBackgroundImages() {

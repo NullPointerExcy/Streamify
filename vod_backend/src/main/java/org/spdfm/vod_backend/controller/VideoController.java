@@ -22,17 +22,19 @@ import java.util.Optional;
 @RequestMapping("/api/v1/videos")
 public class VideoController {
 
-    @Autowired
-    private VideoService videoService;
+    private final VideoService videoService;
+    private final ConfigService configService;
+    private final FFmpegService ffmpegService;
+    private final AmqpTemplate rabbitTemplate;
 
     @Autowired
-    private ConfigService configService;
+    public VideoController(VideoService videoService, ConfigService configService, FFmpegService ffmpegService, AmqpTemplate rabbitTemplate) {
+        this.videoService = videoService;
+        this.configService = configService;
+        this.ffmpegService = ffmpegService;
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-    @Autowired
-    private FFmpegService ffmpegService;
-
-    @Autowired
-    private AmqpTemplate rabbitTemplate;
 
     private String getStoragePath() {
         return configService.getConfigByKey("video.storage.locations").getValue();

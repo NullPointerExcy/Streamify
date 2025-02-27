@@ -12,8 +12,13 @@ import java.util.List;
 @RequestMapping("/api/v1/watchlists")
 public class WatchListController {
 
+    private final WatchListService watchListService;
+
     @Autowired
-    private WatchListService watchListService;
+    public WatchListController(WatchListService watchListService) {
+        this.watchListService = watchListService;
+    }
+
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<Video>> getWatchListByUser(@PathVariable String userId) {

@@ -12,8 +12,13 @@ import java.util.List;
 @RequestMapping("/api/v1/features")
 public class FeatureController {
 
+    private final FeatureService featureService;
+
     @Autowired
-    private FeatureService featureService;
+    public FeatureController(FeatureService featureService) {
+        this.featureService = featureService;
+    }
+
 
     @GetMapping
     public List<Feature> getAllFeatures() {
