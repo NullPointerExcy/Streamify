@@ -93,6 +93,7 @@ const TopBar: React.FC = (props: {
             window.location.href = "/login";
         } else if (action === "logout") {
             localStorage.removeItem("user");
+            localStorage.removeItem("token");
             setUser(null);
             window.location.href = "/";
         }

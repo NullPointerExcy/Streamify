@@ -555,6 +555,7 @@ const Community: React.FC = (props: {
                         event.stopPropagation();
                         openDialog();
                     }}
+                    disabled={!user}
                 >
                     <AddCommentIcon/>
                     <Typography variant="button" sx={{fontSize: 16}}>

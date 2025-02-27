@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -24,51 +25,37 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-
-    private static final List<String> PUBLIC_URLS = Arrays.asList(
-            "/api/v1/auth/**",
-            "/api/v1/users/register",
-            "/videos/**",
-            "/videos/stream/**",
-            "/videos/stream/hls/**",
-            "/api/v1/videos/stream/**",
-            "/api/v1/videos/stream/hls/**"
-    );
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String requestPath = request.getRequestURI();
-        boolean isPublic = PUBLIC_URLS.stream()
-                .anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
+        final String authorizationHeader = request.getHeader("Authorization");
 
-        // Skip JWT validation for public URLs
-        if (isPublic) {
+        if (authorizationHeader == null || authorizationHeader.contains("Bearer null")) {
             chain.doFilter(request, response);
             return;
         }
 
-        final String authorizationHeader = request.getHeader("Authorization");
-
         String email = null;
         String jwt = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
                 email = jwtTokenUtil.extractUsername(jwt);
             } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                System.out.println("JWT expired");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT expired");
                 return;
             } catch (Exception e) {
+                System.out.println("Invalid JWT");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
                 return;
             }
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            System.out.println("Setting security context");
             if (jwtTokenUtil.validateToken(jwt, email)) {
                 List<SimpleGrantedAuthority> authorities = jwtTokenUtil.getRolesFromToken(jwt)
                         .stream()
@@ -81,7 +68,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-
         chain.doFilter(request, response);
     }
+
 }
