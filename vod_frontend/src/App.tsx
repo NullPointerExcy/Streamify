@@ -28,16 +28,17 @@ import UserSettings from "./pages/UserSettings";
 import {UploadProgressProvider} from "./context/UploadProgressContext";
 import GlobalUploadProgress from "./components/GlobalUploadProgress";
 import UploadProgressBar from "./components/UploadProgressBar";
+import CustomThemeProvider from "./themes/CustomThemeProvider";
 
 
-const darkTheme = createTheme({
+/*const darkTheme = createTheme({
     palette: {
         mode: "dark",
         primary: {main: "#90caf9"},
         secondary: {main: "#f48fb1"},
         error: {main: "#791f19"},
     },
-});
+});*/
 
 function App() {
 
@@ -46,7 +47,7 @@ function App() {
     const [loading, setLoading] = React.useState<boolean>(true);
 
     React.useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = localStorage.getItem('streamify_user');
         if (storedUser) {
             const minimalUser = JSON.parse(storedUser);
             getUserById(minimalUser.id).then((response) => {
@@ -103,8 +104,7 @@ function App() {
     );
 
     return (
-        <ThemeProvider theme={darkTheme}>
-            <CssBaseline/>
+        <CustomThemeProvider theme={"dark"}>
             <GlobalStyles styles={{
                 "::-webkit-scrollbar": {
                     width: "8px",
@@ -159,7 +159,7 @@ function App() {
                 </BrowserRouter>
                 <UploadProgressBar/>
             </UploadProgressProvider>
-        </ThemeProvider>
+        </CustomThemeProvider>
 
     );
 }

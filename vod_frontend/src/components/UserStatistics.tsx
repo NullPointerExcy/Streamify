@@ -59,14 +59,14 @@ const UserStatistics: React.FC = (props: {
                         top: "50%",
                         left: isVisible ? -40 : 0,
                         transform: "translateY(-50%)",
-                        bgcolor: "#404346",
+                        bgcolor: "primary.main",
                         color: "white",
                         borderRadius: "5%",
                         height: "40%",
                         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                         zIndex: 1000,
                         "&:hover": {
-                            bgcolor: "#344b64"
+                            bgcolor: "primary.secondary",
                         }
                     }}
                 >

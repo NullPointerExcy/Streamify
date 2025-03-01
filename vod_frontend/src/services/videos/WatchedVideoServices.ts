@@ -3,7 +3,7 @@ import { IVideo } from "../../models/IVideo";
 import {IGuestView} from "../../models/IGuestView";
 
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 
 export const getWatchedVideos = async (userId: string): Promise<IVideo[]> => {

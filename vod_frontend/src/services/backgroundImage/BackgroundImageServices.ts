@@ -1,7 +1,7 @@
 import axios from '../../config/AxiosConfig';
 import {IBackgroundImage} from "../../models/IBackgroundImage";
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 
 

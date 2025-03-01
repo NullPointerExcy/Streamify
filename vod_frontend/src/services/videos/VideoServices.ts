@@ -2,7 +2,7 @@ import axios from '../../config/AxiosConfig';
 import {IVideo} from "../../models/IVideo";
 
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 export const getAllVideos = async (video: any) => {
     return await axios.get('/videos', {

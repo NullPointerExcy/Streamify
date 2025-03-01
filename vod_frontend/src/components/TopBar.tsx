@@ -92,8 +92,8 @@ const TopBar: React.FC = (props: {
         if (action === "login") {
             window.location.href = "/login";
         } else if (action === "logout") {
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
+            localStorage.removeItem("streamify_user");
+            localStorage.removeItem("streamify_jwt_token");
             setUser(null);
             window.location.href = "/";
         }
@@ -158,14 +158,13 @@ const TopBar: React.FC = (props: {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            boxShadow: 'none',
         }}>
             <Toolbar sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 width: "100vw",
-                backgroundColor: !activeBackgroundImage?.imageUrl ? siteSettings?.siteTheme.backgroundColor : "transparent",
+                // backgroundColor: !activeBackgroundImage?.imageUrl ? siteSettings?.siteTheme.backgroundColor : "transparent",
             }}>
                 <Box sx={{
                     display: "flex",
@@ -215,11 +214,14 @@ const TopBar: React.FC = (props: {
                                     fullWidth
                                     sx={{
                                         opacity: isFeatureDisabledForUser(item.id) ? 0.5 : 1,
-                                        backgroundColor: currentPath === item.link ? "rgba(144,202,249,0.2)" : "transparent",
+                                        backgroundColor: currentPath === item.link ? "primary.main" : "transparent",
                                         color: currentPath === item.link ? "#fff" : "inherit",
-                                        borderRadius: 2,
+                                        borderRadius: 1,
+                                        transform: currentPath === item.link && "scale(0.95)",
+                                        boxShadow: currentPath === item.link && "0 0 4px 2px #000000",
                                         "&:hover": {
-                                            backgroundColor: "rgba(144,202,249,0.3)"
+                                            backgroundColor: "primary.main",
+                                            transition: "0.3s",
                                         }
                                     }}
                                 >

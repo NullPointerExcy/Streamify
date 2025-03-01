@@ -19,7 +19,7 @@ import {LoginService} from "../services/users/LoginService";
 
 const Login: React.FC = () => {
     const handleOAuthLogin = (provider: string) => {
-        alert(`Login with ${provider}`);
+        // Login with OAuth2
     };
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
@@ -29,13 +29,13 @@ const Login: React.FC = () => {
         const password = formData.get("password");
 
         LoginService(email, password).then((response) => {
-            localStorage.setItem('token', response.token);
+            localStorage.setItem('streamify_jwt_token', response.token);
             const minimalUser = {
-                id: response.user.id,
-                name: response.user.name,
-                email: response.user.email,
+                id: response.streamify_user.id,
+                name: response.streamify_user.name,
+                email: response.streamify_user.email,
             }
-            localStorage.setItem('user', JSON.stringify(minimalUser));
+            localStorage.setItem('streamify_user', JSON.stringify(minimalUser));
             window.location.href = "/";
         }).catch((error) => {
             console.error("Login error:", error);
@@ -102,6 +102,7 @@ const Login: React.FC = () => {
                             '&:hover': { bgcolor: red[700] }
                         }}
                         onClick={() => handleOAuthLogin("Google")}
+                        disabled
                     >
                         Login with Google
                     </Button>
@@ -115,6 +116,7 @@ const Login: React.FC = () => {
                             '&:hover': { bgcolor: purple[700] }
                         }}
                         onClick={() => handleOAuthLogin("Twitch")}
+                        disabled
                     >
                         Login with Twitch
                     </Button>

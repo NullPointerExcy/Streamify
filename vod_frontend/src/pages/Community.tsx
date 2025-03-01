@@ -520,15 +520,19 @@ const Community: React.FC = (props: {
                                 }
                                 sx={{mt: 2}}
                                 disabled={!user}
+                                InputProps={{
+                                    endAdornment: (
+                                        <Button
+                                            variant="contained"
+                                            endIcon={<SendIcon/>}
+                                            onClick={() => handleAddComment(topic.id)}
+                                            disabled={!user}
+                                        >
+                                            Send
+                                        </Button>
+                                    )
+                                }}
                             />
-                            <Button
-                                variant="contained"
-                                endIcon={<SendIcon/>}
-                                onClick={() => handleAddComment(topic.id)}
-                                disabled={!user}
-                            >
-                                Add comment
-                            </Button>
                         </Collapse>
 
                     </Paper>

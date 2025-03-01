@@ -240,7 +240,7 @@ const AdminGameManager: React.FC = (props: {
 
     return (
         <>
-            <AppBar position="sticky" sx={{mb: 2}}>
+            <AppBar position="sticky" sx={{mb: 2, zIndex: 900}}>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={4}>
@@ -527,7 +527,11 @@ const AdminGameManager: React.FC = (props: {
                         alignItems: "center",
                         justifyContent: "center",
                         textAlign: "center",
-                        "&:hover": { backgroundColor: "#2c9b98" },
+                        "&:hover": {
+                            transition: "0.3s",
+                            transform: "scale(0.94)",
+                            boxShadow: "0 0 8px 4px #000000"
+                        },
                     }}
                     onClick={(event) => {
                         event.stopPropagation();

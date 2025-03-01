@@ -27,7 +27,7 @@ class UploadManager {
 
         const config: AxiosRequestConfig = {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('streamify_jwt_token')}`,
                 'Content-Type': 'multipart/form-data',
             },
             timeout: 600000,

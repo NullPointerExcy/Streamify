@@ -46,6 +46,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public Endpoints
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
+
+                        // Auth Endpoints
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/auth/**",
+                                "/api/v1/auth/login",
+                                "/api/v1/users/register"
+                        ).permitAll()
+
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/videos/**",
                                 "/api/v1/playlists/**",
@@ -60,14 +68,12 @@ public class SecurityConfig {
                                 "/api/v1/comments/**",
                                 "/api/v1/topics/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/addWatchedVideo/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/users/addWatchedVideo/**",
+                                "/api/v1/watchlists/users/**"
+                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
 
-                        // Auth Endpoints
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/auth/**",
-                                "/api/v1/auth/login",
-                                "/api/v1/users/register"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/addWatchedVideo/**").permitAll()
 
                         // Admin/Moderator Endpoints
                         .requestMatchers(HttpMethod.POST, "/api/v1/videos/upload/**")

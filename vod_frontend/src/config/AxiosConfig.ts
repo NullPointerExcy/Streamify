@@ -10,7 +10,7 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('streamify_jwt_token');
     if (token && config) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -26,8 +26,8 @@ instance.interceptors.response.use(
         // Check if the error is a 401 Unauthorized
         if (error.response && error.response.status === 401) {
             // Clear token from local storage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            localStorage.removeItem('streamify_jwt_token');
+            localStorage.removeItem('streamify_user');
 
             // Optionally, redirect the user to the login page
             //window.location.href = '/login';

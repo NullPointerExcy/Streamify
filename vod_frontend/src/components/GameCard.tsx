@@ -202,13 +202,14 @@ const GameCard = (props: {
                             </CardContent>
                             <CardActions>
                                 <Button
-                                    variant="outlined"
+                                    variant="contained"
+                                    color="error"
                                     fullWidth
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         onDelete(game.id);
                                     }}
-                                    sx={{mt: 1, backgroundColor: "#782d28", color: "white"}}
+                                    sx={{m: 1, color: "white"}}
                                     disabled={flipped}
                                 >
                                     Delete

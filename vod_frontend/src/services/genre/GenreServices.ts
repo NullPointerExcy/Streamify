@@ -1,6 +1,6 @@
 import axios from '../../config/AxiosConfig';
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 
 export const getAllGenres = async () => {

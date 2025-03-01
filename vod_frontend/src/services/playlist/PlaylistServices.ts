@@ -1,7 +1,7 @@
 import axios from '../../config/AxiosConfig';
 import {IPlaylist} from "../../models/IPlaylist";
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 
 export const getAllPlaylists = async () => {

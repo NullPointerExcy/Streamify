@@ -6,7 +6,7 @@ import {
     Button,
     Card,
     CardContent,
-    CardMedia,
+    CardMedia, Chip,
     Container,
     Dialog,
     DialogActions,
@@ -239,7 +239,7 @@ const AdminVideoManager: React.FC = (props: {
 
     return (
         <>
-            <AppBar position="sticky" sx={{mb: 2}}>
+            <AppBar position="sticky" sx={{mb: 2, zIndex: 900}}>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={4}>
@@ -488,12 +488,15 @@ const AdminVideoManager: React.FC = (props: {
                             xs={12} sm={6} md={4}
                             key={index}
                             onClick={() => setSelectedVideo(video)}
-                            sx={{ cursor: "pointer" }}
+                            sx={{
+                                cursor: "pointer",
+                            }}
                         >
                             <Card sx={{
                                 height: "100%",
                                 display: "flex",
                                 flexDirection: "column",
+                                alignItems: "center",
                                 "&:hover": {
                                     boxShadow: 5,
                                     cursor: "pointer",
@@ -511,15 +514,25 @@ const AdminVideoManager: React.FC = (props: {
                                         objectFit: "cover",
                                     }}
                                 />
-                                <CardContent>
+                                <CardContent sx={{
+                                    flexGrow: 1,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    alignItems: "left",
+                                    width: "100%",
+                                }}>
                                     <Typography variant="h6" component="h2">
                                         {video.title}
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
-                                        Game: {video.game.title}
+                                        Game: <Chip
+                                                key={video.game.id}
+                                                label={video.game.title}
+                                                sx={{m: 0.5}}/>
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
-                                        Uploaded at: {video.uploadedAt}
+                                        Uploaded at: {new Date(video.uploadedAt).toLocaleString()}
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Duration: {Math.floor(video.duration)}s
@@ -530,13 +543,14 @@ const AdminVideoManager: React.FC = (props: {
                                     </Typography>
                                 </CardContent>
                                 <Button
-                                    variant="outlined"
+                                    variant="contained"
+                                    color="error"
                                     fullWidth
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleDeleteVideo(video);
                                     }}
-                                    sx={{ mt: 1, backgroundColor: "#782d28", color: "white" }}
+                                    sx={{ m: 1, color: "white" }}
                                 >
                                     Delete
                                 </Button>
@@ -568,7 +582,9 @@ const AdminVideoManager: React.FC = (props: {
                         justifyContent: "center",
                         textAlign: "left",
                         "&:hover": {
-                            backgroundColor: "#2c9b98",
+                            transition: "0.3s",
+                            transform: "scale(0.94)",
+                            boxShadow: "0 0 8px 4px #000000"
                         },
                     }}
                     onClick={openDialog}

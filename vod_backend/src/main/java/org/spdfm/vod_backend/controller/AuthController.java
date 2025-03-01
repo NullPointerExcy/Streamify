@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,10 +21,13 @@ public class AuthController {
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public AuthController(UserService userService, JwtTokenUtil jwtTokenUtil) {
+    public AuthController(UserService userService, JwtTokenUtil jwtTokenUtil, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
@@ -38,7 +42,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody User user) {
         return userService.getUserByEmail(user.getEmail())
-                .filter(u -> new BCryptPasswordEncoder().matches(user.getPassword(), u.getPassword()))
+                .filter(u -> passwordEncoder.matches(user.getPassword(), u.getPassword()))
                 .map(u -> {
                     String token = jwtTokenUtil.generateToken(u);
                     Map<String, Object> response = new HashMap<>();
@@ -59,7 +63,7 @@ public class AuthController {
                     userDetails.put("comments", Optional.ofNullable(u.getComments()).orElse(Collections.emptySet()));
                     userDetails.put("lastWatchedVideo", u.getLastWatchedVideo());
 
-                    response.put("user", userDetails);
+                    response.put("streamify_user", userDetails);
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));

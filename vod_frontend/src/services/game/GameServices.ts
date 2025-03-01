@@ -2,7 +2,7 @@ import axios from '../../config/AxiosConfig';
 import {IGame} from "../../models/IGame";
 import { IGenre } from '../../models/IGenre';
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('streamify_jwt_token');
 
 
 export const getAllGames = async () => {

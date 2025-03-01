@@ -31,7 +31,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader == null || authorizationHeader.contains("Bearer null")) {
+        if (authorizationHeader == null || authorizationHeader.contains("Bearer null") || authorizationHeader.isEmpty()) {
             chain.doFilter(request, response);
             return;
         }
@@ -55,7 +55,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            System.out.println("Setting security context");
             if (jwtTokenUtil.validateToken(jwt, email)) {
                 List<SimpleGrantedAuthority> authorities = jwtTokenUtil.getRolesFromToken(jwt)
                         .stream()

@@ -76,15 +76,17 @@ const AdminPanel: React.FC = (props: {
                                 onClick={() => handleSectionChange(index)}
                                 sx={{
                                     "&:hover": {
-                                        backgroundColor: "rgba(0, 0, 0, 0.1)",
+                                        backgroundColor: "primary.main",
                                         cursor: "pointer"
                                     },
                                     backgroundColor:
                                         selectedSection === index
-                                            ? "rgba(144,202,249,0.2)" : "inherit",
+                                            ? "primary.main" : "inherit",
                                     color: selectedSection === index ? "#fff" : "inherit",
                                     display: "flex",
                                     alignItems: "center",
+                                    transform: selectedSection === index && "scale(0.95)",
+                                    boxShadow: selectedSection === index && "0 0 4px 2px #000000",
                                     gap: 1
                                 }}
                             >

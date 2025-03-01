@@ -130,7 +130,7 @@ const AdminUserManager: React.FC = (props: {
 
     return (
         <>
-            <AppBar position="sticky" sx={{mb: 2}}>
+            <AppBar position="sticky" sx={{mb: 2, zIndex: 900}}>
                 <Paper elevation={3} sx={{p: 2}}>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} sm={6}>
@@ -204,7 +204,7 @@ const AdminUserManager: React.FC = (props: {
                                                                     component="span"
                                                                     sx={{cursor: "pointer"}}
                                                                     onClick={(e) => {
-                                                                        if (user.id === JSON.parse(localStorage.getItem("user") || "{}").id) {
+                                                                        if (user.id === JSON.parse(localStorage.getItem("streamify_user") || "{}").id) {
                                                                             return;
                                                                         }
                                                                         e.stopPropagation();
@@ -212,7 +212,7 @@ const AdminUserManager: React.FC = (props: {
                                                                     }}
                                                                 >
                                                                     <BlockIcon color={
-                                                                        user.id === JSON.parse(localStorage.getItem("user") || "{}").id ?
+                                                                        user.id === JSON.parse(localStorage.getItem("streamify_user") || "{}").id ?
                                                                         "#666666" : "error"
                                                                     }/>
                                                                 </Box>
@@ -293,7 +293,7 @@ const AdminUserManager: React.FC = (props: {
                                             variant="contained"
                                             color="warning"
                                             fullWidth
-                                            disabled={user.id === JSON.parse(localStorage.getItem("user") || "{}").id}
+                                            disabled={user.id === JSON.parse(localStorage.getItem("streamify_user") || "{}").id}
                                             onClick={() => handleOpenDialog(user)}
                                         >
                                             Change Role

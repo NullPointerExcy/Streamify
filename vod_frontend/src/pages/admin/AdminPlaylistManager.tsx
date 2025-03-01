@@ -17,7 +17,7 @@ import {
     TextField,
     Typography,
     Divider,
-    Checkbox, Table, AppBar,
+    Checkbox, Table, AppBar, Fab, InputLabel, Select, Chip, MenuItem, FormControl,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,26 +29,30 @@ import {
     deletePlaylist,
     addVideoToPlaylist, updatePlaylistVideos, addPlaylistThumbnail,
 } from "../../services/playlist/PlaylistServices";
-import { getAllVideos } from "../../services/videos/VideoServices";
-import { IPlaylist } from "../../models/IPlaylist";
-import { IVideo } from "../../models/IVideo";
+import {getAllVideos} from "../../services/videos/VideoServices";
+import {IPlaylist} from "../../models/IPlaylist";
+import {IVideo} from "../../models/IVideo";
 import {IUser} from "../../models/IUser";
+import {IGame} from "../../models/IGame";
+import {getAllGames} from "../../services/game/GameServices";
 
 const AdminPlaylistManager: React.FC = (props: {
     user: IUser,
     setUser: (usr: IUser) => void,
 }) => {
 
-    const { user, setUser } = props;
+    const {user, setUser} = props;
 
     const [playlists, setPlaylists] = React.useState<Array<IPlaylist>>([]);
     const [videos, setVideos] = React.useState<Array<IVideo>>([]);
+    const [games, setGames] = React.useState<Array<IGame>>([]);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [selectedPlaylist, setSelectedPlaylist] = React.useState<IPlaylist | null>(null);
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [selectedVideos, setSelectedVideos] = React.useState<string[]>([]);
     const [searchTitle, setSearchTitle] = React.useState("");
+    const [searchGame, setSearchGame] = React.useState<Array<string>>([]);
 
     const [thumbnail, setThumbnail] = React.useState<File | null>(null);
     const [previewThumbnail, setPreviewThumbnail] = React.useState<string | null>(null);
@@ -57,6 +61,7 @@ const AdminPlaylistManager: React.FC = (props: {
     React.useEffect(() => {
         fetchPlaylists();
         fetchVideos();
+        fetchGames();
     }, []);
 
     const fetchPlaylists = () => {
@@ -70,6 +75,12 @@ const AdminPlaylistManager: React.FC = (props: {
             setVideos(response);
         });
     };
+
+    const fetchGames = () => {
+        getAllGames().then((response) => {
+            setGames(response);
+        });
+    }
 
     const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -187,10 +198,6 @@ const AdminPlaylistManager: React.FC = (props: {
         });
     };
 
-    const filteredPlaylists = playlists.filter((playlist) =>
-        playlist.title.toLowerCase().includes(searchTitle.toLowerCase())
-    );
-
     const handleVideoSelection = (videoId) => {
         setSelectedVideos((prevSelected) =>
             prevSelected.includes(videoId)
@@ -199,10 +206,17 @@ const AdminPlaylistManager: React.FC = (props: {
         );
     };
 
+    const filteredPlaylists = playlists.filter((playlist) => {
+            const gameIds = searchGame.map((game) => game.id);
+            return playlist.title.toLowerCase().includes(searchTitle.toLowerCase()) &&
+                searchGame.length === 0 || playlist.videos.some((video) => gameIds.includes(video.game.id));
+        }
+    );
+
     return (
         <>
-            <AppBar position="sticky" sx={{mb: 2}}>
-                <Paper elevation={3} sx={{ p: 2 }}>
+            <AppBar position="sticky" sx={{mb: 2, zIndex: 900}}>
+                <Paper elevation={3} sx={{p: 2}}>
                     <Grid container spacing={2} sx={{
                         alignItems: "center",
                     }}>
@@ -216,70 +230,120 @@ const AdminPlaylistManager: React.FC = (props: {
                             />
                         </Grid>
                         <Grid item xs={12} sm={4}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<AddIcon />}
-                                fullWidth
-                                onClick={() => handleOpenDialog()}
-                            >
-                                Add Playlist
-                            </Button>
+                            <FormControl fullWidth>
+                                <InputLabel>Search by Game</InputLabel>
+                                <Select
+                                    multiple
+                                    value={searchGame}
+                                    onChange={(e) => setSearchGame(e.target.value)}
+                                    label="Search by Games"
+                                    renderValue={(selected) => (
+                                        <div>
+                                            {selected.map((value) => (
+                                                <Chip key={value.id} label={value.title}/>
+                                            ))}
+                                        </div>
+                                    )}
+                                >
+                                    {games.map((game) => (
+                                        <MenuItem key={game.id} value={game}>
+                                            {game.title}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
                     </Grid>
                 </Paper>
             </AppBar>
-            <Container maxWidth={false} sx={{ width: "80%" }}>
+            <Container maxWidth={false} sx={{width: "80%"}}>
                 <Grid container spacing={4}>
                     {filteredPlaylists.map((playlist) => (
-                        <Grid item xs={12} sm={6} md={4} key={playlist.id}>
+                        <Grid
+                            item
+                            xs={12} sm={6} md={4}
+                            key={playlist.id}
+                            sx={{
+                                cursor: "pointer",
+                            }}
+                        >
                             <Card
                                 sx={{
                                     height: "100%",
                                     display: "flex",
                                     flexDirection: "column",
+                                    "&:hover": {
+                                        boxShadow: 5,
+                                        cursor: "pointer",
+                                        transform: "scale(1.05)",
+                                        transition: "all 0.3s ease",
+                                        backgroundColor: "rgba(144,202,249,0.13)"
+                                    }
                                 }}
                             >
-                                <CardContent>
+                                <CardMedia
+                                    component="img"
+                                    image={playlist.thumbnail || (playlist.videos.length > 0 && playlist.videos[0].thumbnail)}
+                                    alt={playlist.title}
+                                    sx={{height: 200, objectFit: "cover"}}
+                                />
+                                <CardContent sx={{
+                                    flexGrow: 1,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    alignItems: "left",
+                                    width: "100%",
+                                }}>
                                     <Typography variant="h6">{playlist.title}</Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         {playlist.description}
                                     </Typography>
-                                    <CardMedia
-                                        component="img"
-                                        image={playlist.thumbnail || ""}
-                                        alt={playlist.title}
-                                        sx={{ height: 200, objectFit: "cover" }}
-                                    />
-                                    <Divider sx={{ my: 2 }} />
-                                    <Table>
-                                        <tbody>
-                                        <tr key={playlist.id}>
-                                            <td>
-                                                <Typography variant="h6">Number of Videos</Typography>
-                                                <Typography variant="h6">Total Playlist time</Typography>
-                                            </td>
-                                            <td>
-                                                <Typography variant="h6">{playlist.videos.length}</Typography>
-                                                <Typography variant="h6">{playlist.videos.reduce((acc, curr) => acc + curr.duration, 0)}</Typography>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </Table>
+                                    <Divider sx={{my: 2}}/>
+                                    <Typography variant="body2" color="textSecondary">Number of Videos: {playlist.videos.length}</Typography>
+                                    <Typography variant="body2" color="textSecondary">Total Playlist time: {playlist.videos.reduce((acc, curr) => acc + curr.duration, 0)}</Typography>
+                                    <Divider sx={{my: 1}}/>
+                                    <Box sx={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: 1,
+                                        mt: 1,
+                                    }}>
+                                        {
+                                            playlist.videos.map((video) => (
+                                                <Chip
+                                                    key={video.game.id}
+                                                    label={video.game.title}
+                                                    sx={{m: 0.5}}
+                                                />
+                                            ))
+                                        }
+                                    </Box>
                                 </CardContent>
-                                <Box sx={{ mt: "auto", display: "flex", justifyContent: "space-between" }}>
-                                    <IconButton
+
+                                <Box sx={{mt: "auto", display: "flex", justifyContent: "space-between"}}>
+                                    <Button
                                         color="primary"
+                                        variant="contained"
                                         onClick={() => handleOpenDialog(playlist)}
+                                        sx={{
+                                            m: 1
+                                        }}
+                                        fullWidth
                                     >
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton
+                                        <EditIcon/> Edit
+                                    </Button>
+                                    <Button
                                         color="error"
+                                        variant="contained"
                                         onClick={() => handleDeletePlaylist(playlist.id)}
+                                        sx={{
+                                            m: 1
+                                        }}
+                                        fullWidth
                                     >
-                                        <DeleteIcon />
-                                    </IconButton>
+                                        <DeleteIcon/> Delete
+                                    </Button>
                                 </Box>
                             </Card>
                         </Grid>
@@ -291,9 +355,9 @@ const AdminPlaylistManager: React.FC = (props: {
                         {selectedPlaylist ? "Edit Playlist" : "Add New Playlist"}
                     </DialogTitle>
                     <DialogContent>
-                        <Divider sx={{ my: 2 }} />
-                        <Typography variant="subtitle1" sx={{ mb: 2 }}>Thumbnail:</Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Divider sx={{my: 2}}/>
+                        <Typography variant="subtitle1" sx={{mb: 2}}>Thumbnail:</Typography>
+                        <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                             <Button
                                 variant="contained"
                                 component="label"
@@ -315,13 +379,13 @@ const AdminPlaylistManager: React.FC = (props: {
                                 Remove Thumbnail
                             </Button>
                             {previewThumbnail && (
-                                <Box sx={{ ml: 2 }}>
+                                <Box sx={{ml: 2}}>
                                     <Typography variant="body2">Preview:</Typography>
                                     <CardMedia
                                         component="img"
                                         image={previewThumbnail}
                                         alt="Thumbnail Preview"
-                                        sx={{ width: 100, height: 100, objectFit: "cover" }}
+                                        sx={{width: 100, height: 100, objectFit: "cover"}}
                                     />
                                 </Box>
                             )}
@@ -330,7 +394,7 @@ const AdminPlaylistManager: React.FC = (props: {
                             label="Title"
                             variant="outlined"
                             fullWidth
-                            sx={{ mb: 2, mt: 2 }}
+                            sx={{mb: 2, mt: 2}}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
@@ -343,8 +407,8 @@ const AdminPlaylistManager: React.FC = (props: {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
-                        <Divider sx={{ my: 2 }} />
-                        <Typography variant="subtitle1" sx={{ mb: 2 }}>Select Videos:</Typography>
+                        <Divider sx={{my: 2}}/>
+                        <Typography variant="subtitle1" sx={{mb: 2}}>Select Videos:</Typography>
                         <Grid container spacing={2}>
                             {videos.map((video) => (
                                 <Grid item xs={6} sm={4} md={3} key={video.id}>
@@ -371,7 +435,7 @@ const AdminPlaylistManager: React.FC = (props: {
                                             component="img"
                                             image={video.thumbnail}
                                             alt={video.title}
-                                            sx={{ height: 100, objectFit: "cover" }}
+                                            sx={{height: 100, objectFit: "cover"}}
                                         />
                                         <CardContent>
                                             <Typography variant="body2" align="center">
@@ -392,6 +456,35 @@ const AdminPlaylistManager: React.FC = (props: {
                         </Button>
                     </DialogActions>
                 </Dialog>
+
+                <Fab
+                    color="primary"
+                    aria-label="add"
+                    sx={{
+                        position: "fixed",
+                        bottom: 16,
+                        left: 16,
+                        width: 200,
+                        height: 60,
+                        borderRadius: 1,
+                        boxShadow: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "left",
+                        "&:hover": {
+                            transition: "0.3s",
+                            transform: "scale(0.94)",
+                            boxShadow: "0 0 8px 4px #000000"
+                        },
+                    }}
+                    onClick={() => handleOpenDialog()}
+                >
+                    <AddIcon sx={{fontSize: 30, marginRight: 1}}/>
+                    <Typography variant="button" sx={{fontSize: 16}}>
+                        Add Playlist
+                    </Typography>
+                </Fab>
             </Container>
         </>
     );
