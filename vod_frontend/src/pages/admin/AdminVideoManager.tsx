@@ -53,7 +53,7 @@ const AdminVideoManager: React.FC = (props: {
     setUser: (usr: IUser) => void,
 }) => {
 
-    const { user, setUser } = props;
+    const {user, setUser} = props;
 
     const [title, setTitle] = React.useState("");
     // Store the game id as string for the selected game
@@ -85,7 +85,7 @@ const AdminVideoManager: React.FC = (props: {
     const [useFirstFrameAsThumbnail, setUseFirstFrameAsThumbnail] = React.useState(false);
 
     const videoRef = React.useRef<HTMLVideoElement>(null);
-    const { startUpload, isUploading } = useUploadProgress();
+    const {startUpload, isUploading} = useUploadProgress();
 
     React.useEffect(() => {
         if (selectedVideo && videoRef.current) {
@@ -118,7 +118,7 @@ const AdminVideoManager: React.FC = (props: {
     const handleAddVideo = async () => {
         if (title && game && videoFile && (thumbnailUrl || thumbnailFile)) {
             const selectedGame: IGame =
-                games.find((g) => g.id === game) || { id: "", title: "" };
+                games.find((g) => g.id === game) || {id: "", title: ""};
 
             let uploadedVideoPath = "";
             try {
@@ -162,7 +162,7 @@ const AdminVideoManager: React.FC = (props: {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setThumbnailUrl(e.target?.result as string);
+                setCustomThumbnail(e.target?.result as string);
             };
             reader.readAsDataURL(file);
             setThumbnailFile(file);
@@ -187,20 +187,18 @@ const AdminVideoManager: React.FC = (props: {
                 video.currentTime = 0;
             };
 
-            if (useFirstFrameAsThumbnail) {
-                video.onseeked = () => {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const ctx = canvas.getContext("2d");
-                    if (ctx) {
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const thumb = canvas.toDataURL("image/png");
-                        setThumbnailUrl(thumb);
-                    }
-                    URL.revokeObjectURL(url);
-                };
-            }
+            video.onseeked = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const thumb = canvas.toDataURL("image/png");
+                    setThumbnailUrl(thumb);
+                }
+                URL.revokeObjectURL(url);
+            };
 
             setVideoUrl(url);
             setVideoFile(file);
@@ -240,7 +238,7 @@ const AdminVideoManager: React.FC = (props: {
     return (
         <>
             <AppBar position="sticky" sx={{mb: 2, zIndex: 900}}>
-                <Paper elevation={3} sx={{ p: 2 }}>
+                <Paper elevation={3} sx={{p: 2}}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={4}>
                             <TextField
@@ -266,7 +264,7 @@ const AdminVideoManager: React.FC = (props: {
                                 variant="outlined"
                                 fullWidth
                                 type="date"
-                                InputLabelProps={{ shrink: true }}
+                                InputLabelProps={{shrink: true}}
                                 value={searchDate}
                                 onChange={(e) => setSearchDate(e.target.value)}
                             />
@@ -274,11 +272,11 @@ const AdminVideoManager: React.FC = (props: {
                     </Grid>
                 </Paper>
             </AppBar>
-            <Container maxWidth={false} sx={{ width: "80%" }}>
+            <Container maxWidth={false} sx={{width: "80%"}}>
                 <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="md" fullWidth>
-                    <DialogTitle>Add New Video</DialogTitle>
+                    <DialogTitle variant="h3">Add New Video</DialogTitle>
                     <DialogContent>
-                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid container spacing={2} sx={{mt: 1}}>
                             <Grid item xs={12} md={6}>
                                 <TextField
                                     label="Title"
@@ -306,8 +304,43 @@ const AdminVideoManager: React.FC = (props: {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
                                     <Box>
+                                        <Box>
+                                            <Card sx={{position: "relative"}}>
+                                                <CardMedia
+                                                    component="img"
+                                                    image={(useFirstFrameAsThumbnail ? thumbnailUrl : customThumbnail) || null}
+                                                    alt="Thumbnail"
+                                                    sx={{objectFit: "contain", height: 300}}
+                                                />
+                                                <Box sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    flexDirection: "column",
+                                                }}>
+                                                    <label htmlFor="thumbnail-upload">
+                                                        <ThumbnailInput
+                                                            accept="image/*"
+                                                            id="thumbnail-upload"
+                                                            type="file"
+                                                            onChange={handleThumbnailUpload}
+                                                        />
+                                                        <Button component="span" variant="contained" color="primary"
+                                                                fullWidth>
+                                                            Upload Thumbnail <AddPhotoAlternateIcon/>
+                                                        </Button>
+                                                    </label>
+                                                </Box>
+                                            </Card>
+                                        </Box>
+                                        <Box sx={{display: "flex", alignItems: "center", gap: 2}}>allowedUsers
+                                            <Typography>Use first frame as thumbnail?</Typography>
+                                            <Switch
+                                                checked={useFirstFrameAsThumbnail}
+                                                onChange={(e) => setUseFirstFrameAsThumbnail(e.target.checked)}
+                                            />
+                                        </Box>
                                         <FormControl fullWidth>
                                             <label htmlFor="video-upload">
                                                 <VideoInput
@@ -319,13 +352,14 @@ const AdminVideoManager: React.FC = (props: {
                                                 <Button
                                                     variant="contained"
                                                     component="span"
-                                                    startIcon={<VideoLibraryIcon />}
+                                                    startIcon={<VideoLibraryIcon/>}
                                                     fullWidth
                                                 >
                                                     Select Video
                                                 </Button>
                                             </label>
                                         </FormControl>
+                                        {/*
                                         {!isPlaying && (
                                             <IconButton
                                                 onClick={() => {
@@ -349,63 +383,26 @@ const AdminVideoManager: React.FC = (props: {
                                                 <PlayCircleOutlineIcon fontSize="large" />
                                             </IconButton>
                                         )}
+
                                         {selectedVideo && videoUrl && (
-                                            <video
-                                                ref={videoRef}
-                                                controls
-                                                autoPlay
-                                                crossOrigin="anonymous"
-                                                style={{
-                                                    width: "85%",
-                                                    height: "auto",
-                                                    objectFit: "contain",
-                                                    backgroundColor: "black",
-                                                }}
-                                                src={videoUrl}
-                                                onPlay={() => setIsPlaying(true)}
-                                                onPause={() => setIsPlaying(false)}
-                                            />
-                                        )}
-                                    </Box>
-                                    <Box>
-                                        <Card sx={{ position: "relative" }}>
-                                            <CardMedia
-                                                component="img"
-                                                image={
-                                                    (useFirstFrameAsThumbnail ? thumbnailUrl : customThumbnail) ||
-                                                    ""
-                                                }
-                                                alt="Thumbnail"
-                                                sx={{ height: "100%", objectFit: "cover" }}
-                                            />
-                                            <Box
-                                                sx={{
-                                                    position: "absolute",
-                                                    top: 0,
-                                                    right: 0,
-                                                    m: 1,
-                                                }}
-                                            >
-                                                <label htmlFor="thumbnail-upload">
-                                                    <ThumbnailInput
-                                                        accept="image/*"
-                                                        id="thumbnail-upload"
-                                                        type="file"
-                                                        onChange={handleThumbnailUpload}
-                                                    />
-                                                    <IconButton component="span" color="primary">
-                                                        <AddPhotoAlternateIcon />
-                                                    </IconButton>
-                                                </label>
-                                            </Box>
-                                        </Card>
-                                    </Box>
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                        <Typography>Use first frame as thumbnail?</Typography>
-                                        <Switch
-                                            checked={useFirstFrameAsThumbnail}
-                                            onChange={(e) => setUseFirstFrameAsThumbnail(e.target.checked)}
-                                        />
+                                                            <video
+                                                                ref={videoRef}
+                                                                controls
+                                                                autoPlay
+                                                                crossOrigin="anonymous"
+                                                                style={{
+                                                                    width: "85%",
+                                                                    height: "auto",
+                                                                    objectFit: "contain",
+                                                                    backgroundColor: "black",
+                                                                }}
+                                                                src={videoUrl}
+                                                                onPlay={() => setIsPlaying(true)}
+                                                                onPause={() => setIsPlaying(false)}
+                                                            />
+                                                        )}
+                                        */}
+
                                     </Box>
                                 </Box>
                             </Grid>
@@ -417,7 +414,7 @@ const AdminVideoManager: React.FC = (props: {
                         </Button>
                         <Button
                             onClick={handleAddVideo}
-                            startIcon={<CloudUploadIcon />}
+                            startIcon={<CloudUploadIcon/>}
                             fullWidth
                             variant="contained"
                             color="primary"
@@ -451,17 +448,17 @@ const AdminVideoManager: React.FC = (props: {
                                     transform: "translate(-50%, -50%)",
                                     color: "white",
                                     backgroundColor: "rgba(0,0,0,0.5)",
-                                    "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                                    "&:hover": {backgroundColor: "rgba(0,0,0,0.7)"},
                                     zIndex: (theme) => theme.zIndex.modal + 101,
                                 }}
                             >
-                                <PlayCircleOutlineIcon fontSize="large" />
+                                <PlayCircleOutlineIcon fontSize="large"/>
                             </IconButton>
                         )}
                         {selectedVideo && videoUrl && (
                             <video
                                 controls
-                                style={{ width: "100%" }}
+                                style={{width: "100%"}}
                                 src={videoUrl}
                                 onPlay={() => setIsPlaying(true)}
                                 onPause={() => setIsPlaying(false)}
@@ -478,7 +475,7 @@ const AdminVideoManager: React.FC = (props: {
                         count={totalPages}
                         page={currentPage}
                         onChange={(event, value) => setCurrentPage(value)}
-                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                        sx={{display: "flex", justifyContent: "center", marginY: 2}}
                     />
                 )}
                 <Grid container spacing={4}>
@@ -527,9 +524,9 @@ const AdminVideoManager: React.FC = (props: {
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Game: <Chip
-                                                key={video.game.id}
-                                                label={video.game.title}
-                                                sx={{m: 0.5}}/>
+                                        key={video.game.id}
+                                        label={video.game.title}
+                                        sx={{m: 0.5}}/>
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         Uploaded at: {new Date(video.uploadedAt).toLocaleString()}
@@ -537,7 +534,7 @@ const AdminVideoManager: React.FC = (props: {
                                     <Typography variant="body2" color="textSecondary">
                                         Duration: {Math.floor(video.duration)}s
                                     </Typography>
-                                    <Divider sx={{ my: 1 }} />
+                                    <Divider sx={{my: 1}}/>
                                     <Typography variant="body2" color="textSecondary">
                                         Views: {video.viewerCount || 0}
                                     </Typography>
@@ -550,7 +547,7 @@ const AdminVideoManager: React.FC = (props: {
                                         e.stopPropagation();
                                         handleDeleteVideo(video);
                                     }}
-                                    sx={{ m: 1, color: "white" }}
+                                    sx={{m: 1, color: "white"}}
                                 >
                                     Delete
                                 </Button>
@@ -563,7 +560,7 @@ const AdminVideoManager: React.FC = (props: {
                         count={totalPages}
                         page={currentPage}
                         onChange={(event, value) => setCurrentPage(value)}
-                        sx={{ display: "flex", justifyContent: "center", marginY: 2 }}
+                        sx={{display: "flex", justifyContent: "center", marginY: 2}}
                     />
                 )}
                 <Fab
@@ -589,8 +586,8 @@ const AdminVideoManager: React.FC = (props: {
                     }}
                     onClick={openDialog}
                 >
-                    <AddIcon sx={{ fontSize: 30, marginRight: 1 }} />
-                    <Typography variant="button" sx={{ fontSize: 16 }}>
+                    <AddIcon sx={{fontSize: 30, marginRight: 1}}/>
+                    <Typography variant="button" sx={{fontSize: 16}}>
                         Add Video
                     </Typography>
                 </Fab>
