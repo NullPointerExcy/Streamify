@@ -12,7 +12,7 @@ to go!
 If you need help, have issues, questions, or feature requests:
 
 - Email: <a href="mailto:nullpointerexcy@gmail.com"><img src="https://img.shields.io/badge/-Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
-- GitHub Issues: https://github.com/NullPointerExcy/streamify/issues
+- GitHub Issues: https://github.com/DanjelPiDev/streamify/issues
 
 ## Feature Checklist
 
